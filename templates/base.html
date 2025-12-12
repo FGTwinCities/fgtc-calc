@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{% block title %}Default Title{% endblock %} - FGTC</title>
+        {% block extra_head %}{% endblock %}
+    </head>
+    <body>
+        <header>
+            <nav>
+                {% block navigation %}
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/calc">Calculator</a></li>
+                </ul>
+                {% endblock %}
+            </nav>
+        </header>
+
+        <main>
+            {% block content %}
+            <p>This page has no content.</p>
+            {% endblock %}
+        </main>
+    </body>
+</html>

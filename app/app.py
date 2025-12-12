@@ -6,12 +6,13 @@ from litestar.logging import LoggingConfig
 from litestar.static_files.config import create_static_files_router
 from litestar.template.config import TemplateConfig
 
+from app.build.controller import BuildController
 from app.static_controller import StaticController
 
 app = Litestar(
     route_handlers=[
         create_static_files_router("/static", ["assets"]),
-        StaticController
+        StaticController, BuildController
     ],
     template_config=TemplateConfig(
         directory=Path(__file__).parent.parent / "templates",
