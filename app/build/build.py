@@ -3,7 +3,7 @@ from enum import Enum
 from typing import List, Optional
 from uuid import uuid4, UUID
 
-""" Data Structures/Classes for builds and components """
+""" DTO data structures/classes for builds and components """
 
 
 class BuildComponent:
@@ -30,13 +30,20 @@ class MemoryType(Enum):
 @dataclass
 class MemoryModule(BuildComponent):
     type: MemoryType
+    upgradable: bool
+    ecc: bool
     clock: int #mhz
     size: int #mb
 
 
+class StorageDiskType(Enum):
+    HDD = "hdd"
+    SSD = "ssd"
+
+
 class StorageDiskForm(Enum):
-    LAPTOP = "laptop"
-    DESKTOP = "desktop"
+    INCH25 = "2.5"
+    INCH35 = "3.5"
     M2 = "m2"
     PCIE = "pcie"
 
@@ -50,36 +57,41 @@ class StorageDiskInterface(Enum):
 
 @dataclass
 class StorageDisk(BuildComponent):
+    type: StorageDiskType
+    upgradable: bool
     size: int #mb
     form: StorageDiskForm
     interface: StorageDiskInterface
 
 
 @dataclass
-class SolidStateDisk(StorageDisk):
-    pass
-
-
-@dataclass
-class HardDriveDisk(StorageDisk):
-    pass
-
-
-@dataclass
 class GraphicsCard(BuildComponent):
     model: str
+    upgradable: bool
     memory: Optional[int] = None #mb
     clock: Optional[int] = None #mhz
 
 
 class WirelessNetworkingStandard[Enum]:
-    BGN = "bgn"
+    BG = "bg"
+    N = "n"
     AC = "ac"
     AX = "ax"
+    BE = "be"
+
+
+class BuildType(Enum):
+    DESKTOP = "desktop"
+    LAPTOP = "laptop"
+    ALL_IN_ONE = "aio"
+    SERVER = "server"
+    TABLET = "tablet"
+    OTHER = "other"
 
 
 @dataclass
 class Build:
+    type: BuildType
     manufacturer: str
     model: str
     sku: str = ""

@@ -16,7 +16,7 @@ class BuildController(Controller):
 
     @get("/create")
     async def create_build_page(self) -> Template:
-        return Template("calc/calculator.html")
+        return Template("build/create.html")
 
 
     @get("/view")

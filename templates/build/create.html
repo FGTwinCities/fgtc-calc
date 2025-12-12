@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+
+{% block title %}Create Build{% endblock %}
+
+{% block extra_head %}
+<script src="/static/js/build/create.js"></script>
+{% endblock %}
+
+{% block content %}
+<div>
+    <form action="" method="POST" onsubmit="return false;" id="create-form">
+        <fieldset>
+            <legend>Computer Type:</legend>
+            <input type="radio" name="type" value="desktop" id="type-desktop">
+            <label for="type-desktop">Desktop</label>
+            <input type="radio" name="type" value="laptop" id="type-laptop">
+            <label for="type-laptop">Laptop</label>
+            <input type="radio" name="type" value="other" id="type-other">
+            <label for="type-other">Other</label>
+            <br>
+            <label for="manufacturer">Manufacturer:</label>
+            <input type="text" name="manufacturer" id="manufacturer">
+            <label for="model">Model:</label>
+            <input type="text" name="model" id="model">
+
+        </fieldset>
+        <fieldset>
+            <legend>Processors</legend>
+            <template id="processor-template">
+                <fieldset>
+                    <legend>Processor</legend>
+                    <input type="text" class="processor-name" name="processor-name">
+                    <button type="button" onclick="onClickRemoveListedItem(this)">Remove</button>
+                </fieldset>
+            </template>
+            <div id="processor-list">
+            </div>
+            <button type="button" onclick="onClickAddListedItem('processor-template', 'processor-list')">Add Processor</button>
+        </fieldset>
+        <fieldset>
+            <legend>Memory</legend>
+            <input type="radio" name="memory-type" value="3" id="memory-type-ddr3">
+            <label for="memory-type-ddr3">DDR3</label>
+            <input type="radio" name="memory-type" value="4" id="memory-type-ddr4">
+            <label for="memory-type-ddr4">DDR4</label>
+            <input type="radio" name="memory-type" value="5" id="memory-type-ddr5">
+            <label for="memory-type-ddr5">DDR5</label>
+            <br>
+            <input type="checkbox" name="memory-upgradable" id="memory-upgradable">
+            <label for="memory-upgradable">Upgradable</label>
+            <input type="checkbox" name="memory-ecc" id="memory-ecc">
+            <label for="memory-ecc">Error Correcting</label>
+            <template id="memory-template">
+                <fieldset>
+                    <legend>Memory Module</legend>
+                    <label for="memory-size">Size:</label>
+                    <input type="number" name="memory-size" id="memory-size">
+                    <select name="memory-size-unit" id="memory-size-unit">
+                        <option value="mb">MB</option>
+                        <option value="gb" selected>GB</option>
+                        <option value="tb">TB</option>
+                    </select>
+                    <br>
+                    <label for="memory-speed">Speed:</label>
+                    <input type="number" name="memory-speed" id="memory-speed">
+                    <label for="memory-speed">MT/s</label>
+                    <br>
+                    <button type="button" onclick="onClickRemoveListedItem(this)">Remove</button>
+                </fieldset>
+            </template>
+            <div id="memory-list"></div>
+            <button type="button" onclick="onClickAddListedItem('memory-template', 'memory-list')">Add Module</button>
+        </fieldset>
+        <fieldset>
+            <legend>Storage</legend>
+            <template id="storage-template">
+                <fieldset>
+                    <legend>Disk</legend>
+                    <label for="storage-disk-type-hdd">Type:</label>
+                    <input type="radio" name="storage-disk-type" value="hdd" id="storage-disk-type-hdd">
+                    <label for="storage-disk-type-hdd">HDD</label>
+                    <input type="radio" name="storage-disk-type" value="ssd" id="storage-disk-type-ssd">
+                    <label for="storage-disk-type-ssd">SSD</label>
+                    <select name="storage-disk-form" id="storage-disk-form">
+                        <option value="2.5">2.5"</option>
+                        <option value="3.5">3.5"</option>
+                        <option value="m2" selected>m.2</option>
+                        <option value="pcie">PCIe</option>
+                    </select>
+                    <select name="storage-disk-interface" id="storage-disk-interface">
+                        <option value="ide">IDE</option>
+                        <option value="sata" selected>SATA</option>
+                        <option value="nvme">NVMe</option>
+                    </select>
+                    <br>
+                    <input type="checkbox" name="storage-disk-upgradable" id="storage-disk-upgradable" checked>
+                    <label for="storage-disk-upgradable">Upgradable</label>
+                    <br>
+                    <label for="storage-disk-size">Size:</label>
+                    <input type="number" name="storage-disk-size" id="storage-disk-size">
+                    <select name="storage-disk-size-unit" id="storage-disk-size-unit">
+                        <option value="mb">MB</option>
+                        <option value="gb" selected>GB</option>
+                        <option value="tb">TB</option>
+                    </select>
+                    <br>
+                    <button type="button" onclick="onClickRemoveListedItem(this)">Remove</button>
+                </fieldset>
+            </template>
+            <div id="storage-list"></div>
+            <button type="button" onclick="onClickAddListedItem('storage-template', 'storage-list')">Add Storage Device</button>
+        </fieldset>
+        <fieldset>
+            <legend>Graphics Cards</legend>
+            <template id="gpu-template">
+                <fieldset>
+                    <legend>Graphics Card</legend>
+                    <input type="checkbox" name="gpu-upgradable" id="gpu-upgradable">
+                    <label for="gpu-upgradable">Upgradable</label>
+                    <br>
+                    <input type="text" name="gpu-name">
+                    <br>
+                    <button type="button" onclick="onClickRemoveListedItem(this)">Remove</button>
+                </fieldset>
+            </template>
+            <div id="gpu-list"></div>
+            <button type="button" onclick="onClickAddListedItem('gpu-template', 'gpu-list')">Add Graphics Card</button>
+        </fieldset>
+        <fieldset>
+            <legend>Display</legend>
+            <label for="display-size">Size:</label>
+            <input type="number" name="display-size" id="display-size">
+            <label for="display-size">"</label>
+            <br>
+            <label for="display-resolution-horizontal">Resolution:</label>
+            <input type="number" name="display-resolution-horizontal" id="display-resolution-horizontal">
+            <label for="display-resolution-vertical">X</label>
+            <input type="number" name="display-resolution-vertical" id="display-resolution-vertical">
+            <br>
+            <label for="display-refreshrate">Refresh Rate:</label>
+            <input type="number" name="display-refreshrate" id="display-refreshrate">
+            <label for="display-refreshrate">Hz</label>
+            <br>
+            <input type="checkbox" name="display-touch" id="display-touch">
+            <label for="display-touch">Touchscreen</label>
+        </fieldset>
+        <fieldset>
+            <legend>Batteries</legend>
+            <template id="battery-template">
+                <fieldset>
+                    <legend>Battery</legend>
+                    <label for="battery-designcap">Design Capacity:</label>
+                    <input type="number" name="battery-designcap" id="battery-designcap">
+                    <label for="battery-designcap">mAh</label>
+                    <br>
+                    <label for="battery-remainingcap">Remaining Capacity:</label>
+                    <input type="number" name="battery-remainingcap" id="battery-remainingcap">
+                    <label for="battery-remainingcap">mAh</label>
+                    <br>
+                    <button type="button" onclick="onClickRemoveListedItem(this)">Remove</button>
+                </fieldset>
+            </template>
+            <div id="battery-list"></div>
+            <button type="button" onclick="onClickAddListedItem('battery-template', 'battery-list')">Add Battery</button>
+        </fieldset>
+        <fieldset>
+            <legend>Networking</legend>
+            <b>Wired:</b>
+            <input type="radio" name="networking-wired" id="networking-wired-none" value="">
+            <label for="networking-wired-none">None</label>
+            <input type="radio" name="networking-wired" id="networking-wired-fast" value="100">
+            <label for="networking-wired-fast">10/100</label>
+            <input type="radio" name="networking-wired" id="networking-wired-gigabit" value="1000">
+            <label for="networking-wired-gigabit">Gigabit</label>
+            <input type="radio" name="networking-wired" id="networking-wired-2gig" value="2500">
+            <label for="networking-wired-2gig">2.5GbE</label>
+            <input type="radio" name="networking-wired" id="networking-wired-10gig" value="10000">
+            <label for="networking-wired-10gig">10GbE</label>
+            <br>
+            <b>Wireless:</b>
+            <input type="radio" name="networking-wireless" id="networking-wireless-none" value="">
+            <label for="networking-wireless-none">None</label>
+            <input type="radio" name="networking-wireless" id="networking-wireless-bg" value="bg">
+            <label for="networking-wireless-bg">WiFi 3 or older</label>
+            <input type="radio" name="networking-wireless" id="networking-wireless-n" value="n">
+            <label for="networking-wireless-n">WiFi 4 (n)</label>
+            <input type="radio" name="networking-wireless" id="networking-wireless-ac" value="ac">
+            <label for="networking-wireless-ac">WiFi 5 (ac)</label>
+            <input type="radio" name="networking-wireless" id="networking-wireless-ax" value="ax">
+            <label for="networking-wireless-ax">WiFi 6 (ax)</label>
+            <input type="radio" name="networking-wireless" id="networking-wireless-be" value="be">
+            <label for="networking-wireless-be">WiFi 7 (be)</label>
+        </fieldset>
+        <button type="button" onclick="onCreateFormSubmit()">Submit</button>
+    </form>
+</div>
+{% endblock %}
