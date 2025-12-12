@@ -8,7 +8,7 @@
 
 {% block content %}
 <div>
-    <form action="" method="POST" onsubmit="return false;" id="create-form">
+    <form action="/build" onsubmit="return false;" id="create-form">
         <fieldset>
             <legend>Computer Type:</legend>
             <input type="radio" name="type" value="desktop" id="type-desktop">
@@ -178,7 +178,7 @@
             <label for="networking-wired-10gig">10GbE</label>
             <br>
             <b>Wireless:</b>
-            <input type="radio" name="networking-wireless" id="networking-wireless-none" value="">
+            <input type="radio" name="networking-wireless" id="networking-wireless-none" value="none">
             <label for="networking-wireless-none">None</label>
             <input type="radio" name="networking-wireless" id="networking-wireless-bg" value="bg">
             <label for="networking-wireless-bg">WiFi 3 or older</label>

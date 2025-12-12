@@ -72,7 +72,7 @@ class GraphicsCard(BuildComponent):
     clock: Optional[int] = None #mhz
 
 
-class WirelessNetworkingStandard[Enum]:
+class WirelessNetworkingStandard(Enum):
     BG = "bg"
     N = "n"
     AC = "ac"

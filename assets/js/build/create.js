@@ -23,7 +23,8 @@ function onClickAddListedItem(templateElementId, listElementId) {
 }
 
 function onCreateFormSubmit() {
-    let formData = new FormData(document.getElementById("create-form"));
+    let form = document.getElementById("create-form");
+    let formData = new FormData(form);
     let buildObj = {};
 
     // Collect values that can be pulled directly from the form into the build object
@@ -87,7 +88,7 @@ function onCreateFormSubmit() {
     for (let i = 0; i < graphicsNames.length; i++) {
         let gpu = {};
         gpu["model"] = graphicsNames[i];
-        gpu["upgradable"] = graphicsUpgradables[i];
+        gpu["upgradable"] = Boolean(graphicsUpgradables[i]);
 
         buildObj["graphics"].push(gpu);
     }
@@ -100,6 +101,15 @@ function onCreateFormSubmit() {
 
     console.log("Converted build DTO:");
     console.log(JSON.stringify(buildObj));
+
+    fetch(form.action, {
+        method: "POST",
+        body: JSON.stringify(buildObj),
+        headers: {
+            "Content-Type": "application/json; charset=UTF-8"
+        }
+    }).then((response) => response.json())
+        .then((json) => console.log(json));
 }
 
 window.onload = function() {
