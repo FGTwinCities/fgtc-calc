@@ -2,6 +2,7 @@
 <html>
     <head>
         <title>{% block title %}Default Title{% endblock %} - FGTC</title>
+        <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js" integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
         {% block extra_head %}{% endblock %}
     </head>
     <body>
@@ -10,7 +11,7 @@
                 {% block navigation %}
                 <ul>
                     <li><a href="/">Home</a></li>
-                    <li><a href="/calc">Calculator</a></li>
+                    <li><a href="/build/create">Create Build</a></li>
                 </ul>
                 {% endblock %}
             </nav>

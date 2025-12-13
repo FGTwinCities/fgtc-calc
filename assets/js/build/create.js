@@ -34,11 +34,17 @@ function onCreateFormSubmit() {
 
     // Collect processors
     buildObj["processors"] = [];
+    let processorEmpties = formData.getAll("processor-emptyslot");
     let processorNames = formData.getAll("processor-name");
     for (let i = 0; i < processorNames.length; i++) {
-        let processor = {};
+        var processor = {};
         processor["manufacturer"] = ""; //TODO
         processor["model"] = processorNames[i];
+
+        // Ignore everything if empty socket is selected
+        if (processorEmpties[i]) {
+            processor = null;
+        }
 
         buildObj["processors"].push(processor);
     }
@@ -48,16 +54,22 @@ function onCreateFormSubmit() {
     let memoryType = formData.get("memory-type");
     let memoryUpgradable = Boolean(formData.get("memory-upgradable"));
     let memoryEcc = Boolean(formData.get("memory-ecc"));
+    let memoryEmpties = formData.getAll("memory-emptyslot");
     let memorySizes = formData.getAll("memory-size");
     let memorySizeUnits = formData.getAll("memory-size-unit");
     let memorySpeeds = formData.getAll("memory-speed");
     for (let i = 0; i < memorySizes.length; i++) {
-        let module = {};
+        var module = {};
         module["type"] = memoryType;
         module["upgradable"] = memoryUpgradable;
         module["ecc"] = memoryEcc;
         module["size"] = normalizeDataSizeMegabytes(memorySizes[i], memorySizeUnits[i]);
         module["clock"] = parseInt(memorySpeeds[i]);
+
+        // Ignore everything if empty slot is selected
+        if (memoryEmpties[i]) {
+            module = null;
+        }
 
         buildObj["memory"].push(module);
     }
@@ -108,8 +120,40 @@ function onCreateFormSubmit() {
         headers: {
             "Content-Type": "application/json; charset=UTF-8"
         }
-    }).then((response) => response.json())
-        .then((json) => console.log(json));
+    }).then(onSubmitResponse);
+}
+
+async function onSubmitResponse(response) {
+    let dto = await response.json();
+    if (response.ok) {
+        window.location.href = "/build/" + dto["id"];
+    } else {
+        let p = document.createElement('p');
+        p.innerText += "Error sending build: ";
+        p.innerText += dto["detail"];
+        document.body.append(p);
+    }
+}
+
+function onFormChanged() {
+    updateVisibleFields();
+}
+
+function updateVisibleFields() {
+    let form = new FormData(document.getElementById("create-form"));
+    let isOther = form.get("type") === "other";
+
+    let isDesktop = form.get("type") === "desktop";
+    let isLaptop = form.get("type") === "laptop";
+    let isComputer = isDesktop || isLaptop;
+
+    $("#fieldset-processor").prop('hidden', !(isComputer || isOther));
+    $("#fieldset-memory").prop('hidden', !(isComputer || isOther));
+    $("#fieldset-storage").prop('hidden', !(isComputer || isOther));
+    $("#fieldset-gpu").prop('hidden', !(isComputer || isOther));
+    $("#fieldset-display").prop('hidden', !(isLaptop || isOther));
+    $("#fieldset-battery").prop('hidden', !(isLaptop || isOther));
+    $("#fieldset-networking").prop('hidden', !(isComputer || isOther));
 }
 
 window.onload = function() {
@@ -118,4 +162,6 @@ window.onload = function() {
     onClickAddListedItem('memory-template', 'memory-list');
     onClickAddListedItem('storage-template', 'storage-list');
     onClickAddListedItem('battery-template', 'battery-list');
+
+    updateVisibleFields();
 }

@@ -8,7 +8,7 @@
 
 {% block content %}
 <div>
-    <form action="/build" onsubmit="return false;" id="create-form">
+    <form action="/build" onsubmit="return false;" id="create-form" onchange="onFormChanged()">
         <fieldset>
             <legend>Computer Type:</legend>
             <input type="radio" name="type" value="desktop" id="type-desktop">
@@ -22,13 +22,15 @@
             <input type="text" name="manufacturer" id="manufacturer">
             <label for="model">Model:</label>
             <input type="text" name="model" id="model">
-
         </fieldset>
-        <fieldset>
+        <fieldset id="fieldset-processor">
             <legend>Processors</legend>
             <template id="processor-template">
                 <fieldset>
                     <legend>Processor</legend>
+                    <input type="checkbox" name="processor-emptyslot" id="processor-emptyslot">
+                    <label for="processor-emptyslot">Empty Socket</label>
+                    <br>
                     <input type="text" class="processor-name" name="processor-name">
                     <button type="button" onclick="onClickRemoveListedItem(this)">Remove</button>
                 </fieldset>
@@ -37,7 +39,7 @@
             </div>
             <button type="button" onclick="onClickAddListedItem('processor-template', 'processor-list')">Add Processor</button>
         </fieldset>
-        <fieldset>
+        <fieldset id="fieldset-memory">
             <legend>Memory</legend>
             <input type="radio" name="memory-type" value="3" id="memory-type-ddr3">
             <label for="memory-type-ddr3">DDR3</label>
@@ -53,6 +55,9 @@
             <template id="memory-template">
                 <fieldset>
                     <legend>Memory Module</legend>
+                    <input type="checkbox" name="memory-emptyslot" id="memory-emptyslot">
+                    <label for="memory-emptyslot">Empty Socket</label>
+                    <br>
                     <label for="memory-size">Size:</label>
                     <input type="number" name="memory-size" id="memory-size">
                     <select name="memory-size-unit" id="memory-size-unit">
@@ -71,7 +76,7 @@
             <div id="memory-list"></div>
             <button type="button" onclick="onClickAddListedItem('memory-template', 'memory-list')">Add Module</button>
         </fieldset>
-        <fieldset>
+        <fieldset id="fieldset-storage">
             <legend>Storage</legend>
             <template id="storage-template">
                 <fieldset>
@@ -110,7 +115,7 @@
             <div id="storage-list"></div>
             <button type="button" onclick="onClickAddListedItem('storage-template', 'storage-list')">Add Storage Device</button>
         </fieldset>
-        <fieldset>
+        <fieldset id="fieldset-gpu">
             <legend>Graphics Cards</legend>
             <template id="gpu-template">
                 <fieldset>
@@ -126,7 +131,7 @@
             <div id="gpu-list"></div>
             <button type="button" onclick="onClickAddListedItem('gpu-template', 'gpu-list')">Add Graphics Card</button>
         </fieldset>
-        <fieldset>
+        <fieldset id="fieldset-display">
             <legend>Display</legend>
             <label for="display-size">Size:</label>
             <input type="number" name="display-size" id="display-size">
@@ -144,7 +149,7 @@
             <input type="checkbox" name="display-touch" id="display-touch">
             <label for="display-touch">Touchscreen</label>
         </fieldset>
-        <fieldset>
+        <fieldset id="fieldset-battery">
             <legend>Batteries</legend>
             <template id="battery-template">
                 <fieldset>
@@ -163,7 +168,7 @@
             <div id="battery-list"></div>
             <button type="button" onclick="onClickAddListedItem('battery-template', 'battery-list')">Add Battery</button>
         </fieldset>
-        <fieldset>
+        <fieldset id="fieldset-networking">
             <legend>Networking</legend>
             <b>Wired:</b>
             <input type="radio" name="networking-wired" id="networking-wired-none" value="">
