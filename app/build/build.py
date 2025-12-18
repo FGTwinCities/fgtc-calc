@@ -62,7 +62,6 @@ class StorageDisk(BuildComponent):
 
 
 class WirelessNetworkingStandard(Enum):
-    NONE = "none"
     BG = "bg"
     N = "n"
     AC = "ac"

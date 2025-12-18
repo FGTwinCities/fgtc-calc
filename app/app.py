@@ -1,5 +1,8 @@
 from pathlib import Path
 
+from advanced_alchemy.extensions.litestar import SQLAlchemyInitPlugin
+from advanced_alchemy.extensions.litestar.plugins.init.config.asyncio import SQLAlchemyAsyncConfig
+from advanced_alchemy.extensions.litestar.plugins.serialization import SQLAlchemySerializationPlugin
 from litestar import Litestar
 from litestar.contrib.jinja import JinjaTemplateEngine
 from litestar.logging import LoggingConfig
@@ -8,6 +11,8 @@ from litestar.template.config import TemplateConfig
 
 from app.build.controller import BuildController
 from app.static_controller import StaticController
+
+sqlalchemy_config = SQLAlchemyAsyncConfig(connection_string="sqlite+aiosqlite:///database.sqlite", create_all=True)
 
 app = Litestar(
     route_handlers=[
@@ -19,4 +24,8 @@ app = Litestar(
         engine=JinjaTemplateEngine,
     ),
     logging_config=LoggingConfig(log_exceptions="always"),
+    plugins=[
+      SQLAlchemyInitPlugin(config=sqlalchemy_config),
+        SQLAlchemySerializationPlugin(),
+    ],
 )
