@@ -1,17 +1,10 @@
-from typing import List, Any
-from uuid import UUID
-
 from advanced_alchemy.repository import SQLAlchemyAsyncRepository
-from advanced_alchemy.repository.typing import SQLAlchemyAsyncRepositoryT
-from litestar import get, post, put, Response
+from litestar import get, post
 from litestar.controller import Controller
 from litestar.di import Provide
-from litestar.handlers import delete
-from litestar.response import Template, Response
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession, AsyncEngine
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.build.model import Processor, Build
+from app.build.model import Processor, Build, GraphicsProcessor
 
 
 class BuildRepository(SQLAlchemyAsyncRepository[Build]):
@@ -30,12 +23,21 @@ async def provide_processors_repo(db_session: AsyncSession) -> ProcessorReposito
     return ProcessorRepository(session=db_session)
 
 
+class GraphicsProcessorRepository(SQLAlchemyAsyncRepository[GraphicsProcessor]):
+    model_type = GraphicsProcessor
+
+
+async def provide_graphics_repo(db_session: AsyncSession) -> GraphicsProcessorRepository:
+    return GraphicsProcessorRepository(session=db_session)
+
+
 class BuildController(Controller):
     path = "build"
 
     dependencies = {
         "builds_repo": Provide(provide_builds_repo),
         "processors_repo": Provide(provide_processors_repo),
+        "graphics_repo": Provide(provide_graphics_repo),
     }
 
 
@@ -45,9 +47,18 @@ class BuildController(Controller):
 
 
     @post("/")
-    async def create_build(self, builds_repo: BuildRepository, data: Build) -> Build:
-        for m in data.memory:
-            m.build_id = data.id
+    async def create_build(self, builds_repo: BuildRepository, processors_repo: ProcessorRepository, graphics_repo: GraphicsProcessorRepository, data: Build) -> Build:
+        #De-duplicate processors
+        for i in range(0, len(data.processors)):
+            found_processors = await processors_repo.list(Processor.model.is_(data.processors[i].model))
+            if len(found_processors) > 0:
+                data.processors[i] = found_processors[0]
+
+        #De-duplicate graphics processors
+        for i in range(0, len(data.graphics)):
+            found_gpus = await graphics_repo.list(GraphicsProcessor.model.is_(data.graphics[i].model))
+            if len(found_gpus) > 0:
+                data.graphics[i] = found_gpus[0]
 
         await builds_repo.add(data)
         await builds_repo.session.commit()
