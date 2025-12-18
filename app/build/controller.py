@@ -1,5 +1,7 @@
+from uuid import UUID
+
 from advanced_alchemy.repository import SQLAlchemyAsyncRepository
-from litestar import get, post
+from litestar import get, post, delete
 from litestar.controller import Controller
 from litestar.di import Provide
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -46,6 +48,11 @@ class BuildController(Controller):
         return await builds_repo.list()
 
 
+    @get("/{build_id: uuid}")
+    async def get_build(self, build_id: UUID, builds_repo: BuildRepository) -> Build:
+        return await builds_repo.get(build_id)
+
+
     @post("/")
     async def create_build(self, builds_repo: BuildRepository, processors_repo: ProcessorRepository, graphics_repo: GraphicsProcessorRepository, data: Build) -> Build:
         #De-duplicate processors
@@ -66,9 +73,31 @@ class BuildController(Controller):
         return data
 
 
+    @delete("/{build_id: uuid}")
+    async def delete_build(self, build_id: UUID, builds_repo: BuildRepository) -> None:
+        # Delete any memory modules associated with this build
+        build = await builds_repo.get(build_id)
+        for module in build.memory:
+            await builds_repo.session.delete(module)
+
+        for disk in build.storage:
+            await builds_repo.session.delete(disk)
+
+        await builds_repo.session.commit()
+        await builds_repo.session.refresh(build)
+
+        await builds_repo.delete(build_id)
+        await builds_repo.session.commit()
+
+
     @get("/processor")
     async def get_processors(self, processors_repo: ProcessorRepository) -> list[Processor]:
         return await processors_repo.list()
+
+
+    @get("/processor/{processor_id: uuid}")
+    async def get_processor(self, processor_id: UUID, processors_repo: ProcessorRepository) -> Processor:
+        return await processors_repo.get(processor_id)
 
 
     @post("/processor")
@@ -77,3 +106,33 @@ class BuildController(Controller):
         await processors_repo.session.commit()
         await processors_repo.session.refresh(data)
         return data
+
+
+    @delete("/processor/{processor_id: uuid}")
+    async def delete_processor(self, processor_id: UUID, processors_repo: ProcessorRepository) -> None:
+        await processors_repo.delete(processor_id)
+        await processors_repo.session.commit()
+
+
+    @get("/graphics")
+    async def get_graphics(self, graphics_repo: GraphicsProcessorRepository) -> list[GraphicsProcessor]:
+        return await graphics_repo.list()
+
+
+    @get("/graphics/{gpu_id: uuid}")
+    async def get_gpu(self, gpu_id: UUID, graphics_repo: GraphicsProcessorRepository) -> GraphicsProcessor:
+        return await graphics_repo.get(gpu_id)
+
+
+    @post("/graphics")
+    async def create_gpu(self, data: GraphicsProcessor, graphics_repo: GraphicsProcessorRepository) -> GraphicsProcessor:
+        await graphics_repo.add(data)
+        await graphics_repo.session.commit()
+        await graphics_repo.session.refresh(data)
+        return data
+
+
+    @delete("/graphics/{gpu_id: uuid}")
+    async def delete_gpu(self, gpu_id: UUID, graphics_repo: GraphicsProcessorRepository) -> None:
+        await graphics_repo.delete(gpu_id)
+        await graphics_repo.session.commit()

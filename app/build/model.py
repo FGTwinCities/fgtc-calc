@@ -23,6 +23,7 @@ class Processor(base.UUIDBase):
     #TODO: Specifications
 
 
+#TODO: MemoryModules should not have their own UUID, replace with integer key
 class MemoryModule(base.UUIDBase):
     __tablename__ = "memory_module"
     build_id = Column(ForeignKey("build.id"), primary_key=True, nullable=True)
@@ -34,6 +35,7 @@ class MemoryModule(base.UUIDBase):
     size: Mapped[int]
 
 
+#TODO: StorageDisk should not have their own UUID, replace with integer key
 class StorageDisk(base.UUIDBase):
     __tablename__ = "storage_disk"
     build_id = Column(ForeignKey("build.id"), primary_key=True, nullable=True)
