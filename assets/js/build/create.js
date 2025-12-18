@@ -34,17 +34,12 @@ function onCreateFormSubmit() {
 
     // Collect processors
     buildObj["processors"] = [];
-    let processorEmpties = formData.getAll("processor-emptyslot");
     let processorNames = formData.getAll("processor-name");
+    let processorUpgradables = formData.getAll("processor-upgradable");
     for (let i = 0; i < processorNames.length; i++) {
         var processor = {};
-        processor["manufacturer"] = ""; //TODO
         processor["model"] = processorNames[i];
-
-        // Ignore everything if empty socket is selected
-        if (processorEmpties[i]) {
-            processor = null;
-        }
+        processor["upgradable"] = Boolean(processorUpgradables[i]);
 
         buildObj["processors"].push(processor);
     }

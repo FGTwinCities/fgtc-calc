@@ -12,11 +12,8 @@ class BuildComponent:
 
 @dataclass
 class Processor(BuildComponent):
-    manufacturer: str
     model: str
-    clock: Optional[int] = None #mhz
-    cores: Optional[int] = None
-    threads: Optional[int] = None
+    upgradable: bool = True
 
 
 class MemoryType(Enum):
@@ -64,15 +61,8 @@ class StorageDisk(BuildComponent):
     interface: StorageDiskInterface
 
 
-@dataclass
-class GraphicsCard(BuildComponent):
-    model: str
-    upgradable: bool
-    memory: Optional[int] = None #mb
-    clock: Optional[int] = None #mhz
-
-
 class WirelessNetworkingStandard(Enum):
+    NONE = "none"
     BG = "bg"
     N = "n"
     AC = "ac"
@@ -94,12 +84,11 @@ class Build:
     type: BuildType
     manufacturer: str
     model: str
-    sku: str = ""
     price: Optional[float] = None
-    processors: List[Optional[Processor]] = field(default_factory=List)
+    processors: List[Processor] = field(default_factory=List)
     memory: List[Optional[MemoryModule]] = field(default_factory=List)
     storage: List[StorageDisk] = field(default_factory=List)
-    graphics: List[GraphicsCard] = field(default_factory=List)
+    graphics: List[Processor] = field(default_factory=List)
     wired_networking: Optional[int] = None #mbps
     wireless_networking: Optional[WirelessNetworkingStandard] = None
     id: UUID = field(default_factory=uuid4)

@@ -28,11 +28,11 @@
             <template id="processor-template">
                 <fieldset>
                     <legend>Processor</legend>
-                    <input type="checkbox" name="processor-emptyslot" id="processor-emptyslot">
-                    <label for="processor-emptyslot">Empty Socket</label>
-                    <br>
                     <input type="text" class="processor-name" name="processor-name">
                     <button type="button" onclick="onClickRemoveListedItem(this)">Remove</button>
+                    <br>
+                    <input type="checkbox" name="processor-upgradable" id="processor-upgradable" checked>
+                    <label for="processor-upgradable">Upgradable</label>
                 </fieldset>
             </template>
             <div id="processor-list">
@@ -120,12 +120,11 @@
             <template id="gpu-template">
                 <fieldset>
                     <legend>Graphics Card</legend>
-                    <input type="checkbox" name="gpu-upgradable" id="gpu-upgradable">
-                    <label for="gpu-upgradable">Upgradable</label>
-                    <br>
                     <input type="text" name="gpu-name">
-                    <br>
                     <button type="button" onclick="onClickRemoveListedItem(this)">Remove</button>
+                    <br>
+                    <input type="checkbox" name="gpu-upgradable" id="gpu-upgradable" checked>
+                    <label for="gpu-upgradable">Upgradable</label>
                 </fieldset>
             </template>
             <div id="gpu-list"></div>
