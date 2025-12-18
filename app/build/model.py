@@ -110,10 +110,11 @@ class Build(base.UUIDAuditBase):
     type: Mapped[BuildType]
     manufacturer: Mapped[str]
     model: Mapped[str]
-    price: Mapped[Optional[float]]
+    price: Mapped[Optional[float]] = None
     processors: Mapped[list[Processor]] = relationship("Processor", secondary=build_to_processor, lazy="selectin")
     memory: Mapped[list[MemoryModule]] = relationship("MemoryModule", lazy="selectin")
     storage: Mapped[list[StorageDisk]] = relationship("StorageDisk", lazy="selectin")
     graphics: Mapped[list[GraphicsProcessor]] = relationship("GraphicsProcessor", secondary=build_to_graphics_processor, lazy="selectin")
-    wired_networking: Mapped[Optional[int]] = None
+    wired_networking: Mapped[Optional[int]] = None #TODO: Handle multiple, store connector type
     wireless_networking: Mapped[Optional[WirelessNetworkingStandard]] = None
+    bluetooth: Mapped[bool] = False

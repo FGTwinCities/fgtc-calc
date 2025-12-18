@@ -4,6 +4,7 @@ from advanced_alchemy.repository import SQLAlchemyAsyncRepository
 from litestar import get, post, delete
 from litestar.controller import Controller
 from litestar.di import Provide
+from litestar.response import Template
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.build.model import Processor, Build, GraphicsProcessor
@@ -41,6 +42,11 @@ class BuildController(Controller):
         "processors_repo": Provide(provide_processors_repo),
         "graphics_repo": Provide(provide_graphics_repo),
     }
+
+
+    @get("/create")
+    async def create_build_page(self) -> Template:
+        return Template("build/create.html")
 
 
     @get("/")
