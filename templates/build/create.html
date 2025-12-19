@@ -121,13 +121,14 @@
             <template id="gpu-template">
                 <fieldset>
                     <legend>Graphics Card</legend>
-                    <input type="text" name="gpu-name">
+                    <input type="search" name="gpu-name" onkeyup="onGraphicsSearchKeyup(event, this)" autocomplete="off" list="graphics-results">
                     <button type="button" onclick="onClickRemoveListedItem(this)">Remove</button>
                     <br>
                     <input type="checkbox" name="gpu-upgradable" id="gpu-upgradable" checked>
                     <label for="gpu-upgradable">Upgradable</label>
                 </fieldset>
             </template>
+            <datalist id="graphics-results"></datalist>
             <div id="gpu-list"></div>
             <button type="button" onclick="onClickAddListedItem('gpu-template', 'gpu-list')">Add Graphics Card</button>
         </fieldset>

@@ -155,3 +155,12 @@ class BuildController(Controller):
     async def delete_gpu(self, gpu_id: UUID, graphics_repo: GraphicsProcessorRepository) -> None:
         await graphics_repo.delete(gpu_id)
         await graphics_repo.session.commit()
+
+
+    @get("/graphics/search")
+    async def search_gpu(self, q: str, graphics_repo: GraphicsProcessorRepository, limit: int = 50) -> list[GraphicsProcessor]:
+        return await graphics_repo.list(
+            GraphicsProcessor.model.icontains(q),
+            OrderBy("model"),
+            LimitOffset(limit=clamp(limit, 0, MAX_SEARCH_ITEMS), offset=0),
+        )
