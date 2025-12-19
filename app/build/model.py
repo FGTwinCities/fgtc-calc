@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from enum import Enum
 from typing import Optional
 
@@ -58,6 +59,7 @@ build_to_processor = Table(
 )
 
 
+@dataclass
 class Processor(base.UUIDBase):
     __tablename__ = "processor"
 
@@ -66,6 +68,7 @@ class Processor(base.UUIDBase):
 
 
 #TODO: MemoryModules should not have their own UUID, replace with integer key
+@dataclass
 class MemoryModule(base.UUIDBase):
     __tablename__ = "memory_module"
     build_id = Column(ForeignKey("build.id"), primary_key=True, nullable=True)
@@ -78,6 +81,7 @@ class MemoryModule(base.UUIDBase):
 
 
 #TODO: StorageDisk should not have their own UUID, replace with integer key
+@dataclass
 class StorageDisk(base.UUIDBase):
     __tablename__ = "storage_disk"
     build_id = Column(ForeignKey("build.id"), primary_key=True, nullable=True)
@@ -97,6 +101,7 @@ build_to_graphics_processor = Table(
 )
 
 
+@dataclass
 class GraphicsProcessor(base.UUIDBase):
     __tablename__ = "graphics_processor"
 
@@ -104,6 +109,7 @@ class GraphicsProcessor(base.UUIDBase):
     #TODO: Specifications
 
 
+@dataclass
 class Build(base.UUIDAuditBase):
     __tablename__ = "build"
 

@@ -10,6 +10,7 @@ from litestar.static_files.config import create_static_files_router
 from litestar.template.config import TemplateConfig
 
 from app.build.controller import BuildController
+from app.price.controller import PriceController
 from app.static_controller import StaticController
 
 sqlalchemy_config = SQLAlchemyAsyncConfig(connection_string="sqlite+aiosqlite:///database.sqlite", create_all=True)
@@ -17,7 +18,9 @@ sqlalchemy_config = SQLAlchemyAsyncConfig(connection_string="sqlite+aiosqlite://
 app = Litestar(
     route_handlers=[
         create_static_files_router("/static", ["assets"]),
-        StaticController, BuildController
+        StaticController,
+        BuildController,
+        PriceController,
     ],
     template_config=TemplateConfig(
         directory=Path(__file__).parent.parent / "templates",

@@ -1,41 +1,17 @@
 from uuid import UUID
 
 from advanced_alchemy.filters import LimitOffset, OrderBy
-from advanced_alchemy.repository import SQLAlchemyAsyncRepository
 from litestar import get, post, delete
 from litestar.controller import Controller
 from litestar.di import Provide
 from litestar.response import Template
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.build.model import Processor, Build, GraphicsProcessor
+from app.build.repository import provide_builds_repo, provide_processors_repo, provide_graphics_repo, BuildRepository, \
+    ProcessorRepository, GraphicsProcessorRepository
 from app.lib.math import clamp
 
 MAX_SEARCH_ITEMS = 100
-
-
-class BuildRepository(SQLAlchemyAsyncRepository[Build]):
-    model_type = Build
-
-
-async def provide_builds_repo(db_session: AsyncSession) -> BuildRepository:
-    return BuildRepository(session=db_session)
-
-
-class ProcessorRepository(SQLAlchemyAsyncRepository[Processor]):
-    model_type = Processor
-
-
-async def provide_processors_repo(db_session: AsyncSession) -> ProcessorRepository:
-    return ProcessorRepository(session=db_session)
-
-
-class GraphicsProcessorRepository(SQLAlchemyAsyncRepository[GraphicsProcessor]):
-    model_type = GraphicsProcessor
-
-
-async def provide_graphics_repo(db_session: AsyncSession) -> GraphicsProcessorRepository:
-    return GraphicsProcessorRepository(session=db_session)
 
 
 class BuildController(Controller):
