@@ -4,6 +4,7 @@
 
 {% block extra_head %}
 <script src="/static/js/build/create.js"></script>
+<script src="/static/js/build/search.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -28,15 +29,15 @@
             <template id="processor-template">
                 <fieldset>
                     <legend>Processor</legend>
-                    <input type="text" class="processor-name" name="processor-name">
+                    <input type="search" class="processor-name" name="processor-name" onkeyup="onProcessorSearchKeyup(event, this)" list="processor-results" autocomplete="off">
                     <button type="button" onclick="onClickRemoveListedItem(this)">Remove</button>
                     <br>
                     <input type="checkbox" name="processor-upgradable" id="processor-upgradable" checked>
                     <label for="processor-upgradable">Upgradable</label>
                 </fieldset>
             </template>
-            <div id="processor-list">
-            </div>
+            <datalist id="processor-results"></datalist>
+            <div id="processor-list"></div>
             <button type="button" onclick="onClickAddListedItem('processor-template', 'processor-list')">Add Processor</button>
         </fieldset>
         <fieldset id="fieldset-memory">

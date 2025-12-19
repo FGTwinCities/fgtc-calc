@@ -1,5 +1,6 @@
 from uuid import UUID
 
+from advanced_alchemy.filters import LimitOffset, OrderBy
 from advanced_alchemy.repository import SQLAlchemyAsyncRepository
 from litestar import get, post, delete
 from litestar.controller import Controller
@@ -8,6 +9,9 @@ from litestar.response import Template
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.build.model import Processor, Build, GraphicsProcessor
+from app.lib.math import clamp
+
+MAX_SEARCH_ITEMS = 100
 
 
 class BuildRepository(SQLAlchemyAsyncRepository[Build]):
@@ -118,6 +122,15 @@ class BuildController(Controller):
     async def delete_processor(self, processor_id: UUID, processors_repo: ProcessorRepository) -> None:
         await processors_repo.delete(processor_id)
         await processors_repo.session.commit()
+
+
+    @get("/processor/search")
+    async def search_processors(self, q: str, processors_repo: ProcessorRepository, limit: int = 50) -> list[Processor]:
+        return await processors_repo.list(
+            Processor.model.icontains(q),
+            OrderBy("model"),
+            LimitOffset(limit=clamp(limit, 0, MAX_SEARCH_ITEMS), offset=0),
+        )
 
 
     @get("/graphics")
