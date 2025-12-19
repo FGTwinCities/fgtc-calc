@@ -17,23 +17,22 @@ function onClickRemoveListedItem(button) {
 }
 
 function onClickAddListedItem(templateElementId, listElementId) {
-    let element = document.getElementById(templateElementId).content.cloneNode(true);
-    let container = document.getElementById(listElementId);
-    container.appendChild(element);
+    let template = $($("#"+templateElementId).html()).clone();
+    $("#"+listElementId).append(template);
 }
 
-function onCreateFormSubmit() {
+function convertFormToDto() {
     let form = document.getElementById("create-form");
     let formData = new FormData(form);
-    let buildObj = {};
+    let dto = {};
 
     // Collect values that can be pulled directly from the form into the build object
-    buildObj["type"] = formData.get("type");
-    buildObj["manufacturer"] = formData.get("manufacturer");
-    buildObj["model"] = formData.get("model");
+    dto["type"] = formData.get("type");
+    dto["manufacturer"] = formData.get("manufacturer");
+    dto["model"] = formData.get("model");
 
     // Collect processors
-    buildObj["processors"] = [];
+    dto["processors"] = [];
     let processorNames = formData.getAll("processor-name");
     let processorUpgradables = formData.getAll("processor-upgradable");
     for (let i = 0; i < processorNames.length; i++) {
@@ -41,11 +40,11 @@ function onCreateFormSubmit() {
         processor["model"] = processorNames[i];
         processor["upgradable"] = Boolean(processorUpgradables[i]);
 
-        buildObj["processors"].push(processor);
+        dto["processors"].push(processor);
     }
 
     // Collect memory modules
-    buildObj["memory"] = [];
+    dto["memory"] = [];
     let memoryType = formData.get("memory-type");
     let memoryUpgradable = Boolean(formData.get("memory-upgradable"));
     let memoryEcc = Boolean(formData.get("memory-ecc"));
@@ -66,11 +65,11 @@ function onCreateFormSubmit() {
             module = null;
         }
 
-        buildObj["memory"].push(module);
+        dto["memory"].push(module);
     }
 
     // Collect storage disks
-    buildObj["storage"] = [];
+    dto["storage"] = [];
     let storageTypes = formData.getAll("storage-disk-type");
     let storageUpgradables = formData.getAll("storage-disk-upgradable");
     let storageSizes = formData.getAll("storage-disk-size");
@@ -85,11 +84,11 @@ function onCreateFormSubmit() {
         disk["form"] = storageForms[i];
         disk["interface"] = storageInterfaces[i];
 
-        buildObj["storage"].push(disk);
+        dto["storage"].push(disk);
     }
 
     // Collect graphics cards
-    buildObj["graphics"] = [];
+    dto["graphics"] = [];
     let graphicsNames = formData.getAll("gpu-name");
     let graphicsUpgradables = formData.getAll("gpu-upgradable");
     for (let i = 0; i < graphicsNames.length; i++) {
@@ -97,21 +96,91 @@ function onCreateFormSubmit() {
         gpu["model"] = graphicsNames[i];
         gpu["upgradable"] = Boolean(graphicsUpgradables[i]);
 
-        buildObj["graphics"].push(gpu);
+        dto["graphics"].push(gpu);
     }
 
     // Collect networking information
     var wired = formData.get("networking-wired");
-    buildObj["wired_networking"] = wired === "" ? null : parseInt(wired);
+    dto["wired_networking"] = wired === "" ? null : parseInt(wired);
     var wireless = formData.get("networking-wireless");
-    buildObj["wireless_networking"] = wireless === "" ? null : wireless;
+    dto["wireless_networking"] = wireless === "" ? null : wireless;
 
     console.log("Converted build DTO:");
-    console.log(JSON.stringify(buildObj));
+    console.log(JSON.stringify(dto));
 
-    fetch(form.action, {
+    return dto;
+}
+
+function fillFormFromDto(dto) {
+    $("input[name=type][value=" + dto["type"] + "]").prop("checked", true);
+    updateVisibleFields();
+
+    // Fill processor information
+    let processorList = $("#processor-list");
+    processorList.children("fieldset").remove(); // Wipe processor list
+    let processorTemplate = $($("#processor-template").html());
+    for (let i = 0; i < dto["processors"].length; i++) {
+        let field = processorTemplate.clone();
+        field.children("input[name=processor-name]").val(dto["processors"][i]["model"]);
+        field.children("input[name=processor-upgradable]").val(dto["processors"][i]["upgradable"]);
+        processorList.append(field);
+    }
+
+    // Fill memory information
+    let memoryList = $("#memory-list");
+    memoryList.children("fieldset").remove();
+    let memoryTemplate = $($("#memory-template").html());
+    for (let i = 0; i < dto["memory"].length; i++) {
+        let field = memoryTemplate.clone();
+        let megabytes = dto["memory"][i]["size"];
+        field.children("input[name=memory-size]").val(megabytes);
+        field.children("select[name=memory-size-unit]").val("mb"); //TODO: Pick and convert units
+        field.children("input[name=memory-speed]").val(dto["memory"][i]["clock"]);
+
+        $("input[name=memory-type][value=" + dto["memory"][0]["type"] + "]").prop("checked", true);
+        $("input[name=memory-upgradable]").prop("checked", dto["memory"][0]["upgradable"]);
+        $("input[name=memory-ecc]").prop("checked", dto["memory"][0]["ecc"]);
+        memoryList.append(field);
+    }
+
+    // Fill storage information
+    let storageList = $("#storage-list");
+    storageList.children("fieldset").remove();
+    let storageTemplate = $($("#storage-template").html());
+    for (let i = 0; i < dto["storage"].length; i++) {
+        let field = storageTemplate.clone();
+        let megabytes = dto["storage"][i]["size"];
+        field.children("input[name=storage-disk-size]").val(megabytes);
+        field.children("select[name=storage-disk-size-unit]").val("mb"); //TODO: Pick and convert units
+        field.children("input[name=storage-disk-type][value=" + dto["storage"][i]["type"] + "]").prop("checked", true);
+        field.children("select[name=storage-disk-form]").val(dto["storage"][i]["form"]);
+        field.children("select[name=storage-disk-interface]").val(dto["storage"][i]["interface"]);
+        field.children("input[name=storage-disk-upgradable]").prop("checked", dto["storage"][i]["upgradable"]);
+        storageList.append(field);
+    }
+
+    // Fill graphics information
+    let graphicsList = $("#gpu-list");
+    graphicsList.children("fieldset").remove();
+    let graphicsTemplate = $($("#gpu-template").html());
+    for (let i = 0; i < dto["graphics"].length; i++) {
+        let field = graphicsTemplate.clone();
+        field.children("input[name=gpu-name]").val(dto["graphics"][i]["model"]);
+        field.children("input[name=gpu-upgradable]").val(dto["graphics"][i]["upgradable"]);
+        graphicsList.append(field);
+    }
+
+    // Fill networking information
+    $("input[name=networking-wired][value=" + (dto["wired_networking"] == null ? "" : dto["wired_networking"]) + "]").prop("checked", true);
+    $("input[name=networking-wireless][value=" + (dto["wireless_networking"] == null ? "" : dto["wireless_networking"]) + "]").prop("checked", true);
+}
+
+function onCreateFormSubmit() {
+    let dto = convertFormToDto();
+
+    fetch("/build", {
         method: "POST",
-        body: JSON.stringify(buildObj),
+        body: JSON.stringify(dto),
         headers: {
             "Content-Type": "application/json; charset=UTF-8"
         }
