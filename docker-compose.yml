@@ -1,0 +1,7 @@
+services:
+  application:
+    build:
+      context: ./
+    container_name: "application"
+    ports:
+      - "8000:8000"
