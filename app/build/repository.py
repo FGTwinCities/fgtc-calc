@@ -2,6 +2,7 @@ from advanced_alchemy.repository import SQLAlchemyAsyncRepository
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.model.build import Build
+from app.db.model.display import Display
 from app.db.model.graphics import GraphicsProcessor
 from app.db.model.memory import MemoryModule
 from app.db.model.processor import Processor
@@ -46,3 +47,11 @@ class StorageDiskRepository(SQLAlchemyAsyncRepository[StorageDisk]):
 
 async def provide_storage_repo(db_session: AsyncSession):
     return StorageDiskRepository(session=db_session)
+
+
+class DisplayRepository(SQLAlchemyAsyncRepository[Display]):
+    model_type = Display
+
+
+async def provide_display_repo(db_session: AsyncSession):
+    return DisplayRepository(session=db_session)

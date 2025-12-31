@@ -4,8 +4,9 @@ from litestar import get
 from litestar.controller import Controller
 from litestar.di import Provide
 
-from app.build.repository import MemoryModuleRepository, provide_memory_repo, provide_storage_repo, StorageDiskRepository
-from app.price.dto import MemoryModulePrice, StorageDiskPrice
+from app.build.repository import MemoryModuleRepository, provide_memory_repo, provide_storage_repo, \
+    StorageDiskRepository, DisplayRepository, provide_display_repo
+from app.price.dto import MemoryModulePrice, StorageDiskPrice, DisplayPrice
 from app.price.model.pricing import PricingModel, provide_default_pricing_model
 
 
@@ -15,6 +16,7 @@ class PriceController(Controller):
     dependencies = {
         "memory_repo": Provide(provide_memory_repo),
         "storage_repo": Provide(provide_storage_repo),
+        "display_repo": Provide(provide_display_repo),
         "model": Provide(provide_default_pricing_model),
     }
 
@@ -33,4 +35,12 @@ class PriceController(Controller):
         price = StorageDiskPrice(disk=disk)
         disk_price = model.storage_model.compute(disk)
         price.price = model.compute_adjustment(disk_price)
+        return price
+
+
+    @get("/display/{display_id: uuid}")
+    async def calculate_display_price(self, display_id: UUID, display_repo: DisplayRepository, model: PricingModel) -> DisplayPrice:
+        display = await display_repo.get(display_id)
+        price = DisplayPrice(display=display)
+        price.price = model.display_model.calculate(display)
         return price
