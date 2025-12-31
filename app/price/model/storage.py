@@ -2,7 +2,8 @@ from litestar.exceptions import ValidationException
 from numpy.polynomial.polynomial import Polynomial
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.build.model import StorageDisk, StorageDiskType, StorageDiskInterface
+from app.db.enum import StorageDiskType, StorageDiskInterface
+from app.db.model.storage import StorageDisk
 from app.lib.math import mb2gb
 
 

@@ -6,9 +6,11 @@ from litestar.controller import Controller
 from litestar.di import Provide
 from litestar.response import Template
 
-from app.build.model import Processor, Build, GraphicsProcessor
 from app.build.repository import provide_builds_repo, provide_processors_repo, provide_graphics_repo, BuildRepository, \
     ProcessorRepository, GraphicsProcessorRepository
+from app.db.model.build import Build
+from app.db.model.graphics import GraphicsProcessor
+from app.db.model.processor import Processor
 from app.lib.math import clamp
 
 MAX_SEARCH_ITEMS = 100

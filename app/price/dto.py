@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from app.build.model import MemoryModule, StorageDisk
+from app.db.model.memory import MemoryModule
+from app.db.model.storage import StorageDisk
 
 
 @dataclass

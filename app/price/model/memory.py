@@ -1,7 +1,7 @@
 from numpy.polynomial.polynomial import Polynomial
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.build.model import MemoryModule
+from app.db.model.memory import MemoryModule
 from app.lib.math import mb2gb
 
 

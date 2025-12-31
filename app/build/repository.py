@@ -1,7 +1,11 @@
 from advanced_alchemy.repository import SQLAlchemyAsyncRepository
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.build.model import Build, Processor, GraphicsProcessor, MemoryModule, StorageDisk
+from app.db.model.build import Build
+from app.db.model.graphics import GraphicsProcessor
+from app.db.model.memory import MemoryModule
+from app.db.model.processor import Processor
+from app.db.model.storage import StorageDisk
 
 
 class BuildRepository(SQLAlchemyAsyncRepository[Build]):
