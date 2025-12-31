@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 from advanced_alchemy.base import UUIDBase
 from sqlalchemy import Column, ForeignKey
-from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.enum import StorageDiskType, StorageDiskForm, StorageDiskInterface
 
@@ -13,8 +13,8 @@ class StorageDisk(UUIDBase):
     __tablename__ = "storage_disk"
     build_id = Column(ForeignKey("build.id"), primary_key=True, nullable=True)
 
-    type: Mapped[StorageDiskType]
-    upgradable: Mapped[bool]
-    form: Mapped[StorageDiskForm]
-    interface: Mapped[StorageDiskInterface]
-    size: Mapped[int]
+    type: Mapped[StorageDiskType] = mapped_column(nullable=False)
+    upgradable: Mapped[bool] = mapped_column(default=True)
+    form: Mapped[StorageDiskForm] = mapped_column(nullable=False)
+    interface: Mapped[StorageDiskInterface] = mapped_column(nullable=False)
+    size: Mapped[int] = mapped_column(nullable=False)

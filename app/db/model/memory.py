@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 from advanced_alchemy.base import UUIDBase
 from sqlalchemy import Column, ForeignKey
-from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.enum import MemoryType
 
@@ -13,8 +13,8 @@ class MemoryModule(UUIDBase):
     __tablename__ = "memory_module"
     build_id = Column(ForeignKey("build.id"), primary_key=True, nullable=True)
 
-    type: Mapped[MemoryType]
-    upgradable: Mapped[bool]
-    ecc: Mapped[bool]
-    clock: Mapped[int]
-    size: Mapped[int]
+    type: Mapped[MemoryType] = mapped_column(nullable=False)
+    upgradable: Mapped[bool] = mapped_column(default=True)
+    ecc: Mapped[bool] = mapped_column(default=False)
+    clock: Mapped[int] = mapped_column(nullable=False)
+    size: Mapped[int] = mapped_column(nullable=False)
