@@ -82,11 +82,6 @@
             <template id="storage-template">
                 <fieldset>
                     <legend>Disk</legend>
-                    <label for="storage-disk-type-hdd">Type:</label>
-                    <input type="radio" name="storage-disk-type" value="hdd" id="storage-disk-type-hdd">
-                    <label for="storage-disk-type-hdd">HDD</label>
-                    <input type="radio" name="storage-disk-type" value="ssd" id="storage-disk-type-ssd">
-                    <label for="storage-disk-type-ssd">SSD</label>
                     <select name="storage-disk-form" id="storage-disk-form">
                         <option value="2.5">2.5"</option>
                         <option value="3.5">3.5"</option>
@@ -95,8 +90,12 @@
                     </select>
                     <select name="storage-disk-interface" id="storage-disk-interface">
                         <option value="ide">IDE</option>
-                        <option value="sata" selected>SATA</option>
-                        <option value="nvme">NVMe</option>
+                        <option value="sata">SATA</option>
+                        <option value="nvme" selected>NVMe</option>
+                    </select>
+                    <select name="storage-disk-type" id="storage-disk-type">
+                        <option value="hdd">HDD</option>
+                        <option value="ssd" selected>SSD</option>
                     </select>
                     <br>
                     <input type="checkbox" name="storage-disk-upgradable" id="storage-disk-upgradable" checked>
