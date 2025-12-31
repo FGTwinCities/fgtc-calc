@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional
 
+from app.db.model.battery import Battery
 from app.db.model.display import Display
 from app.db.model.memory import MemoryModule
 from app.db.model.storage import StorageDisk
@@ -24,3 +25,8 @@ class StorageDiskPrice(Price):
 @dataclass
 class DisplayPrice(Price):
     display: Display = None
+
+
+@dataclass
+class BatteryPrice(Price):
+    battery: Battery = None
