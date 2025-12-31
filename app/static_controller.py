@@ -1,5 +1,5 @@
 from litestar import Controller, get
-from litestar.response import Template, Redirect
+from litestar.response import Template, File
 
 
 class StaticController(Controller):
@@ -11,5 +11,5 @@ class StaticController(Controller):
 
 
     @get("/favicon.ico")
-    async def favicon(self) -> Redirect:
-        return Redirect("/static/favicon.ico")
+    async def favicon(self) -> File:
+        return File("assets/favicon.ico")
