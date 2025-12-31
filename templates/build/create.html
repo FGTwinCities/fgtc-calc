@@ -154,13 +154,13 @@
             <template id="battery-template">
                 <fieldset>
                     <legend>Battery</legend>
-                    <label for="battery-designcap">Design Capacity:</label>
-                    <input type="number" name="battery-designcap" id="battery-designcap">
-                    <label for="battery-designcap">mAh</label>
+                    <label for="battery-designcapacity">Design Capacity:</label>
+                    <input type="number" name="battery-designcapacity" id="battery-designcapacity">
+                    <label for="battery-designcapacity">mAh</label>
                     <br>
-                    <label for="battery-remainingcap">Remaining Capacity:</label>
-                    <input type="number" name="battery-remainingcap" id="battery-remainingcap">
-                    <label for="battery-remainingcap">mAh</label>
+                    <label for="battery-remainingcapacity">Remaining Capacity:</label>
+                    <input type="number" name="battery-remainingcapacity" id="battery-remainingcapacity">
+                    <label for="battery-remainingcapacity">mAh</label>
                     <br>
                     <button type="button" onclick="onClickRemoveListedItem(this)">Remove</button>
                 </fieldset>
@@ -171,7 +171,7 @@
         <fieldset id="fieldset-networking">
             <legend>Networking</legend>
             <b>Wired:</b>
-            <input type="radio" name="networking-wired" id="networking-wired-none" value="">
+            <input type="radio" name="networking-wired" id="networking-wired-none" value="none" checked>
             <label for="networking-wired-none">None</label>
             <input type="radio" name="networking-wired" id="networking-wired-fast" value="100">
             <label for="networking-wired-fast">10/100</label>
@@ -183,7 +183,7 @@
             <label for="networking-wired-10gig">10GbE</label>
             <br>
             <b>Wireless:</b>
-            <input type="radio" name="networking-wireless" id="networking-wireless-none" value="">
+            <input type="radio" name="networking-wireless" id="networking-wireless-none" value="none" checked>
             <label for="networking-wireless-none">None</label>
             <input type="radio" name="networking-wireless" id="networking-wireless-bg" value="bg">
             <label for="networking-wireless-bg">WiFi 3 or older</label>

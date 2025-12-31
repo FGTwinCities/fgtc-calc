@@ -101,7 +101,7 @@ function convertFormToDto() {
 
     // Collect display information
     dto["display"] = []
-    if (dto["type"] === "laptop" || form.get("type") === "other") {
+    if (dto["type"] === "laptop" || dto["type"] === "other") {
         let display = {};
         display["size"] = parseFloat(formData.get("display-size"));
         display["resolution"] = {
@@ -113,11 +113,24 @@ function convertFormToDto() {
         dto["display"] = [display];
     }
 
+    // Collect battery information
+    dto["batteries"] = []
+    if (dto["type"] === "laptop" || dto["type"] === "other") {
+        let design = formData.getAll("battery-designcapacity");
+        let remain = formData.getAll("battery-remainingcapacity");
+        for (let i = 0; i < design.length; i++) {
+            let battery = {};
+            battery["design_capacity"] = parseInt(design[i]);
+            battery["remaining_capacity"] = parseInt(remain[i]);
+            dto["batteries"].push(battery);
+        }
+    }
+
     // Collect networking information
     var wired = formData.get("networking-wired");
-    dto["wired_networking"] = wired === "" ? null : parseInt(wired);
+    dto["wired_networking"] = wired === "none" ? null : parseInt(wired);
     var wireless = formData.get("networking-wireless");
-    dto["wireless_networking"] = wireless === "" ? null : wireless;
+    dto["wireless_networking"] = wireless === "none" ? null : wireless;
 
     console.log("Converted build DTO:");
     console.log(JSON.stringify(dto));
@@ -205,10 +218,20 @@ function fillFormFromDto(dto) {
     $("input[name=display-refreshrate]").val(display_refreshrate);
     $("input[name=display-touch]").prop("checked",  display_touchscreen);
 
+    // Fill battery information
+    let batteryList = $("#battery-list");
+    batteryList.children("fieldset").remove();
+    let batteryTemplate = $($("#battery-template").html());
+    for (let i = 0; i < dto["batteries"].length; i++) {
+        let field = batteryTemplate.clone();
+        field.children("input[name=battery-designcapacity]").val(dto["batteries"][i]["design_capacity"]);
+        field.children("input[name=battery-remainingcapacity]").val(dto["batteries"][i]["remaining_capacity"]);
+        batteryList.append(field);
+    }
 
     // Fill networking information
-    $("input[name=networking-wired][value=" + (dto["wired_networking"] == null ? "" : dto["wired_networking"]) + "]").prop("checked", true);
-    $("input[name=networking-wireless][value=" + (dto["wireless_networking"] == null ? "" : dto["wireless_networking"]) + "]").prop("checked", true);
+    $("input[name=networking-wired][value=" + (dto["wired_networking"] == null ? "none" : dto["wired_networking"]) + "]").prop("checked", true);
+    $("input[name=networking-wireless][value=" + (dto["wireless_networking"] == null ? "none" : dto["wireless_networking"]) + "]").prop("checked", true);
 }
 
 function onCreateFormSubmit() {
