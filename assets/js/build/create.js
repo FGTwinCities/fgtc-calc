@@ -99,6 +99,20 @@ function convertFormToDto() {
         dto["graphics"].push(gpu);
     }
 
+    // Collect display information
+    dto["display"] = []
+    if (dto["type"] === "laptop" || form.get("type") === "other") {
+        let display = {};
+        display["size"] = parseFloat(formData.get("display-size"));
+        display["resolution"] = {
+            "x": parseInt(formData.get("display-resolution-horizontal")),
+            "y": parseInt(formData.get("display-resolution-vertical")),
+        };
+        display["refresh_rate"] = parseInt(formData.get("display-refreshrate"));
+        display["touchscreen"] = Boolean(formData.get("display-touch"));
+        dto["display"] = [display];
+    }
+
     // Collect networking information
     var wired = formData.get("networking-wired");
     dto["wired_networking"] = wired === "" ? null : parseInt(wired);
@@ -169,6 +183,28 @@ function fillFormFromDto(dto) {
         field.children("input[name=gpu-upgradable]").val(dto["graphics"][i]["upgradable"]);
         graphicsList.append(field);
     }
+
+    // Fill display information
+    var display_size = NaN;
+    var display_resolution_x = NaN;
+    var display_resolution_y = NaN;
+    var display_refreshrate = NaN;
+    var display_touchscreen = false;
+
+    if (dto["display"].length > 0) {
+        display_size = dto["display"][0]["size"];
+        display_resolution_x = dto["display"][0]["resolution"]["x"];
+        display_resolution_y = dto["display"][0]["resolution"]["y"];
+        display_refreshrate = dto["display"][0]["refresh_rate"];
+        display_touchscreen = dto["display"][0]["touchscreen"];
+    }
+
+    $("input[name=display-size]").val(display_size);
+    $("input[name=display-resolution-horizontal]").val(display_resolution_x);
+    $("input[name=display-resolution-vertical]").val(display_resolution_y);
+    $("input[name=display-refreshrate]").val(display_refreshrate);
+    $("input[name=display-touch]").prop("checked",  display_touchscreen);
+
 
     // Fill networking information
     $("input[name=networking-wired][value=" + (dto["wired_networking"] == null ? "" : dto["wired_networking"]) + "]").prop("checked", true);

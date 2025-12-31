@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import List
 
 from advanced_alchemy.base import UUIDAuditBase
 from sqlalchemy.orm import Mapped, relationship, mapped_column
@@ -6,6 +7,7 @@ from sqlalchemy.orm import Mapped, relationship, mapped_column
 from app.db.enum import BuildType, WirelessNetworkingStandard
 from app.db.model.build_graphics import build_to_graphics_processor
 from app.db.model.build_processor import build_to_processor
+from app.db.model.display import Display
 from app.db.model.graphics import GraphicsProcessor
 from app.db.model.memory import MemoryModule
 from app.db.model.mixins.price import PriceMixin
@@ -44,5 +46,12 @@ class Build(UUIDAuditBase, PriceMixin):
     graphics: Mapped[list[GraphicsProcessor]] = relationship(
         "GraphicsProcessor",
         secondary=build_to_graphics_processor,
+        lazy="selectin",
+    )
+
+    #TODO: Figure out some way to make this not a list!
+    #   -> once SQLAlchemy 2.1 is released, upgrade and use a composite object instead
+    display: Mapped[List[Display]] = relationship(
+        "Display",
         lazy="selectin",
     )

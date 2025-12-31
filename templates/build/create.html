@@ -98,9 +98,6 @@
                         <option value="ssd" selected>SSD</option>
                     </select>
                     <br>
-                    <input type="checkbox" name="storage-disk-upgradable" id="storage-disk-upgradable" checked>
-                    <label for="storage-disk-upgradable">Upgradable</label>
-                    <br>
                     <label for="storage-disk-size">Size:</label>
                     <input type="number" name="storage-disk-size" id="storage-disk-size">
                     <select name="storage-disk-size-unit" id="storage-disk-size-unit">
@@ -108,6 +105,9 @@
                         <option value="gb" selected>GB</option>
                         <option value="tb">TB</option>
                     </select>
+                    <br>
+                    <input type="checkbox" name="storage-disk-upgradable" id="storage-disk-upgradable" checked>
+                    <label for="storage-disk-upgradable">Upgradable</label>
                     <br>
                     <button type="button" onclick="onClickRemoveListedItem(this)">Remove</button>
                 </fieldset>

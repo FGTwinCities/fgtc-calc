@@ -11,7 +11,7 @@ from app.db.enum import MemoryType
 @dataclass
 class MemoryModule(UUIDBase):
     __tablename__ = "memory_module"
-    build_id = Column(ForeignKey("build.id"), primary_key=True, nullable=True)
+    build_id = Column(ForeignKey("build.id"), nullable=False)
 
     type: Mapped[MemoryType] = mapped_column(nullable=False)
     upgradable: Mapped[bool] = mapped_column(default=True)

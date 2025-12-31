@@ -11,7 +11,7 @@ from app.db.enum import StorageDiskType, StorageDiskForm, StorageDiskInterface
 @dataclass
 class StorageDisk(UUIDBase):
     __tablename__ = "storage_disk"
-    build_id = Column(ForeignKey("build.id"), primary_key=True, nullable=True)
+    build_id = Column(ForeignKey("build.id"), nullable=False)
 
     type: Mapped[StorageDiskType] = mapped_column(nullable=False)
     upgradable: Mapped[bool] = mapped_column(default=True)
