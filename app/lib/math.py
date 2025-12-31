@@ -8,3 +8,11 @@ def clamp(x: int, min: int, max: int) -> int:
         return min
     else:
         return x
+
+
+def mb2gb(mb: float) -> float:
+    return mb / 1000
+
+
+def gb2mb(gb: float) -> float:
+    return gb * 1000

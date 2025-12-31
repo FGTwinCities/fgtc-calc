@@ -1,14 +1,17 @@
 from numpy.polynomial.polynomial import Polynomial
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.build.model import MemoryModule
+from app.lib.math import mb2gb
+
 
 class MemoryPricingModel:
     size_func: Polynomial
     speed_func: Polynomial
 
-    def compute(self, size: int, speed: int) -> float:
-        size_price = self.size_func(float(size) / 1000)
-        speed_price = self.speed_func(speed)
+    def compute(self, module: MemoryModule) -> float:
+        size_price = self.size_func(mb2gb(module.size))
+        speed_price = self.speed_func(module.clock)
         return size_price + speed_price
 
 
