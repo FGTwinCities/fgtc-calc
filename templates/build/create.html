@@ -10,128 +10,153 @@
 {% block content %}
 <div>
     <form action="/build" onsubmit="return false;" id="create-form">
-        <fieldset>
-            <legend>Computer Type:</legend>
-            <input type="radio" name="type" value="desktop" id="type-desktop">
+        <fieldset class="build-section">
+            <legend>Computer Type</legend>
+            <input type="radio" name="type" value="desktop" id="type-desktop" class="radio radio-primary">
             <label for="type-desktop">Desktop</label>
-            <input type="radio" name="type" value="laptop" id="type-laptop">
+            <input type="radio" name="type" value="laptop" id="type-laptop" class="radio radio-primary">
             <label for="type-laptop">Laptop</label>
-            <input type="radio" name="type" value="other" id="type-other">
+            <input type="radio" name="type" value="other" id="type-other" class="radio radio-primary">
             <label for="type-other">Other</label>
             <br>
             <label for="manufacturer">Manufacturer:</label>
-            <input type="text" name="manufacturer" id="manufacturer">
+            <input type="text" name="manufacturer" id="manufacturer" class="input">
             <label for="model">Model:</label>
-            <input type="text" name="model" id="model">
+            <input type="text" name="model" id="model" class="input">
         </fieldset>
-        <fieldset id="fieldset-processor">
+        <fieldset id="fieldset-processor" class="build-section">
             <legend>Processors</legend>
             <template id="processor-template">
-                <fieldset>
+                <fieldset class="build-list-item">
                     <legend>Processor</legend>
-                    <input type="search" class="processor-name" name="processor-name" id="processor-search" list="processor-results" autocomplete="off">
-                    <button type="button" id="remove-button">Remove</button>
+                    <label class="input">
+                        <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <g
+                              stroke-linejoin="round"
+                              stroke-linecap="round"
+                              stroke-width="2.5"
+                              fill="none"
+                              stroke="currentColor"
+                            >
+                              <circle cx="11" cy="11" r="8"></circle>
+                              <path d="m21 21-4.3-4.3"></path>
+                            </g>
+                        </svg>
+                        <input type="search" class="processor-name" name="processor-name" id="processor-search" list="processor-results" autocomplete="off">
+                    </label>
+                    <button type="button" id="remove-button" class="btn">Remove</button>
                     <br>
-                    <input type="checkbox" name="processor-upgradable" id="processor-upgradable" checked>
+                    <input type="checkbox" name="processor-upgradable" id="processor-upgradable" class="checkbox checkbox-primary" checked>
                     <label for="processor-upgradable">Upgradable</label>
                 </fieldset>
             </template>
             <datalist id="processor-results"></datalist>
             <div id="processor-list"></div>
-            <button type="button" id="add-processor-button">Add Processor</button>
+            <button type="button" id="add-processor-button" class="btn">Add Processor</button>
         </fieldset>
-        <fieldset id="fieldset-memory">
+        <fieldset id="fieldset-memory" class="build-section">
             <legend>Memory</legend>
-            <input type="radio" name="memory-type" value="3" id="memory-type-ddr3">
+            <input type="radio" name="memory-type" value="3" id="memory-type-ddr3" class="radio radio-primary">
             <label for="memory-type-ddr3">DDR3</label>
-            <input type="radio" name="memory-type" value="4" id="memory-type-ddr4">
+            <input type="radio" name="memory-type" value="4" id="memory-type-ddr4" class="radio radio-primary">
             <label for="memory-type-ddr4">DDR4</label>
-            <input type="radio" name="memory-type" value="5" id="memory-type-ddr5">
+            <input type="radio" name="memory-type" value="5" id="memory-type-ddr5" class="radio radio-primary">
             <label for="memory-type-ddr5">DDR5</label>
             <br>
-            <input type="checkbox" name="memory-upgradable" id="memory-upgradable">
+            <input type="checkbox" name="memory-upgradable" id="memory-upgradable" class="checkbox checkbox-primary">
             <label for="memory-upgradable">Upgradable</label>
-            <input type="checkbox" name="memory-ecc" id="memory-ecc">
+            <input type="checkbox" name="memory-ecc" id="memory-ecc" class="checkbox checkbox-primary">
             <label for="memory-ecc">Error Correcting</label>
             <template id="memory-template">
-                <fieldset>
+                <fieldset class="build-list-item">
                     <legend>Memory Module</legend>
-                    <input type="checkbox" name="memory-emptyslot" id="memory-emptyslot">
-                    <label for="memory-emptyslot">Empty Socket</label>
-                    <br>
                     <label for="memory-size">Size:</label>
-                    <input type="number" name="memory-size" id="memory-size">
-                    <select name="memory-size-unit" id="memory-size-unit">
+                    <input type="number" name="memory-size" id="memory-size" class="input">
+                    <select name="memory-size-unit" id="memory-size-unit" class="select">
                         <option value="mb">MB</option>
                         <option value="gb" selected>GB</option>
                         <option value="tb">TB</option>
                     </select>
                     <br>
                     <label for="memory-speed">Speed:</label>
-                    <input type="number" name="memory-speed" id="memory-speed">
+                    <input type="number" name="memory-speed" id="memory-speed" class="input">
                     <label for="memory-speed">MT/s</label>
                     <br>
-                    <button type="button" id="remove-button">Remove</button>
+                    <button type="button" id="remove-button" class="btn">Remove</button>
                 </fieldset>
             </template>
             <div id="memory-list"></div>
-            <button type="button" id="add-memory-button">Add Module</button>
+            <button type="button" id="add-memory-button" class="btn">Add Module</button>
         </fieldset>
-        <fieldset id="fieldset-storage">
+        <fieldset id="fieldset-storage" class="build-section">
             <legend>Storage</legend>
             <template id="storage-template">
-                <fieldset>
+                <fieldset class="build-list-item">
                     <legend>Disk</legend>
-                    <select name="storage-disk-form" id="storage-disk-form">
+                    <select name="storage-disk-form" id="storage-disk-form" class="select">
                         <option value="2.5">2.5"</option>
                         <option value="3.5">3.5"</option>
                         <option value="m2" selected>m.2</option>
                         <option value="pcie">PCIe</option>
                     </select>
-                    <select name="storage-disk-interface" id="storage-disk-interface">
+                    <select name="storage-disk-interface" id="storage-disk-interface" class="select">
                         <option value="ide">IDE</option>
                         <option value="sata">SATA</option>
                         <option value="nvme" selected>NVMe</option>
                     </select>
-                    <select name="storage-disk-type" id="storage-disk-type">
+                    <select name="storage-disk-type" id="storage-disk-type" class="select">
                         <option value="hdd">HDD</option>
                         <option value="ssd" selected>SSD</option>
                     </select>
                     <br>
                     <label for="storage-disk-size">Size:</label>
-                    <input type="number" name="storage-disk-size" id="storage-disk-size">
-                    <select name="storage-disk-size-unit" id="storage-disk-size-unit">
+                    <input type="number" name="storage-disk-size" id="storage-disk-size" class="input">
+                    <select name="storage-disk-size-unit" id="storage-disk-size-unit" class="select">
                         <option value="mb">MB</option>
                         <option value="gb" selected>GB</option>
                         <option value="tb">TB</option>
                     </select>
                     <br>
-                    <input type="checkbox" name="storage-disk-upgradable" id="storage-disk-upgradable" checked>
+                    <input type="checkbox" name="storage-disk-upgradable" id="storage-disk-upgradable" class="checkbox checkbox-primary" checked>
                     <label for="storage-disk-upgradable">Upgradable</label>
                     <br>
-                    <button type="button" id="remove-button">Remove</button>
+                    <button type="button" id="remove-button" class="btn">Remove</button>
                 </fieldset>
             </template>
             <div id="storage-list"></div>
-            <button type="button" id="add-storage-button">Add Storage Device</button>
+            <button type="button" id="add-storage-button" class="btn">Add Storage Device</button>
         </fieldset>
-        <fieldset id="fieldset-gpu">
+        <fieldset id="fieldset-gpu" class="build-section">
             <legend>Graphics Cards</legend>
             <template id="gpu-template">
-                <fieldset>
+                <fieldset class="build-list-item">
                     <legend>Graphics Card</legend>
-                    <input type="search" name="gpu-name" id="gpu-search" autocomplete="off" list="graphics-results">
-                    <button type="button" id="remove-button">Remove</button>
+                    <label class="input">
+                        <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <g
+                              stroke-linejoin="round"
+                              stroke-linecap="round"
+                              stroke-width="2.5"
+                              fill="none"
+                              stroke="currentColor"
+                            >
+                              <circle cx="11" cy="11" r="8"></circle>
+                              <path d="m21 21-4.3-4.3"></path>
+                            </g>
+                        </svg>
+                        <input type="search" name="gpu-name" id="gpu-search" autocomplete="off" list="graphics-results">
+                    </label>
+                    <button type="button" id="remove-button" class="btn">Remove</button>
                     <br>
-                    <input type="checkbox" name="gpu-upgradable" id="gpu-upgradable" checked>
+                    <input type="checkbox" name="gpu-upgradable" id="gpu-upgradable" class="checkbox checkbox-primary" checked>
                     <label for="gpu-upgradable">Upgradable</label>
                 </fieldset>
             </template>
             <datalist id="graphics-results"></datalist>
             <div id="gpu-list"></div>
-            <button type="button" id="add-gpu-button">Add Graphics Card</button>
+            <button type="button" id="add-gpu-button" class="btn">Add Graphics Card</button>
         </fieldset>
-        <fieldset id="fieldset-display">
+        <fieldset id="fieldset-display" class="build-section">
             <legend>Display</legend>
             <label for="display-size">Size:</label>
             <input type="number" name="display-size" id="display-size">
@@ -149,10 +174,10 @@
             <input type="checkbox" name="display-touch" id="display-touch">
             <label for="display-touch">Touchscreen</label>
         </fieldset>
-        <fieldset id="fieldset-battery">
+        <fieldset id="fieldset-battery" class="build-section">
             <legend>Batteries</legend>
             <template id="battery-template">
-                <fieldset>
+                <fieldset class="build-list-item">
                     <legend>Battery</legend>
                     <label for="battery-designcapacity">Design Capacity:</label>
                     <input type="number" name="battery-designcapacity" id="battery-designcapacity">
@@ -168,35 +193,35 @@
             <div id="battery-list"></div>
             <button type="button" id="add-battery-button">Add Battery</button>
         </fieldset>
-        <fieldset id="fieldset-networking">
+        <fieldset id="fieldset-networking" class="build-section">
             <legend>Networking</legend>
             <b>Wired:</b>
-            <input type="radio" name="networking-wired" id="networking-wired-none" value="none" checked>
+            <input type="radio" name="networking-wired" id="networking-wired-none" value="none" class="radio radio-primary" checked>
             <label for="networking-wired-none">None</label>
-            <input type="radio" name="networking-wired" id="networking-wired-fast" value="100">
+            <input type="radio" name="networking-wired" id="networking-wired-fast" value="100" class="radio radio-primary">
             <label for="networking-wired-fast">10/100</label>
-            <input type="radio" name="networking-wired" id="networking-wired-gigabit" value="1000">
+            <input type="radio" name="networking-wired" id="networking-wired-gigabit" value="1000" class="radio radio-primary">
             <label for="networking-wired-gigabit">Gigabit</label>
-            <input type="radio" name="networking-wired" id="networking-wired-2gig" value="2500">
+            <input type="radio" name="networking-wired" id="networking-wired-2gig" value="2500" class="radio radio-primary">
             <label for="networking-wired-2gig">2.5GbE</label>
-            <input type="radio" name="networking-wired" id="networking-wired-10gig" value="10000">
+            <input type="radio" name="networking-wired" id="networking-wired-10gig" value="10000" class="radio radio-primary">
             <label for="networking-wired-10gig">10GbE</label>
             <br>
             <b>Wireless:</b>
-            <input type="radio" name="networking-wireless" id="networking-wireless-none" value="none" checked>
+            <input type="radio" name="networking-wireless" id="networking-wireless-none" value="none" class="radio radio-primary" checked>
             <label for="networking-wireless-none">None</label>
-            <input type="radio" name="networking-wireless" id="networking-wireless-bg" value="bg">
+            <input type="radio" name="networking-wireless" id="networking-wireless-bg" value="bg" class="radio radio-primary">
             <label for="networking-wireless-bg">WiFi 3 or older</label>
-            <input type="radio" name="networking-wireless" id="networking-wireless-n" value="n">
+            <input type="radio" name="networking-wireless" id="networking-wireless-n" value="n" class="radio radio-primary">
             <label for="networking-wireless-n">WiFi 4 (n)</label>
-            <input type="radio" name="networking-wireless" id="networking-wireless-ac" value="ac">
+            <input type="radio" name="networking-wireless" id="networking-wireless-ac" value="ac" class="radio radio-primary">
             <label for="networking-wireless-ac">WiFi 5 (ac)</label>
-            <input type="radio" name="networking-wireless" id="networking-wireless-ax" value="ax">
+            <input type="radio" name="networking-wireless" id="networking-wireless-ax" value="ax" class="radio radio-primary">
             <label for="networking-wireless-ax">WiFi 6 (ax)</label>
-            <input type="radio" name="networking-wireless" id="networking-wireless-be" value="be">
+            <input type="radio" name="networking-wireless" id="networking-wireless-be" value="be" class="radio radio-primary">
             <label for="networking-wireless-be">WiFi 7 (be)</label>
         </fieldset>
-        <button type="button" id="submit-button">Submit</button>
+        <button type="button" id="submit-button" class="btn btn-primary">Submit</button>
     </form>
 </div>
 {% endblock %}

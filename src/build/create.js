@@ -17,9 +17,9 @@ function normalizeDataSizeMegabytes(quantity, unit) {
 function addTemplateListItem(templateElementId, listElementId) {
     let template = $($("#"+templateElementId).html()).clone();
 
-    template.children("#remove-button").click(() => template.remove());
-    template.children("#processor-search").keyup(onProcessorSearchKeyup);
-    template.children("#gpu-search").keyup(onGraphicsSearchKeyup);
+    template.find("#remove-button").click(() => template.remove());
+    template.find("#processor-search").keyup(onProcessorSearchKeyup);
+    template.find("#gpu-search").keyup(onGraphicsSearchKeyup);
 
     $("#"+listElementId).append(template);
 }

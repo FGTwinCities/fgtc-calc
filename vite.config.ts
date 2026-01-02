@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
 import litestar from "litestar-vite-plugin";
+import tailwindcss from "@tailwindcss/vite";
 
 
 export default defineConfig({
@@ -12,7 +13,7 @@ export default defineConfig({
     },
   },
   plugins: [
-
+    tailwindcss(),
     litestar({
       input: ["src/main.js"],
     }),

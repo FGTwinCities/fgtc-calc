@@ -11,10 +11,7 @@
         <header>
             <nav>
                 {% block navigation %}
-                <ul>
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/build/create">Create Build</a></li>
-                </ul>
+                    {% include('navigation.html') %}
                 {% endblock %}
             </nav>
         </header>

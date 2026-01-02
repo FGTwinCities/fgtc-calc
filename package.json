@@ -14,8 +14,11 @@
     "htmx.org": "latest"
   },
   "devDependencies": {
-    "typescript": "latest",
+    "@tailwindcss/vite": "^4.1.18",
+    "daisyui": "^5.5.14",
     "litestar-vite-plugin": "latest",
+    "tailwindcss": "^4.1.18",
+    "typescript": "latest",
     "vite": "^7.2.6"
   }
 }

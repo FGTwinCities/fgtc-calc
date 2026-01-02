@@ -1,0 +1,14 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+.build-section {
+    @apply mx-3 my-5 p-3 border-3 border-base-300 rounded-xl;
+}
+
+.build-section>legend {
+    @apply text-xl;
+}
+
+.build-list-item {
+    @apply my-1 p-3 border-3 border-base-300 rounded-xl;
+}
