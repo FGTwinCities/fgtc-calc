@@ -7,22 +7,39 @@
 {{ vite('src/build/search.js') }}
 {% endblock %}
 
+{% macro input_datasize(name) -%}
+    <label class="input">
+        <span class="label">Size</span>
+        <input type="number" name="{{ name }}" id="{{ name }}">
+        <select name="{{ name }}-unit" id="{{ name }}-unit" class="label">
+            <option value="mb">MB</option>
+            <option value="gb" selected>GB</option>
+            <option value="tb">TB</option>
+        </select>
+    </label>
+{%- endmacro %}
+
 {% block content %}
 <div>
     <form action="/build" onsubmit="return false;" id="create-form">
         <fieldset class="build-section">
             <legend>Computer Type</legend>
-            <input type="radio" name="type" value="desktop" id="type-desktop" class="radio radio-primary">
-            <label for="type-desktop">Desktop</label>
-            <input type="radio" name="type" value="laptop" id="type-laptop" class="radio radio-primary">
-            <label for="type-laptop">Laptop</label>
-            <input type="radio" name="type" value="other" id="type-other" class="radio radio-primary">
-            <label for="type-other">Other</label>
+            <div class="filter">
+                <input type="radio" name="type" value="desktop" id="type-desktop" class="btn checked:bg-primary" aria-label="Desktop">
+                <input type="radio" name="type" value="laptop" id="type-laptop" class="btn checked:bg-primary" aria-label="Laptop">
+                <input type="radio" name="type" value="other" id="type-other" class="btn checked:bg-primary" aria-label="Other">
+                <input type="radio" name="type" aria-label="×" class="btn btn-square filter-reset">
+            </div>
             <br>
-            <label for="manufacturer">Manufacturer:</label>
-            <input type="text" name="manufacturer" id="manufacturer" class="input">
-            <label for="model">Model:</label>
-            <input type="text" name="model" id="model" class="input">
+            <label class="floating-label mt-5">
+                <span class="label">Manufacturer</span>
+                <input type="text" name="manufacturer" id="manufacturer" placeholder="Manufacturer" class="input">
+            </label>
+            <br>
+            <label class="floating-label">
+                <span class="label">Model</span>
+                <input type="text" name="model" id="model" placeholder="Model" class="input">
+            </label>
         </fieldset>
         <fieldset id="fieldset-processor" class="build-section">
             <legend>Processors</legend>
@@ -70,17 +87,13 @@
             <template id="memory-template">
                 <fieldset class="build-list-item">
                     <legend>Memory Module</legend>
-                    <label for="memory-size">Size:</label>
-                    <input type="number" name="memory-size" id="memory-size" class="input">
-                    <select name="memory-size-unit" id="memory-size-unit" class="select">
-                        <option value="mb">MB</option>
-                        <option value="gb" selected>GB</option>
-                        <option value="tb">TB</option>
-                    </select>
+                    {{ input_datasize('memory-size') }}
                     <br>
-                    <label for="memory-speed">Speed:</label>
-                    <input type="number" name="memory-speed" id="memory-speed" class="input">
-                    <label for="memory-speed">MT/s</label>
+                    <label class="input">
+                        <span class="label">Speed</span>
+                        <input type="number" name="memory-speed" id="memory-speed">
+                        <span class="label">MT/s</span>
+                    </label>
                     <br>
                     <button type="button" id="remove-button" class="btn">Remove</button>
                 </fieldset>
@@ -109,13 +122,7 @@
                         <option value="ssd" selected>SSD</option>
                     </select>
                     <br>
-                    <label for="storage-disk-size">Size:</label>
-                    <input type="number" name="storage-disk-size" id="storage-disk-size" class="input">
-                    <select name="storage-disk-size-unit" id="storage-disk-size-unit" class="select">
-                        <option value="mb">MB</option>
-                        <option value="gb" selected>GB</option>
-                        <option value="tb">TB</option>
-                    </select>
+                    {{ input_datasize('storage-disk-size') }}
                     <br>
                     <input type="checkbox" name="storage-disk-upgradable" id="storage-disk-upgradable" class="checkbox checkbox-primary" checked>
                     <label for="storage-disk-upgradable">Upgradable</label>
@@ -158,20 +165,26 @@
         </fieldset>
         <fieldset id="fieldset-display" class="build-section">
             <legend>Display</legend>
-            <label for="display-size">Size:</label>
-            <input type="number" name="display-size" id="display-size">
-            <label for="display-size">"</label>
+            <label class="input">
+                <span class="label">Diagonal Size</span>
+                <input type="number" name="display-size" id="display-size">
+                <span class="label">Inch</span>
+            </label>
             <br>
-            <label for="display-resolution-horizontal">Resolution:</label>
-            <input type="number" name="display-resolution-horizontal" id="display-resolution-horizontal">
-            <label for="display-resolution-vertical">X</label>
-            <input type="number" name="display-resolution-vertical" id="display-resolution-vertical">
+            <label class="input">
+                <span class="label">Resolution</span>
+                <input type="number" name="display-resolution-horizontal" id="display-resolution-horizontal">
+                <span class="label">X</span>
+                <input type="number" name="display-resolution-vertical" id="display-resolution-vertical">
+            </label>
             <br>
-            <label for="display-refreshrate">Refresh Rate:</label>
-            <input type="number" name="display-refreshrate" id="display-refreshrate">
-            <label for="display-refreshrate">Hz</label>
+            <label class="input">
+                <span class="label">Refresh Rate</span>
+                <input type="number" name="display-refreshrate" id="display-refreshrate">
+                <span class="label">Hz</span>
+            </label>
             <br>
-            <input type="checkbox" name="display-touch" id="display-touch">
+            <input type="checkbox" name="display-touch" id="display-touch" class="checkbox">
             <label for="display-touch">Touchscreen</label>
         </fieldset>
         <fieldset id="fieldset-battery" class="build-section">
@@ -179,19 +192,24 @@
             <template id="battery-template">
                 <fieldset class="build-list-item">
                     <legend>Battery</legend>
-                    <label for="battery-designcapacity">Design Capacity:</label>
+
+                    <label class="input">
+                        <span class="label">Design Capacity</span>
                     <input type="number" name="battery-designcapacity" id="battery-designcapacity">
-                    <label for="battery-designcapacity">mAh</label>
+                        <span class="label">mAh</span>
+                    </label>
                     <br>
-                    <label for="battery-remainingcapacity">Remaining Capacity:</label>
-                    <input type="number" name="battery-remainingcapacity" id="battery-remainingcapacity">
-                    <label for="battery-remainingcapacity">mAh</label>
+                    <label class="input">
+                        <span class="label">Remaining Capacity</span>
+                        <input type="number" name="battery-remainingcapacity" id="battery-remainingcapacity">
+                        <span class="label">mAh</span>
+                    </label>
                     <br>
-                    <button type="button" id="remove-button">Remove</button>
+                    <button type="button" id="remove-button" class="btn">Remove</button>
                 </fieldset>
             </template>
             <div id="battery-list"></div>
-            <button type="button" id="add-battery-button">Add Battery</button>
+            <button type="button" id="add-battery-button" class="btn">Add Battery</button>
         </fieldset>
         <fieldset id="fieldset-networking" class="build-section">
             <legend>Networking</legend>

@@ -24,7 +24,7 @@ function addTemplateListItem(templateElementId, listElementId) {
     $("#"+listElementId).append(template);
 }
 
-function convertFormToDto() {
+export function convertFormToDto() {
     let form = document.getElementById("create-form");
     let formData = new FormData(form);
     let dto = {};
@@ -141,7 +141,7 @@ function convertFormToDto() {
     return dto;
 }
 
-function fillFormFromDto(dto) {
+export function fillFormFromDto(dto) {
     $("input[name=type][value=" + dto["type"] + "]").prop("checked", true);
     updateVisibleFields();
 
@@ -261,10 +261,6 @@ async function onSubmitResponse(response) {
     }
 }
 
-function onFormChanged() {
-    updateVisibleFields();
-}
-
 function updateVisibleFields() {
     let form = new FormData(document.getElementById("create-form"));
     let isOther = form.get("type") === "other";
@@ -284,7 +280,7 @@ function updateVisibleFields() {
 
 window.onload = function() {
     // Bind events for page
-    $("#create-form").change(onFormChanged);
+    $("input[name=type]").change(updateVisibleFields);
     $("#add-processor-button").click(() => addTemplateListItem('processor-template', 'processor-list'));
     $("#add-memory-button").click(() => addTemplateListItem('memory-template', 'memory-list'));
     $("#add-storage-button").click(() => addTemplateListItem('storage-template', 'storage-list'));
