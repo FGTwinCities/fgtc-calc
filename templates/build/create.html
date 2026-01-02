@@ -3,13 +3,13 @@
 {% block title %}Create Build{% endblock %}
 
 {% block extra_head %}
-<script src="/static/js/build/create.js"></script>
-<script src="/static/js/build/search.js"></script>
+{{ vite('src/build/create.js') }}
+{{ vite('src/build/search.js') }}
 {% endblock %}
 
 {% block content %}
 <div>
-    <form action="/build" onsubmit="return false;" id="create-form" onchange="onFormChanged()">
+    <form action="/build" onsubmit="return false;" id="create-form">
         <fieldset>
             <legend>Computer Type:</legend>
             <input type="radio" name="type" value="desktop" id="type-desktop">
@@ -29,8 +29,8 @@
             <template id="processor-template">
                 <fieldset>
                     <legend>Processor</legend>
-                    <input type="search" class="processor-name" name="processor-name" onkeyup="onProcessorSearchKeyup(event, this)" list="processor-results" autocomplete="off">
-                    <button type="button" onclick="onClickRemoveListedItem(this)">Remove</button>
+                    <input type="search" class="processor-name" name="processor-name" id="processor-search" list="processor-results" autocomplete="off">
+                    <button type="button" id="remove-button">Remove</button>
                     <br>
                     <input type="checkbox" name="processor-upgradable" id="processor-upgradable" checked>
                     <label for="processor-upgradable">Upgradable</label>
@@ -38,7 +38,7 @@
             </template>
             <datalist id="processor-results"></datalist>
             <div id="processor-list"></div>
-            <button type="button" onclick="onClickAddListedItem('processor-template', 'processor-list')">Add Processor</button>
+            <button type="button" id="add-processor-button">Add Processor</button>
         </fieldset>
         <fieldset id="fieldset-memory">
             <legend>Memory</legend>
@@ -71,11 +71,11 @@
                     <input type="number" name="memory-speed" id="memory-speed">
                     <label for="memory-speed">MT/s</label>
                     <br>
-                    <button type="button" onclick="onClickRemoveListedItem(this)">Remove</button>
+                    <button type="button" id="remove-button">Remove</button>
                 </fieldset>
             </template>
             <div id="memory-list"></div>
-            <button type="button" onclick="onClickAddListedItem('memory-template', 'memory-list')">Add Module</button>
+            <button type="button" id="add-memory-button">Add Module</button>
         </fieldset>
         <fieldset id="fieldset-storage">
             <legend>Storage</legend>
@@ -109,19 +109,19 @@
                     <input type="checkbox" name="storage-disk-upgradable" id="storage-disk-upgradable" checked>
                     <label for="storage-disk-upgradable">Upgradable</label>
                     <br>
-                    <button type="button" onclick="onClickRemoveListedItem(this)">Remove</button>
+                    <button type="button" id="remove-button">Remove</button>
                 </fieldset>
             </template>
             <div id="storage-list"></div>
-            <button type="button" onclick="onClickAddListedItem('storage-template', 'storage-list')">Add Storage Device</button>
+            <button type="button" id="add-storage-button">Add Storage Device</button>
         </fieldset>
         <fieldset id="fieldset-gpu">
             <legend>Graphics Cards</legend>
             <template id="gpu-template">
                 <fieldset>
                     <legend>Graphics Card</legend>
-                    <input type="search" name="gpu-name" onkeyup="onGraphicsSearchKeyup(event, this)" autocomplete="off" list="graphics-results">
-                    <button type="button" onclick="onClickRemoveListedItem(this)">Remove</button>
+                    <input type="search" name="gpu-name" id="gpu-search" autocomplete="off" list="graphics-results">
+                    <button type="button" id="remove-button">Remove</button>
                     <br>
                     <input type="checkbox" name="gpu-upgradable" id="gpu-upgradable" checked>
                     <label for="gpu-upgradable">Upgradable</label>
@@ -129,7 +129,7 @@
             </template>
             <datalist id="graphics-results"></datalist>
             <div id="gpu-list"></div>
-            <button type="button" onclick="onClickAddListedItem('gpu-template', 'gpu-list')">Add Graphics Card</button>
+            <button type="button" id="add-gpu-button">Add Graphics Card</button>
         </fieldset>
         <fieldset id="fieldset-display">
             <legend>Display</legend>
@@ -162,11 +162,11 @@
                     <input type="number" name="battery-remainingcapacity" id="battery-remainingcapacity">
                     <label for="battery-remainingcapacity">mAh</label>
                     <br>
-                    <button type="button" onclick="onClickRemoveListedItem(this)">Remove</button>
+                    <button type="button" id="remove-button">Remove</button>
                 </fieldset>
             </template>
             <div id="battery-list"></div>
-            <button type="button" onclick="onClickAddListedItem('battery-template', 'battery-list')">Add Battery</button>
+            <button type="button" id="add-battery-button">Add Battery</button>
         </fieldset>
         <fieldset id="fieldset-networking">
             <legend>Networking</legend>
@@ -196,7 +196,7 @@
             <input type="radio" name="networking-wireless" id="networking-wireless-be" value="be">
             <label for="networking-wireless-be">WiFi 7 (be)</label>
         </fieldset>
-        <button type="button" onclick="onCreateFormSubmit()">Submit</button>
+        <button type="button" id="submit-button">Submit</button>
     </form>
 </div>
 {% endblock %}

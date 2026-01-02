@@ -9,6 +9,8 @@ from litestar.logging import LoggingConfig
 from litestar.plugins.base import InitPluginProtocol, CLIPluginProtocol
 from litestar.static_files import create_static_files_router
 from litestar.template.config import TemplateConfig
+from litestar_vite import VitePlugin
+from litestar_vite.config import ViteConfig
 
 from app.build.controller import BuildController
 from app.price.controller import PriceController
@@ -23,19 +25,25 @@ class ApplicationCore(InitPluginProtocol, CLIPluginProtocol):
         sqlalchemy_config = SQLAlchemyAsyncConfig(connection_string="sqlite+aiosqlite:///database.sqlite",
                                                   create_all=True)
 
+        vite_config = ViteConfig(
+            dev_mode=True,
+            mode="template",
+            types=False
+        )
+
         app_config.plugins.extend(
             [
                 SQLAlchemyInitPlugin(config=sqlalchemy_config),
                 SQLAlchemySerializationPlugin(),
+                VitePlugin(config=vite_config),
             ]
         )
 
         app_config.route_handlers.extend(
             [
-                create_static_files_router("/static", ["assets"]),
                 StaticController,
                 BuildController,
-                PriceController,
+                #PriceController,  #TODO: Nested SQLAlchemy types break the Vite plugin
             ]
         )
 

@@ -8,6 +8,7 @@ dependencies = [
     "advanced-alchemy>=1.8.2",
     "aiosqlite>=0.22.0",
     "ipykernel>=7.1.0",
+    "litestar-vite>=0.15.0",
     "litestar[standard]>=2.18.0",
     "matplotlib>=3.10.8",
     "numpy>=2.4.0",

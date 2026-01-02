@@ -1,3 +1,5 @@
+import {onProcessorSearchKeyup, onGraphicsSearchKeyup} from "./search.js";
+
 function normalizeDataSizeMegabytes(quantity, unit) {
     quantity = parseInt(quantity);
     switch (unit.toLowerCase()) {
@@ -12,12 +14,13 @@ function normalizeDataSizeMegabytes(quantity, unit) {
     }
 }
 
-function onClickRemoveListedItem(button) {
-    button.parentNode.remove();
-}
-
-function onClickAddListedItem(templateElementId, listElementId) {
+function addTemplateListItem(templateElementId, listElementId) {
     let template = $($("#"+templateElementId).html()).clone();
+
+    template.children("#remove-button").click(() => template.remove());
+    template.children("#processor-search").keyup(onProcessorSearchKeyup);
+    template.children("#gpu-search").keyup(onGraphicsSearchKeyup);
+
     $("#"+listElementId).append(template);
 }
 
@@ -280,11 +283,20 @@ function updateVisibleFields() {
 }
 
 window.onload = function() {
+    // Bind events for page
+    $("#create-form").change(onFormChanged);
+    $("#add-processor-button").click(() => addTemplateListItem('processor-template', 'processor-list'));
+    $("#add-memory-button").click(() => addTemplateListItem('memory-template', 'memory-list'));
+    $("#add-storage-button").click(() => addTemplateListItem('storage-template', 'storage-list'));
+    $("#add-gpu-button").click(() => addTemplateListItem('gpu-template', 'gpu-list'));
+    $("#add-battery-button").click(() => addTemplateListItem('battery-template', 'battery-list'));
+    $("#submit-button").click(onCreateFormSubmit);
+
     // Automatically add a CPU, Memory Module, Disk and Battery on page load
-    onClickAddListedItem('processor-template', 'processor-list');
-    onClickAddListedItem('memory-template', 'memory-list');
-    onClickAddListedItem('storage-template', 'storage-list');
-    onClickAddListedItem('battery-template', 'battery-list');
+    addTemplateListItem('processor-template', 'processor-list');
+    addTemplateListItem('memory-template', 'memory-list');
+    addTemplateListItem('storage-template', 'storage-list');
+    addTemplateListItem('battery-template', 'battery-list');
 
     updateVisibleFields();
 }

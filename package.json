@@ -1,0 +1,21 @@
+{
+  "name": "fgtc-calc",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "serve": "vite preview",
+    "watch": "npm run serve",
+    "update": "npm update"
+  },
+  "dependencies": {
+    "htmx.org": "latest"
+  },
+  "devDependencies": {
+    "typescript": "latest",
+    "litestar-vite-plugin": "latest",
+    "vite": "^7.2.6"
+  }
+}
