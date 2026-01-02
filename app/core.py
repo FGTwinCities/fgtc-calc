@@ -43,7 +43,7 @@ class ApplicationCore(InitPluginProtocol, CLIPluginProtocol):
             [
                 StaticController,
                 BuildController,
-                #PriceController,  #TODO: Nested SQLAlchemy types break the Vite plugin
+                PriceController,
             ]
         )
 
