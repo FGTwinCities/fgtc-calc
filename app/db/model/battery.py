@@ -8,7 +8,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 @dataclass
 class Battery(UUIDBase):
     __tablename__ = "battery"
-    build_id = mapped_column(ForeignKey("build.id"))
+    build_id = mapped_column(ForeignKey("build.id"), nullable=True)
 
     design_capacity: Mapped[int] = mapped_column(nullable=False)
     remaining_capacity: Mapped[int] = mapped_column(nullable=False)
