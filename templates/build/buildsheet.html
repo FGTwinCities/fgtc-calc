@@ -1,0 +1,46 @@
+{% macro format_size(size) %}
+    {{ size / 1000 }} GB
+{% endmacro %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {{ vite_hmr() }}
+    {{ vite('src/buildsheet.js') }}
+    <meta charset="UTF-8">
+    <title>Buildsheet - FGTC</title>
+</head>
+<body>
+    <div class="columns-2 mb-8">
+        <div>
+            <img src="/static/img/freegeeklogo.jpg" class="h-24">
+        </div>
+        <div>
+            <p>2537 25th Ave S</p>
+            <p>Minneapolis, MN 55406</p>
+            <p>612-223-5967</p>
+            <p>fgtc.us</p>
+        </div>
+    </div>
+    <div class="buildsheet-section">
+        <h1 class="text-xl font-bold">Manufacturer & Model #:</h1>
+        <p class="text-l">{{ build.manufacturer }} {{ build.model }}</p>
+    </div>
+    {% for processor in build.processors %}
+        <div class="buildsheet-section">
+            <h1 class="text-xl font-bold">Processor</h1>
+            <p class="text-l">{{ processor.model }}</p>
+        </div>
+    {% endfor %}
+    <div class="buildsheet-section">
+        <h1 class="text-xl font-bold">Memory</h1>
+        <p class="text-l">{{ total_memory }} GB</p>
+    </div>
+    <div class="buildsheet-section">
+        <h1 class="text-xl font-bold">Storage</h1>
+        {% for disk in build.storage %}
+            <p>{{ format_size(disk.size) }} {{ disk.form }} {{ disk.interface }} {{ disk.type }}</p>
+        {% endfor %}
+    </div>
+
+</body>
+</html>

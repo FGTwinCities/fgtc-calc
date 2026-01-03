@@ -11,7 +11,7 @@ from app.build.repository import provide_builds_repo, provide_processors_repo, p
 from app.db.model.build import Build
 from app.db.model.graphics import GraphicsProcessor
 from app.db.model.processor import Processor
-from app.lib.math import clamp
+from app.lib.math import clamp, mb2gb
 
 MAX_SEARCH_ITEMS = 100
 
@@ -76,6 +76,21 @@ class BuildController(Controller):
 
         await builds_repo.delete(build_id)
         await builds_repo.session.commit()
+
+
+    @get("/{build_id: uuid}/sheet")
+    async def generate_buildsheet(self, build_id: UUID, builds_repo: BuildRepository) -> Template:
+        build = await builds_repo.get(build_id)
+
+        total_memory = 0
+        for mem in build.memory:
+            total_memory = total_memory + mem.size
+
+        return Template("build/buildsheet.html", context=
+            {
+                "build": build,
+                "total_memory": mb2gb(total_memory),
+            })
 
 
     @get("/processor")

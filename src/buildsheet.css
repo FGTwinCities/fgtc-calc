@@ -1,0 +1,5 @@
+@import "tailwindcss";
+
+.buildsheet-section {
+    @apply border-2 p-2;
+}
