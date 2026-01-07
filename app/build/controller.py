@@ -84,12 +84,20 @@ class BuildController(Controller):
 
         total_memory = 0
         for mem in build.memory:
-            total_memory = total_memory + mem.size
+            total_memory += mem.size
+
+        total_designcapacity = 0
+        total_remainingcapacity = 0
+        for battery in build.batteries:
+            total_designcapacity += battery.design_capacity
+            total_remainingcapacity += battery.remaining_capacity
 
         return Template("build/buildsheet.html", context=
             {
                 "build": build,
                 "total_memory": mb2gb(total_memory),
+                "total_designcapacity": total_designcapacity,
+                "total_remainingcapacity": total_remainingcapacity,
             })
 
 
