@@ -5,6 +5,10 @@
     margin: 0;
 }
 
+.buildsheet-section-list {
+    @apply grid grid-cols-1 divide-y-2 border-2;
+}
+
 .buildsheet-section {
-    @apply border-2 p-2;
+    @apply p-2;
 }
