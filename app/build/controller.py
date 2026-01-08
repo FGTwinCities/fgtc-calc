@@ -1,3 +1,4 @@
+import uuid
 from uuid import UUID
 
 from advanced_alchemy.filters import LimitOffset, OrderBy
@@ -8,8 +9,10 @@ from litestar.response import Template
 
 from app.build.repository import provide_builds_repo, provide_processors_repo, provide_graphics_repo, BuildRepository, \
     ProcessorRepository, GraphicsProcessorRepository
-from app.db.model.build import Build
+from app.db.enum import BuildType, WirelessNetworkingStandard, MemoryType
+from app.db.model.build import Build, BuildProcessorAssociation
 from app.db.model.graphics import GraphicsProcessor
+from app.db.model.memory import MemoryModule
 from app.db.model.processor import Processor
 from app.lib.math import clamp
 
