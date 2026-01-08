@@ -1,21 +1,21 @@
 from dataclasses import dataclass
 
 from advanced_alchemy.base import UUIDAuditBase
+from sqlalchemy.ext.associationproxy import association_proxy, AssociationProxy
 from sqlalchemy.orm import Mapped, relationship, mapped_column
 
 from app.db.enum import BuildType, WirelessNetworkingStandard
 from app.db.model.battery import Battery
-from app.db.model.build_graphics import build_to_graphics_processor
-from app.db.model.build_processor import build_to_processor
 from app.db.model.display import Display
 from app.db.model.graphics import GraphicsProcessor
+from app.db.model.build_graphics_association import BuildGraphicsAssociation
 from app.db.model.memory import MemoryModule
 from app.db.model.mixins.price import PriceMixin
 from app.db.model.processor import Processor
+from app.db.model.build_processor_association import BuildProcessorAssociation
 from app.db.model.storage import StorageDisk
 
 
-@dataclass
 class Build(UUIDAuditBase, PriceMixin):
     __tablename__ = "build"
 
@@ -27,10 +27,22 @@ class Build(UUIDAuditBase, PriceMixin):
     bluetooth: Mapped[bool] = mapped_column(nullable=False, default=False)
 
     # ORM Relationships
-    processors: Mapped[list[Processor]] = relationship(
-        "Processor",
-        secondary=build_to_processor,
+    processor_associations: Mapped[list[BuildProcessorAssociation]] = relationship(
+        "BuildProcessorAssociation",
         lazy="selectin",
+    )
+    processors: AssociationProxy[list[Processor]] = association_proxy(
+        "processor_associations", "processor",
+        creator=lambda obj: BuildProcessorAssociation(processor=obj),
+    )
+
+    graphics_associations: Mapped[list[BuildGraphicsAssociation]] = relationship(
+        "BuildGraphicsAssociation",
+        lazy="selectin",
+    )
+    graphics: AssociationProxy[list[GraphicsProcessor]] = association_proxy(
+        "graphics_associations", "graphics",
+        creator=lambda obj: BuildGraphicsAssociation(graphics=obj),
     )
 
     memory: Mapped[list[MemoryModule]] = relationship(
@@ -40,12 +52,6 @@ class Build(UUIDAuditBase, PriceMixin):
 
     storage: Mapped[list[StorageDisk]] = relationship(
         "StorageDisk",
-        lazy="selectin",
-    )
-
-    graphics: Mapped[list[GraphicsProcessor]] = relationship(
-        "GraphicsProcessor",
-        secondary=build_to_graphics_processor,
         lazy="selectin",
     )
 
