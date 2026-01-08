@@ -1,12 +1,12 @@
 from dataclasses import dataclass
+from uuid import UUID
 
 from advanced_alchemy.base import UUIDAuditBase
+from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, relationship, mapped_column
 
 from app.db.enum import BuildType, WirelessNetworkingStandard
 from app.db.model.battery import Battery
-from app.db.model.build_graphics import build_to_graphics_processor
-from app.db.model.build_processor import build_to_processor
 from app.db.model.display import Display
 from app.db.model.graphics import GraphicsProcessor
 from app.db.model.memory import MemoryModule
@@ -27,11 +27,11 @@ class Build(UUIDAuditBase, PriceMixin):
     bluetooth: Mapped[bool] = mapped_column(nullable=False, default=False)
 
     # ORM Relationships
-    processors: Mapped[list[Processor]] = relationship(
-        "Processor",
-        secondary=build_to_processor,
+    processor_id: Mapped[UUID | None] = mapped_column(ForeignKey("processor.id"))
+    processor: Mapped[Processor | None] = relationship(
         lazy="selectin",
     )
+    processor_count: Mapped[int] = mapped_column(nullable=False, default=1)
 
     memory: Mapped[list[MemoryModule]] = relationship(
         "MemoryModule",
@@ -43,11 +43,11 @@ class Build(UUIDAuditBase, PriceMixin):
         lazy="selectin",
     )
 
-    graphics: Mapped[list[GraphicsProcessor]] = relationship(
-        "GraphicsProcessor",
-        secondary=build_to_graphics_processor,
+    graphics_id: Mapped[UUID | None] = mapped_column(ForeignKey("graphics_processor.id"))
+    graphics: Mapped[GraphicsProcessor | None] = relationship(
         lazy="selectin",
     )
+    graphics_count: Mapped[int] = mapped_column(nullable=False, default=1)
 
     #TODO: Figure out some way to make this not a list!
     #   -> once SQLAlchemy 2.1 is released, upgrade and use a composite object instead

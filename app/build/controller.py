@@ -44,16 +44,20 @@ class BuildController(Controller):
     @post("/")
     async def create_build(self, builds_repo: BuildRepository, processors_repo: ProcessorRepository, graphics_repo: GraphicsProcessorRepository, data: Build) -> Build:
         #De-duplicate processors
-        for i in range(0, len(data.processors)):
-            found_processors = await processors_repo.list(Processor.model.is_(data.processors[i].model))
+        if data.processor:
+            found_processors = await processors_repo.list(Processor.model.is_(data.processor.model))
             if len(found_processors) > 0:
-                data.processors[i] = found_processors[0]
+                data.processor = found_processors[0]
+        else:
+            data.processor_count = 0
 
         #De-duplicate graphics processors
-        for i in range(0, len(data.graphics)):
-            found_gpus = await graphics_repo.list(GraphicsProcessor.model.is_(data.graphics[i].model))
+        if data.graphics:
+            found_gpus = await graphics_repo.list(GraphicsProcessor.model.is_(data.graphics.model))
             if len(found_gpus) > 0:
-                data.graphics[i] = found_gpus[0]
+                data.graphics = found_gpus[0]
+        else:
+            data.graphics_count = 0
 
         await builds_repo.add(data)
         await builds_repo.session.commit()
