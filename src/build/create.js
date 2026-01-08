@@ -145,27 +145,30 @@ export function fillFormFromDto(dto) {
     $("input[name=type][value=" + dto["type"] + "]").prop("checked", true);
     updateVisibleFields();
 
+    $("input[name=manufacturer]").val(dto["manufacturer"])
+    $("input[name=model]").val(dto["model"])
+
     // Fill processor information
     let processorList = $("#processor-list");
-    processorList.children("fieldset").remove(); // Wipe processor list
+    processorList.find("fieldset").remove(); // Wipe processor list
     let processorTemplate = $($("#processor-template").html());
     for (let i = 0; i < dto["processors"].length; i++) {
         let field = processorTemplate.clone();
-        field.children("input[name=processor-name]").val(dto["processors"][i]["model"]);
-        field.children("input[name=processor-upgradable]").val(dto["processors"][i]["upgradable"]);
+        field.find("input[name=processor-name]").val(dto["processors"][i]["model"]);
+        field.find("input[name=processor-upgradable]").val(dto["processors"][i]["upgradable"]);
         processorList.append(field);
     }
 
     // Fill memory information
     let memoryList = $("#memory-list");
-    memoryList.children("fieldset").remove();
+    memoryList.find("fieldset").remove();
     let memoryTemplate = $($("#memory-template").html());
     for (let i = 0; i < dto["memory"].length; i++) {
         let field = memoryTemplate.clone();
         let megabytes = dto["memory"][i]["size"];
-        field.children("input[name=memory-size]").val(megabytes);
-        field.children("select[name=memory-size-unit]").val("mb"); //TODO: Pick and convert units
-        field.children("input[name=memory-speed]").val(dto["memory"][i]["clock"]);
+        field.find("input[name=memory-size]").val(megabytes);
+        field.find("select[name=memory-size-unit]").val("mb"); //TODO: Pick and convert units
+        field.find("input[name=memory-speed]").val(dto["memory"][i]["clock"]);
 
         $("input[name=memory-type][value=" + dto["memory"][0]["type"] + "]").prop("checked", true);
         $("input[name=memory-upgradable]").prop("checked", dto["memory"][0]["upgradable"]);
@@ -175,28 +178,28 @@ export function fillFormFromDto(dto) {
 
     // Fill storage information
     let storageList = $("#storage-list");
-    storageList.children("fieldset").remove();
+    storageList.find("fieldset").remove();
     let storageTemplate = $($("#storage-template").html());
     for (let i = 0; i < dto["storage"].length; i++) {
         let field = storageTemplate.clone();
         let megabytes = dto["storage"][i]["size"];
-        field.children("input[name=storage-disk-size]").val(megabytes);
-        field.children("select[name=storage-disk-size-unit]").val("mb"); //TODO: Pick and convert units
-        field.children("input[name=storage-disk-type][value=" + dto["storage"][i]["type"] + "]").prop("checked", true);
-        field.children("select[name=storage-disk-form]").val(dto["storage"][i]["form"]);
-        field.children("select[name=storage-disk-interface]").val(dto["storage"][i]["interface"]);
-        field.children("input[name=storage-disk-upgradable]").prop("checked", dto["storage"][i]["upgradable"]);
+        field.find("input[name=storage-disk-size]").val(megabytes);
+        field.find("select[name=storage-disk-size-unit]").val("mb"); //TODO: Pick and convert units
+        field.find("input[name=storage-disk-type][value=" + dto["storage"][i]["type"] + "]").prop("checked", true);
+        field.find("select[name=storage-disk-form]").val(dto["storage"][i]["form"]);
+        field.find("select[name=storage-disk-interface]").val(dto["storage"][i]["interface"]);
+        field.find("input[name=storage-disk-upgradable]").prop("checked", dto["storage"][i]["upgradable"]);
         storageList.append(field);
     }
 
     // Fill graphics information
     let graphicsList = $("#gpu-list");
-    graphicsList.children("fieldset").remove();
+    graphicsList.find("fieldset").remove();
     let graphicsTemplate = $($("#gpu-template").html());
     for (let i = 0; i < dto["graphics"].length; i++) {
         let field = graphicsTemplate.clone();
-        field.children("input[name=gpu-name]").val(dto["graphics"][i]["model"]);
-        field.children("input[name=gpu-upgradable]").val(dto["graphics"][i]["upgradable"]);
+        field.find("input[name=gpu-name]").val(dto["graphics"][i]["model"]);
+        field.find("input[name=gpu-upgradable]").val(dto["graphics"][i]["upgradable"]);
         graphicsList.append(field);
     }
 
@@ -223,12 +226,12 @@ export function fillFormFromDto(dto) {
 
     // Fill battery information
     let batteryList = $("#battery-list");
-    batteryList.children("fieldset").remove();
+    batteryList.find("fieldset").remove();
     let batteryTemplate = $($("#battery-template").html());
     for (let i = 0; i < dto["batteries"].length; i++) {
         let field = batteryTemplate.clone();
-        field.children("input[name=battery-designcapacity]").val(dto["batteries"][i]["design_capacity"]);
-        field.children("input[name=battery-remainingcapacity]").val(dto["batteries"][i]["remaining_capacity"]);
+        field.find("input[name=battery-designcapacity]").val(dto["batteries"][i]["design_capacity"]);
+        field.find("input[name=battery-remainingcapacity]").val(dto["batteries"][i]["remaining_capacity"]);
         batteryList.append(field);
     }
 
