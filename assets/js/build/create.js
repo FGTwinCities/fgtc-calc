@@ -31,12 +31,16 @@ function convertFormToDto() {
     dto["manufacturer"] = formData.get("manufacturer");
     dto["model"] = formData.get("model");
 
-    if (formData.get("processor-name")) {
-        dto["processor"] = {
-            "model": formData.get("processor-name"),
-            "upgradable": Boolean(formData.get("processor-upgradable")),
-        };
-        dto["processor_count"] = 1
+    // Collect processors
+    dto["processors"] = [];
+    let processorNames = formData.getAll("processor-name");
+    let processorUpgradables = formData.getAll("processor-upgradable");
+    for (let i = 0; i < processorNames.length; i++) {
+        var processor = {};
+        processor["model"] = processorNames[i];
+        processor["upgradable"] = Boolean(processorUpgradables[i]);
+
+        dto["processors"].push(processor);
     }
 
     // Collect memory modules
@@ -83,12 +87,16 @@ function convertFormToDto() {
         dto["storage"].push(disk);
     }
 
-    if (formData.get("gpu-name")) {
-        dto["graphics"] = {
-            "model": formData.get("gpu-name"),
-            "upgradable": Boolean(formData.get("gpu-upgradable")),
-        };
-        dto["graphics_count"] = 1
+    // Collect graphics cards
+    dto["graphics"] = [];
+    let graphicsNames = formData.getAll("gpu-name");
+    let graphicsUpgradables = formData.getAll("gpu-upgradable");
+    for (let i = 0; i < graphicsNames.length; i++) {
+        let gpu = {};
+        gpu["model"] = graphicsNames[i];
+        gpu["upgradable"] = Boolean(graphicsUpgradables[i]);
+
+        dto["graphics"].push(gpu);
     }
 
     // Collect display information
