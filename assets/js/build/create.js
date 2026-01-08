@@ -100,7 +100,7 @@ function convertFormToDto() {
     }
 
     // Collect display information
-    dto["display"] = []
+    dto["display"] = null;
     if (dto["type"] === "laptop" || dto["type"] === "other") {
         let display = {};
         display["size"] = parseFloat(formData.get("display-size"));
@@ -110,7 +110,7 @@ function convertFormToDto() {
         };
         display["refresh_rate"] = parseInt(formData.get("display-refreshrate"));
         display["touchscreen"] = Boolean(formData.get("display-touch"));
-        dto["display"] = [display];
+        dto["display"] = display;
     }
 
     // Collect battery information
@@ -288,3 +288,6 @@ window.onload = function() {
 
     updateVisibleFields();
 }
+
+window.convertFormToDto = convertFormToDto;
+window.fillFormFromDto = fillFormFromDto;

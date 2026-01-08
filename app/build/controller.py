@@ -9,11 +9,16 @@ from litestar.response import Template
 
 from app.build.repository import provide_builds_repo, provide_processors_repo, provide_graphics_repo, BuildRepository, \
     ProcessorRepository, GraphicsProcessorRepository
+from app.build.schema import BuildCreate
 from app.db.enum import BuildType, WirelessNetworkingStandard, MemoryType
+from app.db.model.battery import Battery
 from app.db.model.build import Build, BuildProcessorAssociation
+from app.db.model.display import Display
 from app.db.model.graphics import GraphicsProcessor
 from app.db.model.memory import MemoryModule
 from app.db.model.processor import Processor
+from app.db.model.storage import StorageDisk
+from app.lib.attrs import attrcopy
 from app.lib.math import clamp
 
 MAX_SEARCH_ITEMS = 100
@@ -45,23 +50,59 @@ class BuildController(Controller):
 
 
     @post("/")
-    async def create_build(self, builds_repo: BuildRepository, processors_repo: ProcessorRepository, graphics_repo: GraphicsProcessorRepository, data: Build) -> Build:
-        #De-duplicate processors
+    async def create_build(self, builds_repo: BuildRepository, processors_repo: ProcessorRepository, graphics_repo: GraphicsProcessorRepository, data: BuildCreate) -> Build:
+        build = Build()
+
+        # Find existing processors by name
         for i in range(0, len(data.processors)):
             found_processors = await processors_repo.list(Processor.model.is_(data.processors[i].model))
             if len(found_processors) > 0:
-                data.processors[i] = found_processors[0]
+                build.processors.append(found_processors[0])
+            else:
+                new_processor = Processor(
+                    model=data.processors[i].model,
+                )
+                new_processor = await processors_repo.add(new_processor, auto_commit=True, auto_refresh=True)
+                build.processors.append(new_processor)
 
-        #De-duplicate graphics processors
+        # Find existing GPUs by name
         for i in range(0, len(data.graphics)):
             found_gpus = await graphics_repo.list(GraphicsProcessor.model.is_(data.graphics[i].model))
             if len(found_gpus) > 0:
-                data.graphics[i] = found_gpus[0]
+                build.graphics.append(found_gpus[0])
+            else:
+                new_gpu = GraphicsProcessor(
+                    model=data.graphics[i].model,
+                )
+                new_gpu = await graphics_repo.add(new_gpu, auto_commit=True, auto_refresh=True)
+                build.graphics.append(new_gpu)
 
-        await builds_repo.add(data)
-        await builds_repo.session.commit()
-        await builds_repo.session.refresh(data)
-        return data
+        for mem in data.memory:
+            module = MemoryModule()
+            attrcopy(mem, module)
+            build.memory.append(module)
+
+        for store in data.storage:
+            disk = StorageDisk()
+            attrcopy(store, disk)
+            build.storage.append(disk)
+
+        if data.display:
+            display = Display()
+            attrcopy(data.display, display)
+            build.display.append(display)
+
+        for batt in data.batteries:
+            battery = Battery()
+            attrcopy(batt, battery)
+            build.batteries.append(battery)
+
+        # Copy all attributes except the once done manually above between the creation object and the model object
+        attr_blocklist = ["processors", "graphics", "memory", "storage", "display", "batteries"]
+        attrcopy(data, build, attr_blocklist)
+
+        build = await builds_repo.add(build, auto_commit=True, auto_refresh=True)
+        return build
 
 
     @delete("/{build_id: uuid}")
