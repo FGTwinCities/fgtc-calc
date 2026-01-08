@@ -1,12 +1,15 @@
+import datetime
 from uuid import UUID
+from zoneinfo import ZoneInfo
 
 from litestar import get
 from litestar.controller import Controller
 from litestar.di import Provide
 
 from app.build.repository import MemoryModuleRepository, provide_memory_repo, provide_storage_repo, \
-    StorageDiskRepository, DisplayRepository, provide_display_repo, BatteryRepository, provide_battery_repo
-from app.price.dto import MemoryModulePrice, StorageDiskPrice, DisplayPrice, BatteryPrice
+    StorageDiskRepository, DisplayRepository, provide_display_repo, BatteryRepository, provide_battery_repo, \
+    BuildRepository, provide_builds_repo
+from app.price.dto import MemoryModulePrice, StorageDiskPrice, DisplayPrice, BatteryPrice, BuildPrice
 from app.price.model.pricing import PricingModel, provide_default_pricing_model
 
 
@@ -14,12 +17,26 @@ class PriceController(Controller):
     path = "price"
 
     dependencies = {
+        "build_repo": Provide(provide_builds_repo),
         "memory_repo": Provide(provide_memory_repo),
         "storage_repo": Provide(provide_storage_repo),
         "display_repo": Provide(provide_display_repo),
         "battery_repo": Provide(provide_battery_repo),
         "model": Provide(provide_default_pricing_model),
     }
+
+    @get("/{build_id: uuid}")
+    async def calculate_build_price(self, build_id: UUID, build_repo: BuildRepository, model: PricingModel) -> BuildPrice:
+        build = await build_repo.get(build_id)
+        price = await model.compute(build)
+
+        build.price = price.price
+        build.priced_at = datetime.datetime.now(tz=ZoneInfo("UTC"))
+
+        await build_repo.update(build, auto_commit=True)
+
+        return price
+
 
     @get("/memory/{module_id: uuid}")
     async def calculate_memory_price(self, module_id: UUID, memory_repo: MemoryModuleRepository, model: PricingModel) -> MemoryModulePrice:
@@ -43,7 +60,7 @@ class PriceController(Controller):
     async def calculate_display_price(self, display_id: UUID, display_repo: DisplayRepository, model: PricingModel) -> DisplayPrice:
         display = await display_repo.get(display_id)
         price = DisplayPrice(display=display)
-        price.price = model.display_model.calculate(display)
+        price.price = model.display_model.compute(display)
         return price
 
 
@@ -51,6 +68,6 @@ class PriceController(Controller):
     async def calculate_battery_price(self, battery_id: UUID, battery_repo: BatteryRepository, model: PricingModel) -> BatteryPrice:
         battery = await battery_repo.get(battery_id)
         price = BatteryPrice(battery=battery)
-        price.price = model.battery_model.calculate(battery)
+        price.price = model.battery_model.compute(battery)
         return price
 

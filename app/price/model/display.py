@@ -10,7 +10,7 @@ class DisplayPricingModel:
     refreshrate_func: Polynomial
     touchscreen_value: float
 
-    def calculate(self, display: Display) -> float:
+    def compute(self, display: Display) -> float:
         megapixels = (display.resolution.x * display.resolution.y) / 1000
         resolution_price = self.resolution_func(megapixels)
         refreshrate_price = self.refreshrate_func(display.refresh_rate)
