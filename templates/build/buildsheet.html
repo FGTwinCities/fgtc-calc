@@ -4,7 +4,7 @@
 
 {% macro format_price(price) %}
     {% if price %}
-        ${{ price }}
+        {{ "$%.2f"|format(price) }}
     {% else %}
         (No price set)
     {% endif %}
@@ -80,7 +80,7 @@
                     {% if not build.memory %}
                         <p><b>NONE</b> This build has no memory!</p>
                     {% else %}
-                        <p class="text-xl font-bold">{{ total_memory }} GB</p>
+                        <p class="text-xl font-bold">{{ "%.1f"|format(total_memory) }} GB</p>
                         <p>{{ build.memory[0].type }} {{ build.memory[0].clock }} Mhz</p>
                     {% endif %}
                 </div>
@@ -120,7 +120,7 @@
                 <div class="buildsheet-section flex flex-row">
                     <h1 class="text-xl font-bold">Battery</h1>
                     <div class="text-right grow self-center">
-                        <p class="text-lg font-bold">{{ (total_remainingcapacity / total_designcapacity) * 100 }}%</p>
+                        <p class="text-lg font-bold">{{ "%.1f"|format((total_remainingcapacity / total_designcapacity) * 100) }}%</p>
                     </div>
                 </div>
             {% endif %}
