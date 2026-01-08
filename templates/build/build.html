@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}Create Build{% endblock %}
+
+{% block extra_head %}
+    {{ vite("src/build/build.js") }}
+{% endblock %}
+
+{% block content %}
+<div id="build"></div>
+{% endblock %}

@@ -4,21 +4,25 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && vue-tsc -b --noEmit",
     "preview": "vite preview",
     "serve": "vite preview",
     "watch": "npm run serve",
     "update": "npm update"
   },
   "dependencies": {
-    "htmx.org": "latest"
+    "htmx.org": "latest",
+    "jquery": "^3.7.1",
+    "vue": "^3.5.26"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.18",
+    "@vitejs/plugin-vue": "^6.0.3",
     "daisyui": "^5.5.14",
     "litestar-vite-plugin": "latest",
     "tailwindcss": "^4.1.18",
     "typescript": "latest",
-    "vite": "^7.2.6"
+    "vite": "^7.2.6",
+    "vue-tsc": "^3.2.2"
   }
 }

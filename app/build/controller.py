@@ -39,6 +39,11 @@ class BuildController(Controller):
         return Template("build/create.html")
 
 
+    @get("/page")
+    async def get_build_page(self) -> Template:
+        return Template("build/build.html")
+
+
     @get("/")
     async def get_builds(self, builds_repo: BuildRepository) -> list[Build]:
         return await builds_repo.list()

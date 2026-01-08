@@ -1,3 +1,5 @@
+import $ from "jquery";
+
 import {onProcessorSearchKeyup, onGraphicsSearchKeyup} from "./search.js";
 
 function normalizeDataSizeMegabytes(quantity, unit) {
