@@ -5,10 +5,13 @@ from advanced_alchemy.filters import LimitOffset, OrderBy
 from litestar import get, post, delete
 from litestar.controller import Controller
 from litestar.di import Provide
+from litestar.exceptions import InternalServerException, ValidationException
 
 from app.db.model.processor import Processor
 from app.db.service.processor import provide_processor_service, ProcessorService
 from app.lib.math import clamp
+from app.passmark.passmark_scraper import PassmarkScraper
+from app.passmark.schema import PassmarkPECoreCpuDetails
 
 MAX_SEARCH_ITEMS = 100
 
@@ -49,3 +52,37 @@ class ProcessorController(Controller):
             OrderBy("model"),
             LimitOffset(limit=clamp(limit, 0, MAX_SEARCH_ITEMS), offset=0),
         )
+
+    @get("/{processor_id: uuid}/update_specs")
+    async def update_processor_specs(self, processor_id: UUID, processor_service: ProcessorService) -> Processor:
+        processor = await processor_service.get(processor_id)
+
+        scraper = PassmarkScraper()
+        search_results = await scraper.search_cpu(processor.model)
+        if len(search_results) <= 0:
+            raise ValidationException("CPU not found on Passmark CPU list.")
+
+        processor.passmark_id = search_results[0].passmark_id
+
+        specs = await scraper.retrieve_cpu(processor.passmark_id)
+
+        processor.multithread_score = specs.multithread_score
+        processor.single_thread_score = specs.single_thread_score
+
+        if specs is PassmarkPECoreCpuDetails:
+            processor.performance_core_count = specs.performance_cores.cores
+            processor.performance_thread_count = specs.performance_cores.threads
+            processor.performance_clock = specs.performance_cores.clock
+            processor.performance_turbo_clock = specs.performance_cores.turbo_clock
+            processor.efficient_core_count = specs.efficient_cores.cores
+            processor.efficient_thread_count = specs.efficient_cores.threads
+            processor.efficient_clock = specs.efficient_cores.clock
+            processor.efficient_turbo_clock = specs.efficient_cores.turbo_clock
+        else:
+            processor.performance_core_count = specs.cores
+            processor.performance_thread_count = specs.threads
+            processor.performance_clock = specs.clock
+            processor.performance_turbo_clock = specs.turbo_clock
+
+        await processor_service.update(processor, auto_commit=True, auto_refresh=True)
+        return processor

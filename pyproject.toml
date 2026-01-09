@@ -6,7 +6,9 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "advanced-alchemy>=1.8.2",
+    "aiohttp>=3.13.3",
     "aiosqlite>=0.22.0",
+    "asyncio>=4.0.0",
     "beautifulsoup4>=4.14.3",
     "ipykernel>=7.1.0",
     "litestar[standard]>=2.18.0",
