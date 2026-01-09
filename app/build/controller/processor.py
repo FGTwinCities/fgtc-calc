@@ -54,15 +54,17 @@ class ProcessorController(Controller):
         )
 
     @get("/{processor_id: uuid}/update_specs")
-    async def update_processor_specs(self, processor_id: UUID, processor_service: ProcessorService) -> Processor:
+    async def update_processor_specs(self, processor_id: UUID, processor_service: ProcessorService, rebind: bool = False) -> Processor:
         processor = await processor_service.get(processor_id)
 
         scraper = PassmarkScraper()
-        search_results = await scraper.search_cpu(processor.model)
-        if len(search_results) <= 0:
-            raise ValidationException("CPU not found on Passmark CPU list.")
 
-        processor.passmark_id = search_results[0].passmark_id
+        if not processor.passmark_id or rebind:
+            search_results = await scraper.search_cpu(processor.model)
+            if len(search_results) <= 0:
+                raise ValidationException("CPU not found on Passmark CPU list.")
+
+            processor.passmark_id = search_results[0].passmark_id
 
         specs = await scraper.retrieve_cpu(processor.passmark_id)
 
