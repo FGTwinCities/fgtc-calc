@@ -10,7 +10,9 @@ from litestar.plugins.base import InitPluginProtocol, CLIPluginProtocol
 from litestar.static_files import create_static_files_router
 from litestar.template.config import TemplateConfig
 
-from app.build.controller import BuildController
+from app.build.controller.build import BuildController
+from app.build.controller.graphics import GraphicsController
+from app.build.controller.processor import ProcessorController
 from app.price.controller import PriceController
 from app.static_controller import StaticController
 
@@ -35,6 +37,8 @@ class ApplicationCore(InitPluginProtocol, CLIPluginProtocol):
                 create_static_files_router("/static", ["assets"]),
                 StaticController,
                 BuildController,
+                ProcessorController,
+                GraphicsController,
                 PriceController,
             ]
         )
