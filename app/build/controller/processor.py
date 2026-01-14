@@ -1,5 +1,7 @@
+import datetime
 from typing import Sequence
 from uuid import UUID
+from zoneinfo import ZoneInfo
 
 from advanced_alchemy.filters import LimitOffset, OrderBy
 from litestar import get, post, delete
@@ -9,6 +11,7 @@ from litestar.exceptions import InternalServerException, ValidationException
 
 from app.db.model.processor import Processor
 from app.db.service.processor import provide_processor_service, ProcessorService
+from app.ebay.price_estimator import EbayPriceEstimator
 from app.lib.math import clamp
 from app.passmark.passmark_scraper import PassmarkScraper
 from app.passmark.schema import PassmarkPECoreCpuDetails
@@ -85,6 +88,19 @@ class ProcessorController(Controller):
             processor.performance_thread_count = specs.threads
             processor.performance_clock = specs.clock
             processor.performance_turbo_clock = specs.turbo_clock
+
+        await processor_service.update(processor, auto_commit=True, auto_refresh=True)
+        return processor
+
+
+    @get("/{processor_id: uuid}/update_price")
+    async def update_processor_price(self, processor_id: UUID, processor_service: ProcessorService) -> Processor:
+        processor = await processor_service.get(processor_id)
+
+        estimator = EbayPriceEstimator()
+        price = await estimator.estimate_processor(processor)
+        processor.price = price
+        processor.priced_at = datetime.datetime.now(tz=ZoneInfo("UTC"))
 
         await processor_service.update(processor, auto_commit=True, auto_refresh=True)
         return processor
