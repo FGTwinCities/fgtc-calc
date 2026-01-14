@@ -4,13 +4,11 @@ import numpy as np
 from dotenv import load_dotenv
 from ebay_rest import API, Error
 
-from app.db.model import Processor
+from app.db.model import Processor, GraphicsProcessor
 
 
 def create_ebay_api() -> API:
     load_dotenv(override=True)
-
-
 
 
 def cull_outliers(x, outlierConstant):
@@ -83,6 +81,17 @@ class EbayPriceEstimator:
         prices = cull_outliers(prices, 0.1)
         return round(np.mean(prices), 2)
 
+    async def estimate_graphics(self, graphics: GraphicsProcessor) -> float:
+        results = await self.fetch_query_results(f'{graphics.model} gpu')
+
+        results = filter(lambda i: item_has_category(i, 27386), results)
+
+        prices = [float(r['price']['value']) for r in results]
+        print(prices)
+        prices = cull_outliers(prices, 0.1)
+        print(prices)
+        return round(np.mean(prices), 2)
+
 
     async def fetch_query_results(self, query: str, limit: int = 25) -> list:
         api = self._get_api()
@@ -106,10 +115,3 @@ class EbayPriceEstimator:
             items.append(item)
 
         return items
-
-
-if __name__ == "__main__":
-    estimator = EbayPriceEstimator()
-    estimator.estimate_price(Processor(
-        model="AMD Ryzen 5 PRO 5650U",
-    ))

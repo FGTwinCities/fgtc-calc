@@ -116,12 +116,3 @@ class PassmarkScraper:
                 result.single_thread_score = int(single_label.find_next_sibling("div").text)
 
         return result
-
-
-
-if __name__ == "__main__":
-    scraper = PassmarkScraper()
-
-    details = asyncio.run(scraper.retrieve_cpu(5816))
-
-    print(details)
