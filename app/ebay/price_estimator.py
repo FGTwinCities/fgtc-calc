@@ -88,11 +88,11 @@ class EbayPriceEstimator:
 
         prices = [float(r['price']['value']) for r in results]
         prices = cull_outliers(prices, 0.1)
-        price = round(np.mean(prices), 2)
+        price = np.mean(prices)
 
         price = self._pricing_model.compute_adjustment(price)
 
-        return price
+        return round(price, 2)
 
 
     async def estimate_graphics(self, graphics: GraphicsProcessor) -> float:
@@ -102,11 +102,11 @@ class EbayPriceEstimator:
 
         prices = [float(r['price']['value']) for r in results]
         prices = cull_outliers(prices, 0.1)
-        price = round(np.mean(prices), 2)
+        price = np.mean(prices)
 
         price = self._pricing_model.compute_adjustment(price)
 
-        return price
+        return round(price, 2)
 
 
     async def fetch_query_results(self, query: str, limit: int = 25) -> list:
