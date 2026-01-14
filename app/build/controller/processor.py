@@ -91,16 +91,3 @@ class ProcessorController(Controller):
 
         await processor_service.update(processor, auto_commit=True, auto_refresh=True)
         return processor
-
-
-    @get("/{processor_id: uuid}/update_price")
-    async def update_processor_price(self, processor_id: UUID, processor_service: ProcessorService) -> Processor:
-        processor = await processor_service.get(processor_id)
-
-        estimator = EbayPriceEstimator()
-        price = await estimator.estimate_processor(processor)
-        processor.price = price
-        processor.priced_at = datetime.datetime.now(tz=ZoneInfo("UTC"))
-
-        await processor_service.update(processor, auto_commit=True, auto_refresh=True)
-        return processor

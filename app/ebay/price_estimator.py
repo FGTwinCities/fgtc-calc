@@ -3,8 +3,10 @@ import os
 import numpy as np
 from dotenv import load_dotenv
 from ebay_rest import API, Error
+from litestar.di import Provide
 
 from app.db.model import Processor, GraphicsProcessor
+from app.price.model.pricing import PricingModel, provide_default_pricing_model
 
 
 def create_ebay_api() -> API:
@@ -33,10 +35,17 @@ def item_has_category(item, category_id) -> bool:
 
 class EbayPriceEstimator:
     _api: API = None
+    _pricing_model: PricingModel = None
+
+    def __init__(self, pricing_model: PricingModel):
+        self._pricing_model = pricing_model
+
 
     def _get_api(self):
         if not self._api:
             try:
+                load_dotenv()
+
                 api = API(application={
                     "app_id": os.getenv("EBAY_APP_ID"),
                     "dev_id": os.getenv("EBAY_DEV_ID"),
@@ -79,7 +88,12 @@ class EbayPriceEstimator:
 
         prices = [float(r['price']['value']) for r in results]
         prices = cull_outliers(prices, 0.1)
-        return round(np.mean(prices), 2)
+        price = round(np.mean(prices), 2)
+
+        price = self._pricing_model.compute_adjustment(price)
+
+        return price
+
 
     async def estimate_graphics(self, graphics: GraphicsProcessor) -> float:
         results = await self.fetch_query_results(f'{graphics.model} gpu')
@@ -87,10 +101,12 @@ class EbayPriceEstimator:
         results = filter(lambda i: item_has_category(i, 27386), results)
 
         prices = [float(r['price']['value']) for r in results]
-        print(prices)
         prices = cull_outliers(prices, 0.1)
-        print(prices)
-        return round(np.mean(prices), 2)
+        price = round(np.mean(prices), 2)
+
+        price = self._pricing_model.compute_adjustment(price)
+
+        return price
 
 
     async def fetch_query_results(self, query: str, limit: int = 25) -> list:

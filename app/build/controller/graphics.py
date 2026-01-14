@@ -52,16 +52,3 @@ class GraphicsController(Controller):
             OrderBy("model"),
             LimitOffset(limit=clamp(limit, 0, MAX_SEARCH_ITEMS), offset=0),
         )
-
-
-    @get("/{gpu_id: uuid}/update_price")
-    async def update_gpu_price(self, gpu_id: UUID, graphics_service: GraphicsProcessorService) -> GraphicsProcessor:
-        gpu = await graphics_service.get(gpu_id)
-
-        estimator = EbayPriceEstimator()
-        price = await estimator.estimate_graphics(gpu)
-        gpu.price = price
-        gpu.priced_at = datetime.datetime.now(tz=ZoneInfo("UTC"))
-
-        await graphics_service.update(gpu, auto_commit=True, auto_refresh=True)
-        return gpu
