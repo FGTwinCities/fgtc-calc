@@ -58,8 +58,8 @@ class AsyncSearchResultsFetcher {
 
 let PROCESSOR_SEARCH = new AsyncSearchResultsFetcher("/build/processor/search", onProcessorResults);
 
-function onProcessorSearchKeyup(event, input) {
-    PROCESSOR_SEARCH.updateQuery(input.value);
+export function onProcessorSearchKeyup(event) {
+    PROCESSOR_SEARCH.updateQuery(event.target.value);
 }
 
 function onProcessorResults(results) {
@@ -73,8 +73,8 @@ function onProcessorResults(results) {
 
 let GRAPHICS_SEARCH = new AsyncSearchResultsFetcher("/build/graphics/search", onGraphicsResults)
 
-function onGraphicsSearchKeyup(event, input) {
-    GRAPHICS_SEARCH.updateQuery(input.value);
+export function onGraphicsSearchKeyup(event) {
+    GRAPHICS_SEARCH.updateQuery(event.target.value);
 }
 
 function onGraphicsResults(results) {

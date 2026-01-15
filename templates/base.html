@@ -3,16 +3,15 @@
     <head>
         <title>{% block title %}Default Title{% endblock %} - FGTC</title>
         <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+        {{ vite_hmr() }}
+        {{ vite('src/main.js') }}
         {% block extra_head %}{% endblock %}
     </head>
     <body>
         <header>
             <nav>
                 {% block navigation %}
-                <ul>
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/build/create">Create Build</a></li>
-                </ul>
+                    {% include('navigation.html') %}
                 {% endblock %}
             </nav>
         </header>
