@@ -18,6 +18,7 @@ from app.db.service.build import provide_build_service, BuildService
 from app.db.service.graphics import provide_graphics_service, GraphicsProcessorService
 from app.db.service.processor import provide_processor_service, ProcessorService
 from app.lib.attrs import attrcopy
+from app.lib.math import mb2gb
 
 
 class BuildController(Controller):
@@ -105,3 +106,26 @@ class BuildController(Controller):
     async def delete_build(self, build_id: UUID, build_service: BuildService) -> None:
         build = await build_service.get(build_id)
         await build_service.delete(build_id)
+
+
+    @get("/{build_id: uuid}/sheet")
+    async def generate_buildsheet(self, build_id: UUID, build_service: BuildService) -> Template:
+        build = await build_service.get(build_id)
+
+        total_memory = 0
+        for mem in build.memory:
+            total_memory += mem.size
+
+        total_designcapacity = 0
+        total_remainingcapacity = 0
+        for battery in build.batteries:
+            total_designcapacity += battery.design_capacity
+            total_remainingcapacity += battery.remaining_capacity
+
+        return Template("build/buildsheet.html", context=
+        {
+            "build": build,
+            "total_memory": mb2gb(total_memory),
+            "total_designcapacity": total_designcapacity,
+            "total_remainingcapacity": total_remainingcapacity,
+        })

@@ -1,0 +1,164 @@
+{% macro format_size(size) %}
+    {{ size / 1000 }} GB
+{% endmacro %}
+
+{% macro format_price(price) %}
+    {% if price %}
+        {{ "$%.2f"|format(price) }}
+    {% else %}
+        (No price set)
+    {% endif %}
+{% endmacro %}
+
+{% macro format_wireless(wireless) %}
+    {% if not wireless %}
+        <p class="text-xl font-bold">NONE</p>
+    {% else %}
+        <p class=""><b>Yes</b> ({{ wireless }})</p>
+    {% endif %}
+{% endmacro %}
+
+{% macro format_wired(wired) %}
+    {% if not wired %}
+        <p class="text-xl font-bold">NONE</p>
+    {% else %}
+        <p class=""><b>Yes</b>
+        {% if wired < 1000 %}
+            (10/100 Mbps)
+        {% elif wired == 1000 %}
+            (Gigabit)
+        {% elif wired == 2500 %}
+            (2.5GbE)
+        {% elif wired == 10000 %}
+            (10GbE)
+        {% else %}
+            ({{ wired }} Mbps)
+        {% endif %}
+        </p>
+    {% endif %}
+{% endmacro %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {{ vite_hmr() }}
+    {{ vite('src/buildsheet.js') }}
+    <meta charset="UTF-8">
+    <title>Buildsheet - FGTC</title>
+</head>
+<body>
+<div class="grid grid-cols-2 m-6 gap-8">
+    <div>
+        <div class="columns-2 mb-8">
+            <div>
+                <img src="/static/img/freegeeklogo.jpg" class="h-24">
+            </div>
+            <div class="text-right">
+                <p>2537 25th Ave S</p>
+                <p>Minneapolis, MN 55406</p>
+                <p>612-223-5967</p>
+                <p>fgtc.us</p>
+            </div>
+        </div>
+        <div>
+            <h1 class="text-4xl font-bold mb-8">Price: {{ format_price(build.price) }}</h1>
+        </div>
+        <div class="buildsheet-section-list">
+            <div class="buildsheet-section">
+                <h1 class="text-xl font-bold">Manufacturer & Model #:</h1>
+                <p class="text-l">{{ build.manufacturer }} {{ build.model }}</p>
+            </div>
+            {% for processor in build.processors %}
+                <div class="buildsheet-section">
+                    <h1 class="text-xl font-bold">Processor</h1>
+                    <p class="text-l">{{ processor.model }}</p>
+                </div>
+            {% endfor %}
+            <div class="buildsheet-section flex flex-row">
+                <h1 class="text-xl font-bold">Memory</h1>
+                <div class="text-right grow self-center">
+                    {% if not build.memory %}
+                        <p><b>NONE</b> This build has no memory!</p>
+                    {% else %}
+                        <p class="text-xl font-bold">{{ "%.1f"|format(total_memory) }} GB</p>
+                        <p>{{ build.memory[0].type }} {{ build.memory[0].clock }} Mhz</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="buildsheet-section flex flex-row">
+                <h1 class="text-xl font-bold">Storage</h1>
+                <div class="text-right grow self-center">
+                    {% if not build.storage %}
+                        <p><b>NONE</b> This build has no storage drive!</p>
+                    {% endif %}
+                    {% for disk in build.storage %}
+                        <p>{{ format_size(disk.size) }} {{ disk.form }} {{ disk.interface }} {{ disk.type }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="buildsheet-section flex flex-row">
+                <h1 class="text-xl font-bold">Graphics</h1>
+                <div class="text-right grow self-center">
+                    {% if not build.graphics %}
+                        <p><b>NONE</b> (Integrated only)</p>
+                    {% endif %}
+                    {% for gpu in build.graphics %}
+                        <p>{{ gpu.model }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+            {% if build.display %}
+                <div class="buildsheet-section flex flex-row">
+                    <h1 class="text-xl font-bold">Display</h1>
+                    <div class="text-right grow self-center">
+                        <p class="text-lg font-bold">{{ build.display[0].size }}"{% if build.display[0].touchscreen %} Touchscreen{% endif %}</p>
+                        <p>{{ build.display[0].resolution.x }} x {{ build.display[0].resolution.y }} ({{ build.display[0].refresh_rate }} Hz)</p>
+                    </div>
+                </div>
+            {% endif %}
+            {% if build.batteries %}
+                <div class="buildsheet-section flex flex-row">
+                    <h1 class="text-xl font-bold">Battery</h1>
+                    <div class="text-right grow self-center">
+                        <p class="text-lg font-bold">{{ "%.1f"|format((total_remainingcapacity / total_designcapacity) * 100) }}%</p>
+                    </div>
+                </div>
+            {% endif %}
+            <div class="buildsheet-section flex flex-row">
+                <h1 class="text-xl font-bold">WiFi?</h1>
+                <div class="text-right grow self-center">
+                    {{ format_wireless(build.wireless_networking) }}
+                </div>
+            </div>
+            <div class="buildsheet-section flex flex-row">
+                <h1 class="text-xl font-bold">Wired?</h1>
+                <div class="text-right grow self-center">
+                    {{ format_wired(build.wired_networking) }}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <div class="buildsheet-section min-h-64 border-2">
+            <h1 class="text-xl font-bold">Additional Notes</h1>
+            <p>{{ build.notes }}</p>
+        </div>
+        <p class="text-md text-center">
+            Any hardware issue not detailed above is COVERED within 30 days of purchase.
+        </p>
+        <p class="text-sm text-center mt-2 mb-8">
+            Call or visit our store for more info.
+        </p>
+        <div class="buildsheet-section-list">
+            {% for cpu in build.processors %}
+                <div class="buildsheet-section">
+                    <h1 class="text-xl font-bold">CPU Details ({{ cpu.model }})</h1>
+                    <p>Base Clock: {{ cpu.base_clock }} Ghz</p>
+                    <p>Cores: {{ cpu.cores }} Threads: {{ cpu.threads }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -9,7 +9,7 @@ from litestar.logging import LoggingConfig
 from litestar.plugins.base import InitPluginProtocol, CLIPluginProtocol
 from litestar.static_files import create_static_files_router
 from litestar.template.config import TemplateConfig
-from litestar_vite import VitePlugin
+from litestar_vite import VitePlugin, PathConfig
 from litestar_vite.config import ViteConfig
 
 from app.build.controller.build import BuildController
@@ -30,7 +30,12 @@ class ApplicationCore(InitPluginProtocol, CLIPluginProtocol):
         vite_config = ViteConfig(
             dev_mode=True,
             mode="template",
-            types=False
+            types=False,
+            paths=PathConfig(
+                bundle_dir="public",
+                resource_dir="src",
+                static_dir="assets",
+            )
         )
 
         app_config.plugins.extend(
