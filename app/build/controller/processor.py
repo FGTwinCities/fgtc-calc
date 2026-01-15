@@ -19,6 +19,37 @@ from app.passmark.schema import PassmarkPECoreCpuDetails
 MAX_SEARCH_ITEMS = 100
 
 
+async def update_processor_specs(processor: Processor, rebind: bool = False):
+    scraper = PassmarkScraper()
+
+    if not processor.passmark_id or rebind:
+        search_results = await scraper.search_cpu(processor.model)
+        if len(search_results) <= 0:
+            raise ValidationException("CPU not found on Passmark CPU list.")
+
+        processor.passmark_id = search_results[0].passmark_id
+
+    specs = await scraper.retrieve_cpu(processor.passmark_id)
+
+    processor.multithread_score = specs.multithread_score
+    processor.single_thread_score = specs.single_thread_score
+
+    if isinstance(specs, PassmarkPECoreCpuDetails):
+        processor.performance_core_count = specs.performance_cores.cores
+        processor.performance_thread_count = specs.performance_cores.threads
+        processor.performance_clock = round(specs.performance_cores.clock * 1000)
+        processor.performance_turbo_clock = round(specs.performance_cores.turbo_clock * 1000)
+        processor.efficient_core_count = specs.efficient_cores.cores
+        processor.efficient_thread_count = specs.efficient_cores.threads
+        processor.efficient_clock = round(specs.efficient_cores.clock * 1000)
+        processor.efficient_turbo_clock = round(specs.efficient_cores.turbo_clock * 1000)
+    else:
+        processor.performance_core_count = specs.cores
+        processor.performance_thread_count = specs.threads
+        processor.performance_clock = round(specs.clock * 1000)
+        processor.performance_turbo_clock = round(specs.turbo_clock * 1000)
+
+
 class ProcessorController(Controller):
     path = "build/processor"
 
@@ -59,35 +90,6 @@ class ProcessorController(Controller):
     @get("/{processor_id: uuid}/update_specs")
     async def update_processor_specs(self, processor_id: UUID, processor_service: ProcessorService, rebind: bool = False) -> Processor:
         processor = await processor_service.get(processor_id)
-
-        scraper = PassmarkScraper()
-
-        if not processor.passmark_id or rebind:
-            search_results = await scraper.search_cpu(processor.model)
-            if len(search_results) <= 0:
-                raise ValidationException("CPU not found on Passmark CPU list.")
-
-            processor.passmark_id = search_results[0].passmark_id
-
-        specs = await scraper.retrieve_cpu(processor.passmark_id)
-
-        processor.multithread_score = specs.multithread_score
-        processor.single_thread_score = specs.single_thread_score
-
-        if isinstance(specs, PassmarkPECoreCpuDetails):
-            processor.performance_core_count = specs.performance_cores.cores
-            processor.performance_thread_count = specs.performance_cores.threads
-            processor.performance_clock = specs.performance_cores.clock
-            processor.performance_turbo_clock = specs.performance_cores.turbo_clock
-            processor.efficient_core_count = specs.efficient_cores.cores
-            processor.efficient_thread_count = specs.efficient_cores.threads
-            processor.efficient_clock = specs.efficient_cores.clock
-            processor.efficient_turbo_clock = specs.efficient_cores.turbo_clock
-        else:
-            processor.performance_core_count = specs.cores
-            processor.performance_thread_count = specs.threads
-            processor.performance_clock = specs.clock
-            processor.performance_turbo_clock = specs.turbo_clock
-
+        await update_processor_specs(processor, rebind)
         await processor_service.update(processor, auto_commit=True, auto_refresh=True)
         return processor

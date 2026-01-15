@@ -27,12 +27,12 @@ class PricingModel:
         for processor in build.processors:
             if processor.price:
                 price += processor.price
-                debug.append({"price": processor.price, "processor": processor})
+                debug.append(WithPrice(item=processor, price=processor.price))
 
         for gpu in build.graphics:
             if gpu.price:
                 price += gpu.price
-                debug.append({"price": gpu.price, "graphics": gpu})
+                debug.append(WithPrice(item=gpu, price=gpu.price))
 
 
         submodule_prices = []

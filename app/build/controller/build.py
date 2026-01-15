@@ -38,7 +38,7 @@ class BuildController(Controller):
 
 
     @get("/")
-    async def get_builds(self, build_service: BuildService, offset: int = 1, page_size: int = 25) -> Sequence[Build]:
+    async def get_builds(self, build_service: BuildService, offset: int = 0, page_size: int = 25) -> Sequence[Build]:
         return await build_service.list(
             LimitOffset(offset=offset, limit=page_size),
             OrderBy(Build.created_at, "desc"),

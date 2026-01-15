@@ -6,6 +6,7 @@ from litestar import get
 from litestar.controller import Controller
 from litestar.di import Provide
 
+from app.build.controller.processor import update_processor_specs
 from app.db.model import Processor, GraphicsProcessor, MemoryModule, StorageDisk, Display, Battery
 from app.db.repository import MemoryModuleRepository, provide_memory_repo, provide_storage_repo, \
     StorageDiskRepository, DisplayRepository, provide_display_repo, BatteryRepository, provide_battery_repo
@@ -52,8 +53,10 @@ class PriceController(Controller):
     async def calculate_build_price(self, build_id: UUID, build_service: BuildService, processor_service: ProcessorService, model: PricingModel) -> BuildPrice:
         build = await build_service.get(build_id)
 
-        # If prices for associated processors or GPUs are not present or too old, update those first
+        # If prices/specs for associated processors or GPUs are not present or too old, update those first
         for processor in build.processors:
+            if not processor.passmark_id:
+                await update_processor_specs(processor)
             if not processor.price or not processor.priced_at or now() > (processor.priced_at + PRICE_VALID_TIMESPAN):
                 await _update_processor_price(processor, model)
 
