@@ -69,9 +69,11 @@
                 <p class="text-l">{{ build.manufacturer }} {{ build.model }}</p>
             </div>
             {% for processor in build.processors %}
-                <div class="buildsheet-section">
-                    <h1 class="text-xl font-bold">Processor</h1>
-                    <p class="text-l">{{ processor.model }}</p>
+                <div class="buildsheet-section flex flex-row">
+                    <h1 class="text-xl font-bold">Processor{% if not (loop.first and loop.last) %} #{{ loop.index }}{% endif %}</h1>
+                    <div class="text-right grow self-center">
+                        <p class="text-l">{{ processor.model }}</p>
+                    </div>
                 </div>
             {% endfor %}
             <div class="buildsheet-section flex flex-row">
@@ -83,6 +85,9 @@
                         <p class="text-xl font-bold">{{ "%.1f"|format(total_memory) }} GB</p>
                         <p>{{ build.memory[0].type }} {{ build.memory[0].clock }} Mhz</p>
                     {% endif %}
+                    {% if not build.memory[0].upgradable %}
+                        <p><b>Not User Upgradable</b></p>
+                    {% endif %}
                 </div>
             </div>
             <div class="buildsheet-section flex flex-row">
@@ -93,6 +98,9 @@
                     {% endif %}
                     {% for disk in build.storage %}
                         <p>{{ format_size(disk.size) }} {{ disk.form }} {{ disk.interface }} {{ disk.type }}</p>
+                        {% if not disk.upgradable %}
+                            <p><b>Not User Upgradable</b></p>
+                        {% endif %}
                     {% endfor %}
                 </div>
             </div>
@@ -150,7 +158,7 @@
             Call or visit our store for more info.
         </p>
         <div class="buildsheet-section-list">
-            {% for cpu in build.processors %}
+            {% for cpu in build.processors|unique %}
                 <div class="buildsheet-section">
                     <h1 class="text-xl font-bold">CPU Details ({{ cpu.model }})</h1>
                     {% if cpu.efficient_core_count %}
@@ -164,6 +172,15 @@
                     <p><b>Passmark Rating:</b> {{ cpu.multithread_score }} Multithreaded, {{ cpu.single_thread_score }} Single Threaded</p>
                 </div>
             {% endfor %}
+            {% for gpu in build.graphics|unique %}
+                <div class="buildsheet-section">
+                    <h1 class="text-xl font-bold">GPU Details ({{ gpu.model }})</h1>
+                    <!-- TODO: GPU Specs -->
+                </div>
+            {% endfor %}
+            <div class="buildsheet-section">
+                <p class="text-xs"><b>Build ID:</b> {{ build.id }}</p>
+            </div>
         </div>
     </div>
 </div>

@@ -23,3 +23,6 @@ class Processor(UUIDAuditBase, PriceMixin):
     efficient_thread_count: Mapped[int | None] = mapped_column(nullable=True)
     efficient_clock: Mapped[int | None] = mapped_column(nullable=True)
     efficient_turbo_clock: Mapped[int | None] = mapped_column(nullable=True)
+
+    def __hash__(self):
+        return hash(self.id)

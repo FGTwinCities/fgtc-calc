@@ -12,3 +12,6 @@ class GraphicsProcessor(UUIDAuditBase, PriceMixin):
 
     model: Mapped[str] = mapped_column(nullable=False, unique=True)
     #TODO: Specifications
+
+    def __hash__(self):
+        return hash(self.id)
