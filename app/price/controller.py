@@ -11,10 +11,27 @@ from app.db.repository import MemoryModuleRepository, provide_memory_repo, provi
 from app.db.service.build import provide_build_service, BuildService
 from app.db.service.processor import provide_processor_service, ProcessorService
 from app.db.service.graphics import provide_graphics_service, GraphicsProcessorService
+from app.lib.datetime import now
 from app.price.dto import MemoryModulePrice, StorageDiskPrice, DisplayPrice, BatteryPrice, BuildPrice
 from app.price.model.pricing import PricingModel, provide_default_pricing_model
 from app.db.model import Processor, GraphicsProcessor
 from app.ebay.price_estimator import EbayPriceEstimator
+
+PRICE_VALID_TIMESPAN = datetime.timedelta(days=7)
+
+
+async def _update_processor_price(processor: Processor, model: PricingModel) -> None:
+    estimator = EbayPriceEstimator(model)
+    price = await estimator.estimate_processor(processor)
+    processor.price = price
+    processor.priced_at = now()
+
+
+async def _update_graphics_price(graphics: GraphicsProcessor, model: PricingModel) -> None:
+    estimator = EbayPriceEstimator(model)
+    price = await estimator.estimate_graphics(graphics)
+    graphics.price = price
+    graphics.priced_at = now()
 
 
 class PriceController(Controller):
@@ -32,8 +49,18 @@ class PriceController(Controller):
     }
 
     @get("/{build_id: uuid}")
-    async def calculate_build_price(self, build_id: UUID, build_service: BuildService, model: PricingModel) -> BuildPrice:
+    async def calculate_build_price(self, build_id: UUID, build_service: BuildService, processor_service: ProcessorService, model: PricingModel) -> BuildPrice:
         build = await build_service.get(build_id)
+
+        # If prices for associated processors or GPUs are not present or too old, update those first
+        for processor in build.processors:
+            if not processor.price or not processor.priced_at or now() > (processor.priced_at + PRICE_VALID_TIMESPAN):
+                await _update_processor_price(processor, model)
+
+        for gpu in build.graphics:
+            if not gpu.price or gpu.priced_at or now() > (gpu.priced_at + PRICE_VALID_TIMESPAN):
+                await _update_graphics_price(gpu, model)
+
         price = await model.compute(build)
 
         build.price = price.price
@@ -82,10 +109,7 @@ class PriceController(Controller):
     async def update_processor_price(self, processor_id: UUID, processor_service: ProcessorService, model: PricingModel) -> Processor:
         processor = await processor_service.get(processor_id)
 
-        estimator = EbayPriceEstimator(model)
-        price = await estimator.estimate_processor(processor)
-        processor.price = price
-        processor.priced_at = datetime.datetime.now(tz=ZoneInfo("UTC"))
+        await _update_processor_price(processor, model)
 
         await processor_service.update(processor, auto_commit=True, auto_refresh=True)
         return processor
@@ -95,10 +119,7 @@ class PriceController(Controller):
     async def update_gpu_price(self, gpu_id: UUID, graphics_service: GraphicsProcessorService, model: PricingModel) -> GraphicsProcessor:
         gpu = await graphics_service.get(gpu_id)
 
-        estimator = EbayPriceEstimator(model)
-        price = await estimator.estimate_graphics(gpu)
-        gpu.price = price
-        gpu.priced_at = datetime.datetime.now(tz=ZoneInfo("UTC"))
+        await _update_graphics_price(gpu, model)
 
         await graphics_service.update(gpu, auto_commit=True, auto_refresh=True)
         return gpu

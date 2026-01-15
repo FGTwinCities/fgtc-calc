@@ -3,10 +3,9 @@ import os
 import numpy as np
 from dotenv import load_dotenv
 from ebay_rest import API, Error
-from litestar.di import Provide
 
 from app.db.model import Processor, GraphicsProcessor
-from app.price.model.pricing import PricingModel, provide_default_pricing_model
+from app.price.model.pricing import PricingModel
 
 
 def create_ebay_api() -> API:
@@ -90,8 +89,6 @@ class EbayPriceEstimator:
         prices = cull_outliers(prices, 0.1)
         price = np.mean(prices)
 
-        price = self._pricing_model.compute_adjustment(price)
-
         return round(price, 2)
 
 
@@ -103,8 +100,6 @@ class EbayPriceEstimator:
         prices = [float(r['price']['value']) for r in results]
         prices = cull_outliers(prices, 0.1)
         price = np.mean(prices)
-
-        price = self._pricing_model.compute_adjustment(price)
 
         return round(price, 2)
 
