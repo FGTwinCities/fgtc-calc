@@ -1,6 +1,7 @@
 from typing import Sequence
 from uuid import UUID
 
+from advanced_alchemy.filters import LimitOffset, OrderBy
 from litestar import get, post, delete
 from litestar.controller import Controller
 from litestar.di import Provide
@@ -37,8 +38,11 @@ class BuildController(Controller):
 
 
     @get("/")
-    async def get_builds(self, build_service: BuildService) -> Sequence[Build]:
-        return await build_service.list()
+    async def get_builds(self, build_service: BuildService, offset: int = 1, page_size: int = 25) -> Sequence[Build]:
+        return await build_service.list(
+            LimitOffset(offset=offset, limit=page_size),
+            OrderBy(Build.created_at, "desc"),
+        )
 
 
     @get("/{build_id: uuid}")
@@ -104,8 +108,7 @@ class BuildController(Controller):
 
     @delete("/{build_id: uuid}")
     async def delete_build(self, build_id: UUID, build_service: BuildService) -> None:
-        build = await build_service.get(build_id)
-        await build_service.delete(build_id)
+        await build_service.delete(build_id, auto_commit=True)
 
 
     @get("/{build_id: uuid}/sheet")

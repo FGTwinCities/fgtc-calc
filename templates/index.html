@@ -2,6 +2,57 @@
 
 {% block title %}Homepage{% endblock %}
 
+{% block extra_head %}
+    {{ vite('src/recentBuilds.js') }}
+{% endblock %}
+
 {% block content %}
-<h1>Hello</h1>
+<div class="flex justify-center mt-24 mb-24">
+    <a class="btn btn-xl" href="/build/create">Create New Build</a>
+</div>
+<div class="ml-12 mr-12">
+    <div class="join join-vertical bg-base-200 w-full">
+        <div class="join-item border-base-300 border p-4">
+            <h1 class="text-2xl">Recent Builds</h1>
+        </div>
+        <div id="recent-builds-list"></div>
+        <template id="recent-build-entry-template">
+            <div class="build-entry collapse collapse-arrow join-item border-base-300 border">
+                <input type="radio" name="recent-builds-accordian" checked="checked" />
+                <div class="collapse-title flex flex-row">
+                    <p class="font-semibold text-2xl" id="entry-title"></p>
+                    <p class="self-center text-right grow" id="entry-subtitle"></p>
+                </div>
+                <div class="collapse-content">
+                    <div class="pb-4">
+                        <span class="text-l font-semibold">Price: </span><span id="entry-price"></span>
+                    </div>
+                    <div class="flex flex-auto gap-4">
+                        <div class="join bg-base-300 p-4 rounded-box">
+                            <div class="join-item pr-8 self-center font-semibold text-lg">CPU</div>
+                            <div class="join-item" id="entry-processors"></div>
+                        </div>
+                        <div class="join bg-base-300 p-4 rounded-box">
+                            <div class="join-item pr-8 self-center font-semibold text-lg">Memory</div>
+                            <div class="join-item" id="entry-memory"></div>
+                        </div>
+                        <div class="join bg-base-300 p-4 rounded-box">
+                            <div class="join-item pr-8 self-center font-semibold text-lg">Storage</div>
+                            <div class="join-item" id="entry-storage"></div>
+                        </div>
+                        <div class="join bg-base-300 p-4 rounded-box">
+                            <div class="join-item pr-8 self-center font-semibold text-lg">Graphics</div>
+                            <div class="join-item" id="entry-graphics"></div>
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <a class="btn btn-primary" href="/price/%ID%">Generate Price</a>
+                        <a class="btn btn-primary" href="/build/%ID%/sheet">Print Buildsheet</a>
+                        <button class="btn btn-error" id="entry-delete-button">Delete Build</button>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+</div>
 {% endblock %}
