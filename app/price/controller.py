@@ -6,16 +6,16 @@ from litestar import get
 from litestar.controller import Controller
 from litestar.di import Provide
 
+from app.db.model import Processor, GraphicsProcessor, MemoryModule, StorageDisk, Display, Battery
 from app.db.repository import MemoryModuleRepository, provide_memory_repo, provide_storage_repo, \
     StorageDiskRepository, DisplayRepository, provide_display_repo, BatteryRepository, provide_battery_repo
 from app.db.service.build import provide_build_service, BuildService
-from app.db.service.processor import provide_processor_service, ProcessorService
 from app.db.service.graphics import provide_graphics_service, GraphicsProcessorService
-from app.lib.datetime import now
-from app.price.dto import MemoryModulePrice, StorageDiskPrice, DisplayPrice, BatteryPrice, BuildPrice
-from app.price.model.pricing import PricingModel, provide_default_pricing_model
-from app.db.model import Processor, GraphicsProcessor
+from app.db.service.processor import provide_processor_service, ProcessorService
 from app.ebay.price_estimator import EbayPriceEstimator
+from app.lib.datetime import now
+from app.price.dto import BuildPrice, WithPrice
+from app.price.model.pricing import PricingModel, provide_default_pricing_model
 
 PRICE_VALID_TIMESPAN = datetime.timedelta(days=7)
 
@@ -72,37 +72,31 @@ class PriceController(Controller):
 
 
     @get("/memory/{module_id: uuid}")
-    async def calculate_memory_price(self, module_id: UUID, memory_repo: MemoryModuleRepository, model: PricingModel) -> MemoryModulePrice:
+    async def calculate_memory_price(self, module_id: UUID, memory_repo: MemoryModuleRepository, model: PricingModel) -> WithPrice[MemoryModule]:
         module = await memory_repo.get(module_id)
-        price = MemoryModulePrice(module=module)
-        module_price = model.memory_model.compute(module)
-        price.price = model.compute_adjustment(module_price)
-        return price
+        price = model.memory_model.compute(module)
+        return WithPrice(price=price, item=module)
 
 
     @get("/storage/{disk_id: uuid}")
-    async def calculate_storage_price(self, disk_id: UUID, storage_repo: StorageDiskRepository, model: PricingModel) -> StorageDiskPrice:
+    async def calculate_storage_price(self, disk_id: UUID, storage_repo: StorageDiskRepository, model: PricingModel) -> WithPrice[StorageDisk]:
         disk = await storage_repo.get(disk_id)
-        price = StorageDiskPrice(disk=disk)
-        disk_price = model.storage_model.compute(disk)
-        price.price = model.compute_adjustment(disk_price)
-        return price
+        price = model.storage_model.compute(disk)
+        return WithPrice(price=price, item=disk)
 
 
     @get("/display/{display_id: uuid}")
-    async def calculate_display_price(self, display_id: UUID, display_repo: DisplayRepository, model: PricingModel) -> DisplayPrice:
+    async def calculate_display_price(self, display_id: UUID, display_repo: DisplayRepository, model: PricingModel) -> WithPrice[Display]:
         display = await display_repo.get(display_id)
-        price = DisplayPrice(display=display)
-        price.price = model.display_model.compute(display)
-        return price
+        price = model.display_model.calculate(display)
+        return WithPrice(price=price, item=display)
 
 
     @get("/battery/{battery_id: uuid}")
-    async def calculate_battery_price(self, battery_id: UUID, battery_repo: BatteryRepository, model: PricingModel) -> BatteryPrice:
+    async def calculate_battery_price(self, battery_id: UUID, battery_repo: BatteryRepository, model: PricingModel) -> WithPrice[Battery]:
         battery = await battery_repo.get(battery_id)
-        price = BatteryPrice(battery=battery)
-        price.price = model.battery_model.compute(battery)
-        return price
+        price = model.battery_model.calculate(battery)
+        return WithPrice(price=price, item=battery)
 
 
     @get("/processor/{processor_id: uuid}")

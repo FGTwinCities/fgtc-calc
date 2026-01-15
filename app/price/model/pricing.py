@@ -2,7 +2,7 @@ from numpy.polynomial.polynomial import Polynomial
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.model.build import Build
-from app.price.dto import BuildPrice, MemoryModulePrice, StorageDiskPrice, DisplayPrice, BatteryPrice, PriceAdjustment
+from app.price.dto import BuildPrice, PriceAdjustment, WithPrice
 from app.price.model.battery import BatteryPricingModel, provide_battery_pricing_model
 from app.price.model.display import DisplayPricingModel, provide_display_pricing_model
 from app.price.model.memory import MemoryPricingModel, provide_memory_pricing_model
@@ -37,16 +37,16 @@ class PricingModel:
 
         submodule_prices = []
         for mem in build.memory:
-            submodule_prices.append(MemoryModulePrice(module=mem, price=self.memory_model.compute(mem)))
+            submodule_prices.append(WithPrice(item=mem, price=self.memory_model.compute(mem)))
 
         for disk in build.storage:
-            submodule_prices.append(StorageDiskPrice(disk=disk, price=self.storage_model.compute(disk)))
+            submodule_prices.append(WithPrice(item=disk, price=self.storage_model.compute(disk)))
 
         for display in build.display:
-            submodule_prices.append(DisplayPrice(display=display, price=self.display_model.compute(display)))
+            submodule_prices.append(WithPrice(item=display, price=self.display_model.compute(display)))
 
         for battery in build.batteries:
-            submodule_prices.append(BatteryPrice(battery=battery, price=self.battery_model.compute(battery)))
+            submodule_prices.append(WithPrice(item=battery, price=self.battery_model.compute(battery)))
 
         for submodule in submodule_prices:
             price += submodule.price
@@ -54,7 +54,7 @@ class PricingModel:
 
         adjusted = self.compute_adjustment(price)
         debug.append(PriceAdjustment(price=adjusted-price, comment="Store Adjustment"))
-        price = adjusted
+        price = round(adjusted, 2)
 
         return BuildPrice(
             price=price,

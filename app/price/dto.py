@@ -1,36 +1,19 @@
 from dataclasses import dataclass, field
-from typing import Optional, Any
+from typing import Optional, Any, Generic, TypeVar
 
-from app.db.model.battery import Battery
 from app.db.model.build import Build
-from app.db.model.display import Display
-from app.db.model.memory import MemoryModule
-from app.db.model.storage import StorageDisk
+
+T = TypeVar("T")
+
+@dataclass
+class WithPrice(Generic[T]):
+    price: float
+    item: T
 
 
 @dataclass
 class Price:
     price: Optional[float] = None
-
-
-@dataclass
-class MemoryModulePrice(Price):
-    module: MemoryModule = None
-
-
-@dataclass
-class StorageDiskPrice(Price):
-    disk: StorageDisk = None
-
-
-@dataclass
-class DisplayPrice(Price):
-    display: Display = None
-
-
-@dataclass
-class BatteryPrice(Price):
-    battery: Battery = None
 
 
 @dataclass
