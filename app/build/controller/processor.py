@@ -74,7 +74,7 @@ class ProcessorController(Controller):
         processor.multithread_score = specs.multithread_score
         processor.single_thread_score = specs.single_thread_score
 
-        if specs is PassmarkPECoreCpuDetails:
+        if isinstance(specs, PassmarkPECoreCpuDetails):
             processor.performance_core_count = specs.performance_cores.cores
             processor.performance_thread_count = specs.performance_cores.threads
             processor.performance_clock = specs.performance_cores.clock

@@ -153,8 +153,15 @@
             {% for cpu in build.processors %}
                 <div class="buildsheet-section">
                     <h1 class="text-xl font-bold">CPU Details ({{ cpu.model }})</h1>
-                    <p>Base Clock: {{ cpu.base_clock }} Ghz</p>
-                    <p>Cores: {{ cpu.cores }} Threads: {{ cpu.threads }}</p>
+                    {% if cpu.efficient_core_count %}
+                    <p><b>Total Cores:</b> {{ cpu.performance_core_count + cpu.efficient_core_count }} Cores, {{ cpu.performance_thread_count + cpu.efficient_thread_count }} Threads</p>
+                    <p><b>Performance Cores:</b> {{ cpu.performance_core_count }} Cores, {{ cpu.performance_thread_count }} Threads @ {{ cpu.performance_clock }} GHz Base, {{ cpu.performance_turbo_clock }} GHz Turbo</p>
+                    <p><b>Efficiency Cores:</b> {{ cpu.efficient_core_count }} Cores, {{ cpu.efficient_thread_count }} Threads @ {{ cpu.efficient_clock }} GHz Base, {{ cpu.efficient_turbo_clock }} GHz Turbo</p>
+                    {% else %}
+                    <p><b>Base Clock:</b> {{ cpu.performance_clock }} Ghz</p>
+                    <p><b>Cores:</b> {{ cpu.performance_core_count }} <b>Threads:</b> {{ cpu.performance_thread_count }}</p>
+                    {% endif %}
+                    <p><b>Passmark Rating:</b> {{ cpu.multithread_score }} Multithreaded, {{ cpu.single_thread_score }} Single Threaded</p>
                 </div>
             {% endfor %}
         </div>
