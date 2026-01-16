@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 from advanced_alchemy.extensions.litestar import SQLAlchemyInitPlugin, SQLAlchemySerializationPlugin, \
@@ -28,7 +29,7 @@ class ApplicationCore(InitPluginProtocol, CLIPluginProtocol):
                                                   create_all=True)
 
         vite_config = ViteConfig(
-            dev_mode=True,
+            dev_mode=os.getenv("DEV_MODE", "True").lower() in ("true", 1, "t"),
             mode="template",
             types=False,
             paths=PathConfig(

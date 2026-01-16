@@ -23,3 +23,12 @@ dependencies = [
 
 [project.scripts]
 app = "app.__main__:run_cli"
+
+[build-system]
+build-backend = "hatchling.build"
+requires = ["hatchling", "setuptools"]
+
+[tool.hatch.build.targets.wheel]
+skip-excluded-dirs = false
+ignore-vcs = true
+packages = ["app", "templates"]

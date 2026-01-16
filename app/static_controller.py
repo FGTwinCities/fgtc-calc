@@ -1,3 +1,5 @@
+import os
+
 from litestar import Controller, get
 from litestar.response import Template, File
 
@@ -12,4 +14,7 @@ class StaticController(Controller):
 
     @get("/favicon.ico")
     async def favicon(self) -> File:
-        return File("assets/favicon.ico")
+        if os.getenv("DEV_MODE", "True").lower() in ("true", 1, "t"):
+            return File("assets/favicon.ico")
+        else:
+            return File("public/favicon.ico")
