@@ -15,7 +15,12 @@ export default defineConfig({
   plugins: [
     tailwindcss(),
     litestar({
-      input: ["src/main.js"],
+      input: [
+        "src/main.js",
+        "src/buildsheet.js",
+        "src/build/create.js",
+        "src/build/search.js",
+        ],
     }),
   ],
   build: {

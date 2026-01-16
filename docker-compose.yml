@@ -5,3 +5,33 @@ services:
     container_name: "application"
     ports:
       - "8000:8000"
+    environment:
+      VITE_DEV_MODE: "false"
+      DATABASE_URL: "postgresql+asyncpg://app:app@database:5432/app"
+    depends_on:
+      database:
+        condition: service_healthy
+
+  database:
+    image: postgres:18.1-alpine3.23
+    environment:
+      POSTGRES_DB: "app"
+      POSTGRES_USER: "app"
+      POSTGRES_PASSWORD: "app"
+    ports:
+      - "15432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD
+        - pg_isready
+        - -U
+        - app
+      interval: 2s
+      timeout: 3s
+      retries: 40
+
+volumes:
+  db-data: {}
