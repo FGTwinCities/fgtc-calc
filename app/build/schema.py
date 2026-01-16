@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from struct import Struct
 
 from app.db.enum import BuildType, WirelessNetworkingStandard, MemoryType, StorageDiskType, StorageDiskInterface, \
     StorageDiskForm

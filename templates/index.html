@@ -45,10 +45,18 @@
                             <div class="join-item" id="entry-graphics"></div>
                         </div>
                     </div>
-                    <div class="mt-6">
-                        <a class="btn btn-primary" href="/price/%ID%">Generate Price</a>
+                    <div class="join mt-6">
+                        <label class="input join-item">
+                            <span class="label">$</span>
+                            <input id="entry-set-price-field" type="number">
+                        </label>
+                        <button id="entry-set-price-button" class="btn btn-primary join-item rounded-r-full">Set Price</button>
+                    </div>
+                    <div class="mt-4 flex flex-row gap-4">
+                        <button class="btn btn-primary" id="entry-generate-price-button">Generate Price</button>
                         <a class="btn btn-primary" href="/build/%ID%/sheet">Print Buildsheet</a>
-                        <button class="btn btn-error" id="entry-delete-button">Delete Build</button>
+                        <a class="btn btn-warning" href="/build/create?edit=%ID%">Edit</a>
+                        <button class="btn btn-error" id="entry-delete-button">Delete</button>
                     </div>
                 </div>
             </div>
