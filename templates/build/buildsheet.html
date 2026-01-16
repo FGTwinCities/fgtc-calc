@@ -163,10 +163,11 @@
                     <h1 class="text-xl font-bold">CPU Details ({{ cpu.model }})</h1>
                     {% if cpu.efficient_core_count %}
                     <p><b>Total Cores:</b> {{ cpu.performance_core_count + cpu.efficient_core_count }} Cores, {{ cpu.performance_thread_count + cpu.efficient_thread_count }} Threads</p>
-                    <p><b>Performance Cores:</b> {{ cpu.performance_core_count }} Cores, {{ cpu.performance_thread_count }} Threads @ {{ cpu.performance_clock }} GHz Base, {{ cpu.performance_turbo_clock }} GHz Turbo</p>
-                    <p><b>Efficiency Cores:</b> {{ cpu.efficient_core_count }} Cores, {{ cpu.efficient_thread_count }} Threads @ {{ cpu.efficient_clock }} GHz Base, {{ cpu.efficient_turbo_clock }} GHz Turbo</p>
+                    <p><b>Performance Cores:</b> {{ cpu.performance_core_count }} Cores, {{ cpu.performance_thread_count }} Threads @ {{ cpu.performance_clock / 1000 }} GHz Base{% if cpu.performance_turbo_clock %}, {{ cpu.performance_turbo_clock / 1000 }} GHz Turbo{% endif %}</p>
+                    <p><b>Efficiency Cores:</b> {{ cpu.efficient_core_count }} Cores, {{ cpu.efficient_thread_count }} Threads @ {{ cpu.efficient_clock / 1000 }} GHz Base{% if cpu.efficient_turbo_clock %}, {{ cpu.efficient_turbo_clock / 1000 }} GHz Turbo{% endif %}</p>
                     {% else %}
-                    <p><b>Base Clock:</b> {{ cpu.performance_clock }} Ghz</p>
+                    <p><b>Base Clock:</b> {{ cpu.performance_clock / 1000 }} Ghz</p>
+                    {% if cpu.performance_turbo_clock %}<p><b>Turbo Clock:</b> {{ cpu.performance_turbo_clock / 1000 }}</p>{% endif %}
                     <p><b>Cores:</b> {{ cpu.performance_core_count }} <b>Threads:</b> {{ cpu.performance_thread_count }}</p>
                     {% endif %}
                     <p><b>Passmark Rating:</b> {{ cpu.multithread_score }} Multithreaded, {{ cpu.single_thread_score }} Single Threaded</p>

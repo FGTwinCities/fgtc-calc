@@ -37,17 +37,23 @@ async def update_processor_specs(processor: Processor, rebind: bool = False):
     if isinstance(specs, PassmarkPECoreCpuDetails):
         processor.performance_core_count = specs.performance_cores.cores
         processor.performance_thread_count = specs.performance_cores.threads
-        processor.performance_clock = round(specs.performance_cores.clock * 1000)
-        processor.performance_turbo_clock = round(specs.performance_cores.turbo_clock * 1000)
+        if specs.performance_cores.clock:
+            processor.performance_clock = round(specs.performance_cores.clock * 1000)
+        if specs.performance_cores.turbo_clock:
+            processor.performance_turbo_clock = round(specs.performance_cores.turbo_clock * 1000)
         processor.efficient_core_count = specs.efficient_cores.cores
         processor.efficient_thread_count = specs.efficient_cores.threads
-        processor.efficient_clock = round(specs.efficient_cores.clock * 1000)
-        processor.efficient_turbo_clock = round(specs.efficient_cores.turbo_clock * 1000)
+        if specs.efficient_cores.clock:
+            processor.efficient_clock = round(specs.efficient_cores.clock * 1000)
+        if specs.efficient_cores.turbo_clock:
+            processor.efficient_turbo_clock = round(specs.efficient_cores.turbo_clock * 1000)
     else:
         processor.performance_core_count = specs.cores
         processor.performance_thread_count = specs.threads
-        processor.performance_clock = round(specs.clock * 1000)
-        processor.performance_turbo_clock = round(specs.turbo_clock * 1000)
+        if specs.clock:
+            processor.performance_clock = round(specs.clock * 1000)
+        if specs.turbo_clock:
+            processor.performance_turbo_clock = round(specs.turbo_clock * 1000)
 
 
 class ProcessorController(Controller):
