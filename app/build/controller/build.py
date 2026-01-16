@@ -52,10 +52,17 @@ class BuildController(Controller):
 
         # Find existing processors by name
         for i in range(0, len(data.processors)):
-            found_processors = await processor_service.list(Processor.model.is_(data.processors[i].model))
-            if len(found_processors) > 0:
-                build.processors.append(found_processors[0])
-            else:
+            # For some dumb reason, model.is_() breaks everything when using postgres, so query by contains and do final comparison here
+            #TODO: Please find a fix
+            found_processors = await processor_service.list(Processor.model.contains(data.processors[i].model))
+
+            is_found = False
+            for processor in found_processors:
+                if processor.model == data.processors[i].model:
+                    build.processors.append(processor)
+                    is_found = True
+
+            if not is_found:
                 new_processor = Processor(
                     model=data.processors[i].model,
                 )
@@ -64,10 +71,15 @@ class BuildController(Controller):
 
         # Find existing GPUs by name
         for i in range(0, len(data.graphics)):
-            found_gpus = await graphics_service.list(GraphicsProcessor.model.is_(data.graphics[i].model))
-            if len(found_gpus) > 0:
-                build.graphics.append(found_gpus[0])
-            else:
+            found_gpus = await graphics_service.list(GraphicsProcessor.model.contains(data.graphics[i].model))
+
+            is_found = False
+            for gpu in found_gpus:
+                if gpu.model == data.graphics[i].model:
+                    build.graphics.append(gpu)
+                    is_found = True
+
+            if not is_found:
                 new_gpu = GraphicsProcessor(
                     model=data.graphics[i].model,
                 )

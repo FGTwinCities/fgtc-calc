@@ -17,7 +17,6 @@ export default defineConfig({
     litestar({
       input: [
         "src/main.js",
-        "src/recentBuilds.js",
         "src/buildsheet.js",
         "src/build/create.js",
         "src/build/search.js",

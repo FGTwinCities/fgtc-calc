@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 
+from advanced_alchemy.config import AsyncSessionConfig
 from advanced_alchemy.extensions.litestar import SQLAlchemyInitPlugin, SQLAlchemySerializationPlugin, \
     SQLAlchemyAsyncConfig
 from click import Group
@@ -25,8 +26,13 @@ class ApplicationCore(InitPluginProtocol, CLIPluginProtocol):
         pass
 
     def on_app_init(self, app_config: AppConfig) -> AppConfig:
-        sqlalchemy_config = SQLAlchemyAsyncConfig(connection_string="sqlite+aiosqlite:///database.sqlite",
-                                                  create_all=True)
+        session_config = AsyncSessionConfig(expire_on_commit=False)
+        sqlalchemy_config = SQLAlchemyAsyncConfig(
+            connection_string=os.getenv("DATABASE_URL", "sqlite+aiosqlite:///database.sqlite"),
+            before_send_handler="autocommit",
+            session_config=session_config,
+            create_all=True,
+        )
 
         vite_config = ViteConfig(
             dev_mode=os.getenv("DEV_MODE", "True").lower() in ("true", 1, "t"),
