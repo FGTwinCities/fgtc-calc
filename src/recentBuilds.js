@@ -24,6 +24,18 @@ function timeSince(date) {
     return Math.floor(seconds) + " seconds";
 }
 
+async function onClickGeneratePrice(build_id) {
+    try {
+        await $.ajax(`/price/${build_id}`)
+    } catch(err) {
+        console.log(err);
+        alert("Failed to price build. Details are in log.")
+    }
+
+    await fetchRecentBuildsPage();
+    $(`.build-entry[build-id=${build_id}]`).find("input[type=radio]").prop("checked", true);
+}
+
 async function onClickSetPrice(build_id) {
     let price = parseFloat($(`.build-entry[build-id=${build_id}]`).find("#entry-set-price-field").val());
     let dto = {
@@ -35,7 +47,9 @@ async function onClickSetPrice(build_id) {
         'data': JSON.stringify(dto),
         'dataType': "json",
     });
-    fetchRecentBuildsPage();
+
+    await fetchRecentBuildsPage();
+    $(`.build-entry[build-id=${build_id}]`).find("input[type=radio]").prop("checked", true);
 }
 
 async function onClickDeleteBuild(build_id) {
@@ -89,12 +103,19 @@ async function fetchRecentBuildsPage() {
         });
 
         entry.find("#entry-set-price-button").click(() => onClickSetPrice(build.id));
+        entry.find("#entry-generate-price-button").click(() => onClickGeneratePrice(build.id));
         entry.find("#entry-delete-button").click(() => onClickDeleteBuild(build.id));
 
         entryList.append(entry);
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    let selectId = urlParams.get('select');
+    if (selectId) {
+        $(`.build-entry[build-id=${selectId}]`).find("input[type=radio]").prop("checked", true);
     }
 }
 
 window.onload = function() {
     fetchRecentBuildsPage();
-}
+};

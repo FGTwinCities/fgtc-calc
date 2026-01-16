@@ -245,10 +245,10 @@ async function onCreateFormSubmit() {
 
     try {
         let response = await $.ajax(url, settings);
-        window.location.href = "/build/" + response["id"];
+        window.location.href = `/?select=${response['id']}`;
     } catch(err) {
         console.log(err);
-        alert("Build rejected by server.")
+        alert("Build rejected by server. Details can be found in log.")
     }
 }
 
