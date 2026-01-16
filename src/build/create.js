@@ -22,6 +22,7 @@ function addTemplateListItem(templateElementId, listElementId) {
     template.find("#gpu-search").keyup(onGraphicsSearchKeyup);
 
     $("#"+listElementId).append(template);
+    return template
 }
 
 export function convertFormToDto() {
@@ -149,22 +150,15 @@ export function fillFormFromDto(dto) {
     $("input[name=model]").val(dto["model"])
 
     // Fill processor information
-    let processorList = $("#processor-list");
-    processorList.find("fieldset").remove(); // Wipe processor list
-    let processorTemplate = $($("#processor-template").html());
     for (let i = 0; i < dto["processors"].length; i++) {
-        let field = processorTemplate.clone();
+        let field = addTemplateListItem('processor-template', 'processor-list');
         field.find("input[name=processor-name]").val(dto["processors"][i]["model"]);
         field.find("input[name=processor-upgradable]").val(dto["processors"][i]["upgradable"]);
-        processorList.append(field);
     }
 
     // Fill memory information
-    let memoryList = $("#memory-list");
-    memoryList.find("fieldset").remove();
-    let memoryTemplate = $($("#memory-template").html());
     for (let i = 0; i < dto["memory"].length; i++) {
-        let field = memoryTemplate.clone();
+        let field = addTemplateListItem('memory-template', 'memory-list');
         let megabytes = dto["memory"][i]["size"];
         field.find("input[name=memory-size]").val(megabytes);
         field.find("select[name=memory-size-unit]").val("mb"); //TODO: Pick and convert units
@@ -173,15 +167,11 @@ export function fillFormFromDto(dto) {
         $("input[name=memory-type][value=" + dto["memory"][0]["type"] + "]").prop("checked", true);
         $("input[name=memory-upgradable]").prop("checked", dto["memory"][0]["upgradable"]);
         $("input[name=memory-ecc]").prop("checked", dto["memory"][0]["ecc"]);
-        memoryList.append(field);
     }
 
     // Fill storage information
-    let storageList = $("#storage-list");
-    storageList.find("fieldset").remove();
-    let storageTemplate = $($("#storage-template").html());
     for (let i = 0; i < dto["storage"].length; i++) {
-        let field = storageTemplate.clone();
+        let field = addTemplateListItem('storage-template', 'storage-list');
         let megabytes = dto["storage"][i]["size"];
         field.find("input[name=storage-disk-size]").val(megabytes);
         field.find("select[name=storage-disk-size-unit]").val("mb"); //TODO: Pick and convert units
@@ -189,15 +179,11 @@ export function fillFormFromDto(dto) {
         field.find("select[name=storage-disk-form]").val(dto["storage"][i]["form"]);
         field.find("select[name=storage-disk-interface]").val(dto["storage"][i]["interface"]);
         field.find("input[name=storage-disk-upgradable]").prop("checked", dto["storage"][i]["upgradable"]);
-        storageList.append(field);
     }
 
     // Fill graphics information
-    let graphicsList = $("#gpu-list");
-    graphicsList.find("fieldset").remove();
-    let graphicsTemplate = $($("#gpu-template").html());
     for (let i = 0; i < dto["graphics"].length; i++) {
-        let field = graphicsTemplate.clone();
+        let field = addTemplateListItem('graphics-template', 'graphics-list');
         field.find("input[name=gpu-name]").val(dto["graphics"][i]["model"]);
         field.find("input[name=gpu-upgradable]").val(dto["graphics"][i]["upgradable"]);
         graphicsList.append(field);
@@ -240,27 +226,29 @@ export function fillFormFromDto(dto) {
     $("input[name=networking-wireless][value=" + (dto["wireless_networking"] == null ? "none" : dto["wireless_networking"]) + "]").prop("checked", true);
 }
 
-function onCreateFormSubmit() {
+async function onCreateFormSubmit() {
     let dto = convertFormToDto();
 
-    fetch("/build", {
+    var url = "/build";
+    let settings = {
         method: "POST",
-        body: JSON.stringify(dto),
-        headers: {
-            "Content-Type": "application/json; charset=UTF-8"
-        }
-    }).then(onSubmitResponse);
-}
+        data: JSON.stringify(dto),
+        dataType: "json",
+    };
 
-async function onSubmitResponse(response) {
-    let dto = await response.json();
-    if (response.ok) {
-        window.location.href = "/build/" + dto["id"];
-    } else {
-        let p = document.createElement('p');
-        p.innerText += "Error sending build: ";
-        p.innerText += dto["detail"];
-        document.body.append(p);
+    const urlParams = new URLSearchParams(window.location.search);
+    let editId = urlParams.get('edit');
+    if (editId) {
+        url = `/build/${editId}`;
+        settings.method = "PATCH";
+    }
+
+    try {
+        let response = await $.ajax(url, settings);
+        window.location.href = "/build/" + response["id"];
+    } catch(err) {
+        console.log(err);
+        alert("Build rejected by server.")
     }
 }
 
@@ -281,7 +269,7 @@ function updateVisibleFields() {
     $("#fieldset-networking").prop('hidden', !(isComputer || isOther));
 }
 
-window.onload = function() {
+window.onload = async function() {
     // Bind events for page
     $("input[name=type]").change(updateVisibleFields);
     $("#add-processor-button").click(() => addTemplateListItem('processor-template', 'processor-list'));
@@ -291,13 +279,19 @@ window.onload = function() {
     $("#add-battery-button").click(() => addTemplateListItem('battery-template', 'battery-list'));
     $("#submit-button").click(onCreateFormSubmit);
 
-    // Automatically add a CPU, Memory Module, Disk and Battery on page load
-    addTemplateListItem('processor-template', 'processor-list');
-    addTemplateListItem('memory-template', 'memory-list');
-    addTemplateListItem('storage-template', 'storage-list');
-    addTemplateListItem('battery-template', 'battery-list');
+    const urlParams = new URLSearchParams(window.location.search);
+    let editId = urlParams.get('edit');
+    if (editId) {
+        fillFormFromDto(await $.ajax(`/build/${editId}`));
+    } else {
+        // Automatically add a CPU, Memory Module, Disk and Battery on page load
+        addTemplateListItem('processor-template', 'processor-list');
+        addTemplateListItem('memory-template', 'memory-list');
+        addTemplateListItem('storage-template', 'storage-list');
+        addTemplateListItem('battery-template', 'battery-list');
 
-    updateVisibleFields();
+        updateVisibleFields();
+    }
 }
 
 window.convertFormToDto = convertFormToDto;
