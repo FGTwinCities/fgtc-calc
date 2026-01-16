@@ -183,10 +183,9 @@ export function fillFormFromDto(dto) {
 
     // Fill graphics information
     for (let i = 0; i < dto["graphics"].length; i++) {
-        let field = addTemplateListItem('graphics-template', 'graphics-list');
+        let field = addTemplateListItem('gpu-template', 'gpu-list');
         field.find("input[name=gpu-name]").val(dto["graphics"][i]["model"]);
         field.find("input[name=gpu-upgradable]").val(dto["graphics"][i]["upgradable"]);
-        graphicsList.append(field);
     }
 
     // Fill display information
