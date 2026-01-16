@@ -24,6 +24,20 @@ function timeSince(date) {
     return Math.floor(seconds) + " seconds";
 }
 
+async function onClickSetPrice(build_id) {
+    let price = parseFloat($(`.build-entry[build-id=${build_id}]`).find("#entry-set-price-field").val());
+    let dto = {
+        'price': price,
+    }
+
+    await $.ajax(`/price/${build_id}`, {
+        'method': "POST",
+        'data': JSON.stringify(dto),
+        'dataType': "json",
+    });
+    fetchRecentBuildsPage();
+}
+
 async function onClickDeleteBuild(build_id) {
     if (confirm("Are you sure you want to delete this build?") != true) {
         return;
@@ -74,6 +88,7 @@ async function fetchRecentBuildsPage() {
             return val.replace(/%ID%/g, build.id);
         });
 
+        entry.find("#entry-set-price-button").click(() => onClickSetPrice(build.id));
         entry.find("#entry-delete-button").click(() => onClickDeleteBuild(build.id));
 
         entryList.append(entry);

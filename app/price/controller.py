@@ -2,12 +2,12 @@ import datetime
 from uuid import UUID
 from zoneinfo import ZoneInfo
 
-from litestar import get
+from litestar import get, post
 from litestar.controller import Controller
 from litestar.di import Provide
 
 from app.build.controller.processor import update_processor_specs
-from app.db.model import Processor, GraphicsProcessor, MemoryModule, StorageDisk, Display, Battery
+from app.db.model import Processor, GraphicsProcessor, MemoryModule, StorageDisk, Display, Battery, Build
 from app.db.repository import MemoryModuleRepository, provide_memory_repo, provide_storage_repo, \
     StorageDiskRepository, DisplayRepository, provide_display_repo, BatteryRepository, provide_battery_repo
 from app.db.service.build import provide_build_service, BuildService
@@ -15,7 +15,7 @@ from app.db.service.graphics import provide_graphics_service, GraphicsProcessorS
 from app.db.service.processor import provide_processor_service, ProcessorService
 from app.ebay.price_estimator import EbayPriceEstimator
 from app.lib.datetime import now
-from app.price.dto import BuildPrice, WithPrice
+from app.price.dto import BuildPrice, WithPrice, Price
 from app.price.model.pricing import PricingModel, provide_default_pricing_model
 
 PRICE_VALID_TIMESPAN = datetime.timedelta(days=7)
@@ -121,3 +121,23 @@ class PriceController(Controller):
         await graphics_service.update(gpu, auto_commit=True, auto_refresh=True)
         return gpu
 
+    @post("/{build_id: uuid}")
+    async def set_build_price(self, build_id: UUID, data: Price, build_service: BuildService) -> Build:
+        build = await build_service.get(build_id)
+        build.price = data.price
+        await build_service.update(build, auto_commit=True, auto_refresh=True)
+        return build
+
+    @post("/processor/{processor_id: uuid}")
+    async def set_processor_price(self, processor_id: UUID, data: Price, processor_service: ProcessorService) -> Processor:
+        processor = await processor_service.get(processor_id)
+        processor.price = data.price
+        await processor_service.update(processor, auto_commit=True, auto_refresh=True)
+        return processor
+
+    @post("/graphics/{gpu_id: uuid}")
+    async def set_gpu_price(self, gpu_id: UUID, data: Price, graphics_service: GraphicsProcessorService) -> GraphicsProcessor:
+        gpu = await graphics_service.get(gpu_id)
+        gpu.price = data.price
+        await graphics_service.update(gpu, auto_commit=True, auto_refresh=True)
+        return gpu
