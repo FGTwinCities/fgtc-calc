@@ -52,6 +52,15 @@ async function onClickSetPrice(build_id) {
     $(`.build-entry[build-id=${build_id}]`).find("input[type=radio]").prop("checked", true);
 }
 
+function onClickPrintBuildsheet(build_id) {
+    var printWindow = window.open(`/build/${build_id}/sheet`);
+    printWindow.addEventListener('load', async function() {
+        printWindow.print();
+        await setTimeout(500);
+        printWindow.close();
+    });
+}
+
 async function onClickDeleteBuild(build_id) {
     if (confirm("Are you sure you want to delete this build?") != true) {
         return;
@@ -104,6 +113,7 @@ async function fetchRecentBuildsPage() {
 
         entry.find("#entry-set-price-button").click(() => onClickSetPrice(build.id));
         entry.find("#entry-generate-price-button").click(() => onClickGeneratePrice(build.id));
+        entry.find("#entry-print-button").click(() => onClickPrintBuildsheet(build.id));
         entry.find("#entry-delete-button").click(() => onClickDeleteBuild(build.id));
 
         entryList.append(entry);
