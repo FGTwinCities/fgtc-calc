@@ -1,5 +1,7 @@
+import datetime
 from typing import Sequence
 from uuid import UUID
+from zoneinfo import ZoneInfo
 
 from advanced_alchemy.filters import LimitOffset, OrderBy
 from litestar import get, post, delete, patch
@@ -167,4 +169,5 @@ class BuildController(Controller):
             "total_memory": mb2gb(total_memory),
             "total_designcapacity": total_designcapacity,
             "total_remainingcapacity": total_remainingcapacity,
+            "current_datetime": datetime.datetime.now(tz=ZoneInfo("UTC"))
         })

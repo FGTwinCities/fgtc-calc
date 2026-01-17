@@ -180,6 +180,8 @@
                 </div>
             {% endfor %}
             <div class="buildsheet-section">
+                <p class="text-xs"><b>Created:</b> {{ build.created_at.astimezone().strftime('%B %d, %Y at %I:%M %p') }}</p>
+                <p class="text-xs"><b>Printed:</b> {{ current_datetime.astimezone().strftime('%B %d, %Y at %I:%M %p') }}</p>
                 <p class="text-xs"><b>Build ID:</b> {{ build.id }}</p>
             </div>
         </div>
