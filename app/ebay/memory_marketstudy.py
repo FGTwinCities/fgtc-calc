@@ -1,9 +1,16 @@
 import asyncio
 import re
+from typing import AsyncGenerator
 
+import numpy as np
+from aiostream import stream
+from scipy.optimize import curve_fit
+
+from app.db.enum import MemoryType
+from app.db.model import MemoryModule
 from app.ebay.ebay_connection import EbayConnection
 from app.lib.math import gb2mb, tb2mb
-from app.price.model.memory import MemoryPricingModel
+from app.price.model.memory import MemoryPricingModel, memory_model_func
 
 
 def parse_memory_speed(speed_string: str) -> int | None:
@@ -47,13 +54,69 @@ def parse_memory_aspects(aspects: list) -> dict:
 	return result
 
 
-async def run_memory_marketstudy() -> MemoryPricingModel:
-	conn = EbayConnection()
-	
+async def fetch_memory_marketdata_query(conn: EbayConnection, query: str, limit: int) -> AsyncGenerator[dict]:
 	results = await conn.fetch_query_results("DDR4", 10)
 	for item in asyncio.as_completed([conn.fetch_item(r) for r in results]):
-		print(parse_memory_aspects((await item).get("localized_aspects")))
+		itm = await item
+		aspects = parse_memory_aspects(itm.get("localized_aspects"))
+
+		# Remove any items that dont have required specs listed in aspects
+		if None in [aspects.get("module_capacity"), aspects.get("speed")]:
+			continue
+
+		# Remove any items that are not priced in USD
+		if itm.get("price", {}).get("currency") != "USD":
+			continue
+
+		module_price = float(itm.get("price", {}).get("value"))
+		module_price /= aspects.get("module_count", 1)
+
+		yield {
+			# "listing": itm,
+			"price": module_price,
+			"capacity": aspects.get("module_capacity"),
+			"speed": aspects.get("speed"),
+		}
+
+
+async def run_memory_marketstudy() -> MemoryPricingModel:
+	conn = EbayConnection()
+
+	queries = [
+		"DDR3",
+		"DDR4",
+		"DDR5",
+	]
+
+	capacities = []
+	speeds = []
+	prices = []
+
+	combine = stream.merge(*[fetch_memory_marketdata_query(conn, query, 50) for query in queries])
+	async with combine.stream() as streamer:
+		async for data in streamer:
+			capacities.append(data.get("capacity"))
+			speeds.append(data.get("speed"))
+			prices.append(data.get("price"))
+
+	capacities = np.array(capacities)
+	speeds = np.array(speeds)
+	prices = np.array(prices)
+
+	popt, pcov = curve_fit(memory_model_func, (capacities, speeds), prices)
+
+	model = MemoryPricingModel()
+	model.parameters = popt
+	return model
 
 
 if __name__ == "__main__":
-	asyncio.run(run_memory_marketstudy())
+	model = asyncio.run(run_memory_marketstudy())
+
+	price = model.compute(MemoryModule(
+		type=MemoryType.DDR4,
+		clock=3600,
+		size=16000,
+	))
+
+	print(f'Price for 16GB of DDR4@3600: {price}')
