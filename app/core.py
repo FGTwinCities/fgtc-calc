@@ -7,9 +7,9 @@ from advanced_alchemy.extensions.litestar import SQLAlchemyInitPlugin, SQLAlchem
 from click import Group
 from litestar.config.app import AppConfig
 from litestar.contrib.jinja import JinjaTemplateEngine
+from litestar.di import Provide
 from litestar.logging import LoggingConfig
 from litestar.plugins.base import InitPluginProtocol, CLIPluginProtocol
-from litestar.static_files import create_static_files_router
 from litestar.template.config import TemplateConfig
 from litestar_vite import VitePlugin, PathConfig
 from litestar_vite.config import ViteConfig
@@ -18,6 +18,7 @@ from app.build.controller.build import BuildController
 from app.build.controller.graphics import GraphicsController
 from app.build.controller.processor import ProcessorController
 from app.price.controller import PriceController
+from app.price.model.service import provide_pricing_model_service
 from app.static_controller import StaticController
 
 
@@ -69,5 +70,9 @@ class ApplicationCore(InitPluginProtocol, CLIPluginProtocol):
         )
 
         app_config.logging_config = LoggingConfig(log_exceptions="always")
+
+        app_config.dependencies = {
+            "pricing_model_service": Provide(provide_pricing_model_service),
+        }
 
         return app_config

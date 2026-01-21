@@ -15,11 +15,19 @@ from app.price.model.memory import MemoryPricingModel, memory_model_func
 
 def parse_memory_speed(speed_string: str) -> int | None:
 	res = re.search(r'[Pp][Cc]\d-(\d+)', speed_string)
+
+	if not res:
+		return None
+
 	return round(int(res.group(1)) / 8)
 
 
 def parse_capacity(capacity_string: str) -> int | None:
 	res = re.search(r'(\d+)\s*([MmGgTt][Bb])', capacity_string)
+
+	if not res:
+		return None
+
 	value = int(res.group(1))
 	unit = res.group(2).lower()
 

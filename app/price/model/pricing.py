@@ -1,11 +1,11 @@
 from numpy.polynomial.polynomial import Polynomial
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.model.build import Build
+from app.db.model.stored_pricing_model import StoredPricingModel
 from app.price.dto import BuildPrice, PriceAdjustment, WithPrice
 from app.price.model.battery import BatteryPricingModel, provide_battery_pricing_model
 from app.price.model.display import DisplayPricingModel, provide_display_pricing_model
-from app.price.model.memory import MemoryPricingModel, provide_memory_pricing_model
+from app.price.model.memory import MemoryPricingModel
 from app.price.model.storage import StoragePricingModel, provide_storage_pricing_model
 
 
@@ -61,12 +61,21 @@ class PricingModel:
             component_pricing=debug,
         )
 
+    @classmethod
+    async def from_stored(cls, stored_model: StoredPricingModel):
+        model = PricingModel()
 
-async def provide_default_pricing_model(db_session: AsyncSession) -> PricingModel:
-    model = PricingModel()
-    model.adjustment = Polynomial([0, 0.5, 0])
-    model.memory_model = await provide_memory_pricing_model(db_session)
-    model.storage_model = await provide_storage_pricing_model(db_session)
-    model.display_model = await provide_display_pricing_model(db_session)
-    model.battery_model = await provide_battery_pricing_model(db_session)
-    return model
+        model.memory_model = MemoryPricingModel()
+        model.memory_model.parameters = (
+            stored_model.memory_param_a,
+            stored_model.memory_param_b,
+            stored_model.memory_param_c,
+            stored_model.memory_param_d,
+            stored_model.memory_param_e,
+        )
+
+        model.storage_model = await provide_storage_pricing_model(None)
+        model.display_model = await provide_display_pricing_model(None)
+        model.battery_model = await provide_battery_pricing_model(None)
+
+        return model

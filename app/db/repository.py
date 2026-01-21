@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.model.battery import Battery
 from app.db.model.display import Display
 from app.db.model.memory import MemoryModule
+from app.db.model.stored_pricing_model import StoredPricingModel
 from app.db.model.storage import StorageDisk
 
 
@@ -37,3 +38,11 @@ class BatteryRepository(SQLAlchemyAsyncRepository[Battery]):
 
 async def provide_battery_repo(db_session: AsyncSession) -> BatteryRepository:
     return BatteryRepository(session=db_session)
+
+
+class PricingModelRepository(SQLAlchemyAsyncRepository[StoredPricingModel]):
+    model_type = StoredPricingModel
+
+
+async def provide_pricing_model_repo(db_session: AsyncSession) -> PricingModelRepository:
+    return PricingModelRepository(session=db_session)
