@@ -1,10 +1,15 @@
-from advanced_alchemy.filters import OrderBy
+import datetime
+
+from litestar.exceptions import ValidationException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.model.stored_pricing_model import StoredPricingModel
 from app.db.repository import PricingModelRepository, provide_pricing_model_repo
 from app.ebay.memory_marketstudy import run_memory_marketstudy
+from app.lib.datetime import now
 from app.price.model.pricing import PricingModel
+
+MODEL_VALID_LIFESPAN = datetime.timedelta(days=7)
 
 
 class PricingModelService:
@@ -15,22 +20,23 @@ class PricingModelService:
 
 
     async def generate_model(self):
-        memory = await run_memory_marketstudy()
+        model = PricingModel()
+        model.memory_model = await run_memory_marketstudy()
 
-        stored = StoredPricingModel()
-        stored.memory_param_a = memory.parameters[0]
-        stored.memory_param_b = memory.parameters[1]
-        stored.memory_param_c = memory.parameters[2]
-        stored.memory_param_d = memory.parameters[3]
-        stored.memory_param_e = memory.parameters[4]
+        stored = model.to_stored()
 
         await self._repo.add(stored, auto_commit=True)
 
 
     async def get_model(self) -> PricingModel:
-        stored_model = await self._repo.get_one(
-            OrderBy(StoredPricingModel.created_at),
+        models = await self._repo.list(
+            StoredPricingModel.created_at > (now() - MODEL_VALID_LIFESPAN)
         )
+
+        stored_model = max(models, key=lambda m: m.created_at)
+
+        if not stored_model:
+            raise ValidationException("No pricing model is available")
 
         return await PricingModel.from_stored(stored_model)
 

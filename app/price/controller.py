@@ -16,7 +16,6 @@ from app.db.service.processor import provide_processor_service, ProcessorService
 from app.ebay.price_estimator import EbayPriceEstimator
 from app.lib.datetime import now
 from app.price.dto import BuildPrice, WithPrice, Price
-from app.price.model.pricing import PricingModel
 from app.price.model.service import PricingModelService
 
 PRICE_VALID_TIMESPAN = datetime.timedelta(days=7)
@@ -148,6 +147,6 @@ class PriceController(Controller):
         return gpu
 
     @get("/generate_model")
-    async def generate_pricing_model(self, pricing_model_service: PricingModelService) -> PricingModel:
+    async def generate_pricing_model(self, pricing_model_service: PricingModelService) -> dict:
         await pricing_model_service.generate_model()
-        return await pricing_model_service.get_model()
+        return {"message": "Pricing model generated"}

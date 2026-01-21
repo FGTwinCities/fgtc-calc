@@ -79,3 +79,14 @@ class PricingModel:
         model.battery_model = await provide_battery_pricing_model(None)
 
         return model
+
+    def to_stored(self) -> StoredPricingModel:
+        stored = StoredPricingModel()
+
+        stored.memory_param_a = self.memory_model.parameters[0]
+        stored.memory_param_b = self.memory_model.parameters[1]
+        stored.memory_param_c = self.memory_model.parameters[2]
+        stored.memory_param_d = self.memory_model.parameters[3]
+        stored.memory_param_e = self.memory_model.parameters[4]
+
+        return stored
