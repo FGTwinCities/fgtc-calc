@@ -1,24 +1,8 @@
-import os
-
 import numpy as np
-from dotenv import load_dotenv
-from ebay_rest import API, Error
 
 from app.db.model import Processor, GraphicsProcessor
 from app.ebay.ebay_connection import EbayConnection
-from app.price.model.pricing import PricingModel
-
-
-def cull_outliers(x, outlierConstant):
-    a = np.array(x)
-    upper_quartile = np.percentile(a, 75)
-    lower_quartile = np.percentile(a, 25)
-    IQR = (upper_quartile - lower_quartile) * outlierConstant
-    quartileSet = (lower_quartile - IQR, upper_quartile + IQR)
-
-    result = a[np.where((a >= quartileSet[0]) & (a <= quartileSet[1]))]
-
-    return result.tolist()
+from app.ebay.util import cull_outliers
 
 
 def item_has_category(item, category_id) -> bool:

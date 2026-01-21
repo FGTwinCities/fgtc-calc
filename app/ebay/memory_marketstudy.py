@@ -9,7 +9,8 @@ from scipy.optimize import curve_fit
 from app.db.enum import MemoryType
 from app.db.model import MemoryModule
 from app.ebay.ebay_connection import EbayConnection
-from app.lib.math import gb2mb, tb2mb
+from app.ebay.util import parse_capacity
+from app.lib.util import try_int
 from app.price.model.memory import MemoryPricingModel, memory_model_func
 
 
@@ -19,28 +20,8 @@ def parse_memory_speed(speed_string: str) -> int | None:
 	if not res:
 		return None
 
-	return round(int(res.group(1)) / 8)
+	return round(try_int(res.group(1)) / 8)
 
-
-def parse_capacity(capacity_string: str) -> int | None:
-	res = re.search(r'(\d+)\s*([MmGgTt][Bb])', capacity_string)
-
-	if not res:
-		return None
-
-	value = int(res.group(1))
-	unit = res.group(2).lower()
-
-	if 'm' in unit:
-		pass
-	elif 'g' in unit:
-		value = gb2mb(value)
-	elif 't' in unit:
-		value = tb2mb(value)
-	else:
-		return None
-
-	return round(value)
 
 def parse_memory_aspects(aspects: list) -> dict:
 	result = {}
@@ -54,7 +35,7 @@ def parse_memory_aspects(aspects: list) -> dict:
 			result["total_capacity"] = parse_capacity(val)
 
 		if key == "number of modules":
-			result["module_count"] = int(val)
+			result["module_count"] = try_int(val)
 
 		if key == "bus speed":
 			result["speed"] = parse_memory_speed(val)
@@ -63,7 +44,7 @@ def parse_memory_aspects(aspects: list) -> dict:
 
 
 async def fetch_memory_marketdata_query(conn: EbayConnection, query: str, limit: int) -> AsyncGenerator[dict]:
-	results = await conn.fetch_query_results("DDR4", 10)
+	results = await conn.fetch_query_results(query, limit)
 	for item in asyncio.as_completed([conn.fetch_item(r) for r in results]):
 		itm = await item
 		aspects = parse_memory_aspects(itm.get("localized_aspects"))

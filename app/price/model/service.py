@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.model.stored_pricing_model import StoredPricingModel
 from app.db.repository import PricingModelRepository, provide_pricing_model_repo
 from app.ebay.memory_marketstudy import run_memory_marketstudy
+from app.ebay.storage_marketstudy import run_storage_marketstudy
 from app.lib.datetime import now
 from app.price.model.pricing import PricingModel
 
@@ -22,6 +23,7 @@ class PricingModelService:
     async def generate_model(self):
         model = PricingModel()
         model.memory_model = await run_memory_marketstudy()
+        model.storage_model = await run_storage_marketstudy()
 
         stored = model.to_stored()
 

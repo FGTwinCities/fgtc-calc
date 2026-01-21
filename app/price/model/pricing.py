@@ -74,6 +74,23 @@ class PricingModel:
             stored_model.memory_param_e,
         )
 
+        model.storage_model = StoragePricingModel()
+        model.storage_model.hdd_parameters = (
+            stored_model.storage_hdd_param_a,
+            stored_model.storage_hdd_param_b,
+            stored_model.storage_hdd_param_c,
+        )
+        model.storage_model.sata_ssd_parameters = (
+            stored_model.storage_sata_ssd_param_a,
+            stored_model.storage_sata_ssd_param_b,
+            stored_model.storage_sata_ssd_param_c,
+        )
+        model.storage_model.nvme_ssd_parameters = (
+            stored_model.storage_nvme_ssd_param_a,
+            stored_model.storage_nvme_ssd_param_b,
+            stored_model.storage_nvme_ssd_param_c,
+        )
+
         return model
 
     def to_stored(self) -> StoredPricingModel:
@@ -84,5 +101,15 @@ class PricingModel:
         stored.memory_param_c = self.memory_model.parameters[2]
         stored.memory_param_d = self.memory_model.parameters[3]
         stored.memory_param_e = self.memory_model.parameters[4]
+
+        stored.storage_hdd_param_a = self.storage_model.hdd_parameters[0]
+        stored.storage_hdd_param_b = self.storage_model.hdd_parameters[1]
+        stored.storage_hdd_param_c = self.storage_model.hdd_parameters[2]
+        stored.storage_sata_ssd_param_a = self.storage_model.sata_ssd_parameters[0]
+        stored.storage_sata_ssd_param_b = self.storage_model.sata_ssd_parameters[1]
+        stored.storage_sata_ssd_param_c = self.storage_model.sata_ssd_parameters[2]
+        stored.storage_nvme_ssd_param_a = self.storage_model.nvme_ssd_parameters[0]
+        stored.storage_nvme_ssd_param_b = self.storage_model.nvme_ssd_parameters[1]
+        stored.storage_nvme_ssd_param_c = self.storage_model.nvme_ssd_parameters[2]
 
         return stored
