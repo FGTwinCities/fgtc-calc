@@ -12,7 +12,3 @@ class MemoryPricingModel:
 
     def compute(self, module: MemoryModule) -> float:
         return memory_model_func((module.size, module.clock), *self.parameters)
-
-
-async def provide_memory_pricing_model(db_session: AsyncSession) -> MemoryPricingModel:
-    return MemoryPricingModel()

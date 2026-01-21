@@ -7,31 +7,24 @@ from app.db.model.storage import StorageDisk
 from app.lib.math import mb2gb
 
 
+def storage_model_func(x: float, a: float, b: float, c: float) -> float:
+    return (a * x ** 2) + (b * x) + c
+
+
 class StoragePricingModel:
-    hdd_size_func: Polynomial
-    sata_size_func: Polynomial
-    nvme_size_func: Polynomial
+    hdd_parameters = (0, 1, 0)
+    sata_ssd_parameters = (0, 1, 0)
+    nvme_ssd_parameters = (0, 1, 0)
 
     def compute(self, disk: StorageDisk) -> float:
         if disk.type == StorageDiskType.HDD:
-            return self.hdd_size_func(mb2gb(disk.size))
+            return storage_model_func(disk.size, *self.hdd_parameters)
         elif disk.type == StorageDiskType.SSD:
             if disk.interface == StorageDiskInterface.SATA:
-                return self.sata_size_func(mb2gb(disk.size))
+                return storage_model_func(disk.size, *self.sata_ssd_parameters)
             elif disk.interface == StorageDiskInterface.NVME:
-                return self.nvme_size_func(mb2gb(disk.size))
+                return storage_model_func(disk.size, *self.nvme_ssd_parameters)
             else:
                 raise ValidationException("Invalid interface for SSD: " + disk.interface.__str__())
         else:
             raise ValidationException("Invalid configuration.")
-
-
-async def provide_storage_pricing_model(db_session: AsyncSession) -> StoragePricingModel:
-    model = StoragePricingModel()
-
-    #TODO: Use database
-    model.hdd_size_func = Polynomial([0, 0.03, 0])
-    model.sata_size_func = Polynomial([0, 0.13, 0])
-    model.nvme_size_func = Polynomial([0, 0.2, 0])
-
-    return model

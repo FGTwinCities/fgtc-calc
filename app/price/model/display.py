@@ -17,12 +17,3 @@ class DisplayPricingModel:
         size_price = self.size_func(display.size)
         touch_price = self.touchscreen_value if display.touchscreen else 0
         return resolution_price + refreshrate_price + size_price + touch_price
-
-
-async def provide_display_pricing_model(db_session: AsyncSession) -> DisplayPricingModel:
-    model = DisplayPricingModel()
-    model.size_func = Polynomial([0, 1, 0])
-    model.resolution_func = Polynomial([-2.0736, 0.001, 0])
-    model.refreshrate_func = Polynomial([-19.8, 0.33, 0])
-    model.touchscreen_value = 15
-    return model

@@ -38,7 +38,7 @@ class PricingModelService:
         if not stored_model:
             raise ValidationException("No pricing model is available")
 
-        return await PricingModel.from_stored(stored_model)
+        return PricingModel.from_stored(stored_model)
 
 
 async def provide_pricing_model_service(db_session: AsyncSession) -> PricingModelService:

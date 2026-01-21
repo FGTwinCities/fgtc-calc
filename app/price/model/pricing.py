@@ -3,10 +3,10 @@ from numpy.polynomial.polynomial import Polynomial
 from app.db.model.build import Build
 from app.db.model.stored_pricing_model import StoredPricingModel
 from app.price.dto import BuildPrice, PriceAdjustment, WithPrice
-from app.price.model.battery import BatteryPricingModel, provide_battery_pricing_model
-from app.price.model.display import DisplayPricingModel, provide_display_pricing_model
+from app.price.model.battery import BatteryPricingModel
+from app.price.model.display import DisplayPricingModel
 from app.price.model.memory import MemoryPricingModel
-from app.price.model.storage import StoragePricingModel, provide_storage_pricing_model
+from app.price.model.storage import StoragePricingModel
 
 
 class PricingModel:
@@ -15,10 +15,10 @@ class PricingModel:
     def compute_adjustment(self, price: float) -> float:
         return self.adjustment(price)
 
-    memory_model: MemoryPricingModel
-    storage_model: StoragePricingModel
-    display_model: DisplayPricingModel
-    battery_model: BatteryPricingModel
+    memory_model: MemoryPricingModel = MemoryPricingModel()
+    storage_model: StoragePricingModel = StoragePricingModel()
+    display_model: DisplayPricingModel = DisplayPricingModel()
+    battery_model: BatteryPricingModel = BatteryPricingModel()
 
     async def compute(self, build: Build) -> BuildPrice:
         debug = []
@@ -62,7 +62,7 @@ class PricingModel:
         )
 
     @classmethod
-    async def from_stored(cls, stored_model: StoredPricingModel):
+    def from_stored(cls, stored_model: StoredPricingModel):
         model = PricingModel()
 
         model.memory_model = MemoryPricingModel()
@@ -73,10 +73,6 @@ class PricingModel:
             stored_model.memory_param_d,
             stored_model.memory_param_e,
         )
-
-        model.storage_model = await provide_storage_pricing_model(None)
-        model.display_model = await provide_display_pricing_model(None)
-        model.battery_model = await provide_battery_pricing_model(None)
 
         return model
 
