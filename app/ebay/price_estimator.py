@@ -5,11 +5,8 @@ from dotenv import load_dotenv
 from ebay_rest import API, Error
 
 from app.db.model import Processor, GraphicsProcessor
+from app.ebay.ebay_connection import EbayConnection
 from app.price.model.pricing import PricingModel
-
-
-def create_ebay_api() -> API:
-    load_dotenv(override=True)
 
 
 def cull_outliers(x, outlierConstant):
@@ -33,55 +30,11 @@ def item_has_category(item, category_id) -> bool:
 
 
 class EbayPriceEstimator:
-    _api: API = None
-    _pricing_model: PricingModel = None
-
-    def __init__(self, pricing_model: PricingModel):
-        self._pricing_model = pricing_model
-
-
-    def _get_api(self):
-        if not self._api:
-            try:
-                load_dotenv()
-
-                api = API(application={
-                    "app_id": os.getenv("EBAY_APP_ID"),
-                    "dev_id": os.getenv("EBAY_DEV_ID"),
-                    "cert_id": os.getenv("EBAY_SECRET"),
-                    "redirect_uri": os.getenv("EBAY_REDIRECT"),
-                }, user={
-                    "email_or_username": os.getenv("EBAY_USERNAME"),
-                    "password": os.getenv("EBAY_PASSWORD"),
-                    "scopes": [
-                        "https://api.ebay.com/oauth/api_scope",
-                        "https://api.ebay.com/oauth/api_scope/sell.inventory"
-                    ],
-                    "refresh_token": "",
-                    "refresh_token_expiry": ""
-                }, header={
-                    "accept_language": "en-US",
-                    "affiliate_campaign_id": "",
-                    "affiliate_reference_id": "",
-                    "content_language": "en-US",
-                    "country": "US",
-                    "currency": "USD",
-                    "device_id": "",
-                    "marketplace_id": "EBAY_US",
-                    "zip": "20500"
-                })
-            except Error as e:
-                print(f'Error {e.number} is {e.reason}  {e.detail}.\n')
-                raise RuntimeError("Failed to authenticate with eBay API")
-            else:
-                self._api = api
-                return api
-        else:
-            return self._api
+    connection: EbayConnection = EbayConnection()
 
 
     async def estimate_processor(self, processor: Processor) -> float:
-        results = await self.fetch_query_results(f'{processor.model} processor')
+        results = await self.connection.fetch_query_results(f'{processor.model} processor')
 
         results = filter(lambda i: item_has_category(i, 164), results)
 
@@ -93,7 +46,7 @@ class EbayPriceEstimator:
 
 
     async def estimate_graphics(self, graphics: GraphicsProcessor) -> float:
-        results = await self.fetch_query_results(f'{graphics.model} gpu')
+        results = await self.connection.fetch_query_results(f'{graphics.model} gpu')
 
         results = filter(lambda i: item_has_category(i, 27386), results)
 
@@ -102,27 +55,3 @@ class EbayPriceEstimator:
         price = np.mean(prices)
 
         return round(price, 2)
-
-
-    async def fetch_query_results(self, query: str, limit: int = 25) -> list:
-        api = self._get_api()
-
-        filters = []
-        buying_option = "FIXED_PRICE"
-        filters.append("buyingOptions:{" + buying_option + "}")
-        currency = "USD"
-        filters.append(f"priceCurrency:{currency}")
-        filter_ = ",".join(filters)
-
-        items = []
-        for record in api.buy_browse_search(q=query, limit=limit, filter=filter_):
-            if 'record' not in record:
-                continue
-
-            item = record['record']
-            if item['price']['currency'] != 'USD':
-                continue
-
-            items.append(item)
-
-        return items
