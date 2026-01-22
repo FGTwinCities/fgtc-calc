@@ -29,7 +29,7 @@ async def update_processor_specs(processor: Processor, rebind: bool = False):
 
         processor.passmark_id = search_results[0].passmark_id
 
-    specs = await scraper.retrieve_cpu(processor.passmark_id)
+    specs = await scraper.retrieve_cpu_by_id(processor.passmark_id)
 
     processor.multithread_score = specs.multithread_score
     processor.single_thread_score = specs.single_thread_score

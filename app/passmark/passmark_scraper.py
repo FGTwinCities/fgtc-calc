@@ -1,4 +1,5 @@
 import re
+from typing import overload
 from urllib.parse import urlencode
 
 from aiohttp import ClientSession
@@ -39,21 +40,28 @@ class PassmarkScraper:
 
                 for tag in tags:
                     cpu_name = tag.find("a").text
-                    cpu_id = int(re.search(r'\d+', tag.get("id")).group())
 
                     if query:
                         if query.lower() not in cpu_name.lower():
                             continue
 
+                    cpu_id = int(re.search(r'\d+', tag.get("id")).group())
+                    score = int(re.search(r'\d+', tag.find_all("td")[1].text).group())
+
                     results.append(PassmarkSearchResult(
                         name=cpu_name,
                         passmark_id=cpu_id,
+                        multithread_score=score,
                     ))
 
         return results
 
 
-    async def retrieve_cpu(self, cpu_id: int) -> PassmarkCpuDetails:
+    async def retrieve_cpu(self, cpu: PassmarkSearchResult) -> PassmarkCpuDetails:
+        return await self.retrieve_cpu_by_id(cpu.passmark_id)
+
+
+    async def retrieve_cpu_by_id(self, cpu_id: int) -> PassmarkCpuDetails:
         result = None
 
         async with self._create_cpu_session() as session:
@@ -65,6 +73,15 @@ class PassmarkScraper:
 
                 cpu_name = soup.find(["span", "p"], class_="cpuname").text
 
+                class_elem = soup.find(["p", "strong", "b"], string=re.compile(r'[Cc]lass:')).parent
+                cpu_class = re.search(r'[Cc]lass:\s*([\w]+)', class_elem.text)
+                if cpu_class:
+                    cpu_class = cpu_class.group(1)
+
+                socket_elem = soup.find(["p", "strong", "b"], string=re.compile(r'[Ss]ocket:')).parent
+                socket = re.search(r'[Ss]ocket:\s*([\w\d]+)', socket_elem.text)
+                if socket:
+                    socket = socket.group(1)
 
                 total_cores_threads = soup.find(["p", "strong", "b"], string=re.compile(r'[Tt]otal\s[Cc]ores:'))
 
@@ -73,6 +90,8 @@ class PassmarkScraper:
                     result = PassmarkPECoreCpuDetails(
                         name=cpu_name,
                         passmark_id=cpu_id,
+                        cpu_class=cpu_class,
+                        socket=socket,
                     )
 
                     try:
@@ -87,6 +106,8 @@ class PassmarkScraper:
                     result = PassmarkStandardCpuDetails(
                         name=cpu_name,
                         passmark_id=cpu_id,
+                        cpu_class=cpu_class,
+                        socket=socket,
                     )
 
                     try:
