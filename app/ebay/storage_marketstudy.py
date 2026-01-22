@@ -10,7 +10,7 @@ from app.ebay.util import parse_capacity
 from app.lib.util import try_int
 from app.price.model.storage import StoragePricingModel, storage_model_func
 
-MAX_PRICE_PER_MB: float = 0.0002
+MAX_STORAGE_PRICE_PER_MB: float = 0.0005
 
 
 def parse_disk_aspects(aspects: list) -> dict:
@@ -38,7 +38,10 @@ async def fetch_disk_marketdata_query(conn: EbayConnection, query: str, limit: i
         if not filter_func(item):
             continue
 
-        aspects = parse_disk_aspects(item.get("localized_aspects"))
+        try:
+            aspects = parse_disk_aspects(item.get("localized_aspects"))
+        except ValueError:
+            continue
 
         if None in [aspects.get("capacity")]:
             continue
@@ -50,7 +53,7 @@ async def fetch_disk_marketdata_query(conn: EbayConnection, query: str, limit: i
         disk_price = float(item.get("price", {}).get("value"))
         disk_price /= aspects.get("disk_count", 1)
 
-        if disk_price / aspects.get("capacity") > MAX_PRICE_PER_MB:
+        if disk_price / aspects.get("capacity") > MAX_STORAGE_PRICE_PER_MB:
             continue
 
         yield {

@@ -35,10 +35,10 @@ class PricingModelService:
             StoredPricingModel.created_at > (now() - MODEL_VALID_LIFESPAN)
         )
 
-        stored_model = max(models, key=lambda m: m.created_at)
-
-        if not stored_model:
+        if len(models) <= 0:
             raise ValidationException("No pricing model is available")
+
+        stored_model = max(models, key=lambda m: m.created_at)
 
         return PricingModel.from_stored(stored_model)
 

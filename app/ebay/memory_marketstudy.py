@@ -9,9 +9,11 @@ from scipy.optimize import curve_fit
 from app.db.enum import MemoryType
 from app.db.model import MemoryModule
 from app.ebay.ebay_connection import EbayConnection
+from app.ebay.storage_marketstudy import category_filter
 from app.ebay.util import parse_capacity
-from app.lib.util import try_int
 from app.price.model.memory import MemoryPricingModel, memory_model_func
+
+MAX_MEMORY_PRICE_PER_MB = 0.08
 
 
 def parse_memory_speed(speed_string: str) -> int | None:
@@ -20,7 +22,7 @@ def parse_memory_speed(speed_string: str) -> int | None:
 	if not res:
 		return None
 
-	return round(try_int(res.group(1)) / 8)
+	return round(int(res.group(1)) / 8)
 
 
 def parse_memory_aspects(aspects: list) -> dict:
@@ -35,7 +37,7 @@ def parse_memory_aspects(aspects: list) -> dict:
 			result["total_capacity"] = parse_capacity(val)
 
 		if key == "number of modules":
-			result["module_count"] = try_int(val)
+			result["module_count"] = int(val)
 
 		if key == "bus speed":
 			result["speed"] = parse_memory_speed(val)
@@ -46,19 +48,29 @@ def parse_memory_aspects(aspects: list) -> dict:
 async def fetch_memory_marketdata_query(conn: EbayConnection, query: str, limit: int) -> AsyncGenerator[dict]:
 	results = await conn.fetch_query_results(query, limit)
 	for item in asyncio.as_completed([conn.fetch_item(r) for r in results]):
-		itm = await item
-		aspects = parse_memory_aspects(itm.get("localized_aspects"))
+		item = await item
+
+		if not category_filter(item, 170083):
+			continue
+
+		try:
+			aspects = parse_memory_aspects(item.get("localized_aspects"))
+		except ValueError:
+			continue
 
 		# Remove any items that dont have required specs listed in aspects
 		if None in [aspects.get("module_capacity"), aspects.get("speed")]:
 			continue
 
 		# Remove any items that are not priced in USD
-		if itm.get("price", {}).get("currency") != "USD":
+		if item.get("price", {}).get("currency") != "USD":
 			continue
 
-		module_price = float(itm.get("price", {}).get("value"))
+		module_price = float(item.get("price", {}).get("value"))
 		module_price /= aspects.get("module_count", 1)
+
+		if module_price / aspects.get("module_capacity") > MAX_MEMORY_PRICE_PER_MB:
+			continue
 
 		yield {
 			# "listing": itm,
