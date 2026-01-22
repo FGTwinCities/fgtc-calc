@@ -2,6 +2,7 @@ import os
 
 from dotenv import load_dotenv
 from ebay_rest import API, Error
+from ebay_rest.api.buy_browse.rest import ApiException
 
 
 class EbayConnection:
@@ -83,3 +84,9 @@ class EbayConnection:
 
 		api = self._get_api()
 		return api.buy_browse_get_item(item_id)
+
+	async def fetch_item_or_none(self, item: dict | str) -> dict | None:
+		try:
+			return await self.fetch_item(item)
+		except ApiException:
+			return None

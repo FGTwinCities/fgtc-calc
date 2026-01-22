@@ -47,8 +47,11 @@ def parse_memory_aspects(aspects: list) -> dict:
 
 async def fetch_memory_marketdata_query(conn: EbayConnection, query: str, limit: int) -> AsyncGenerator[dict]:
 	results = await conn.fetch_query_results(query, limit)
-	for item in asyncio.as_completed([conn.fetch_item(r) for r in results]):
+	for item in asyncio.as_completed([conn.fetch_item_or_none(r) for r in results]):
 		item = await item
+
+		if item is None:
+			continue
 
 		if not category_filter(item, 170083):
 			continue
