@@ -32,9 +32,9 @@ export function convertFormToDto() {
 
     // Collect values that can be pulled directly from the form into the build object
     dto["type"] = formData.get("type");
-    dto["manufacturer"] = formData.get("manufacturer");
-    dto["model"] = formData.get("model");
-    dto["operating_system"] = formData.get("operating-system");
+    dto["manufacturer"] = formData.get("manufacturer") == "" ? null : formData.get("manufacturer");
+    dto["model"] = formData.get("model") == "" ? null : formData.get("model");
+    dto["operating_system"] = formData.get("operating-system") == "" ? null : formData.get("operating-system");
 
     // Collect processors
     dto["processors"] = [];

@@ -68,6 +68,16 @@
                 <h1 class="text-xl font-bold">Manufacturer & Model #:</h1>
                 <p class="text-l">{{ build.manufacturer }} {{ build.model }}</p>
             </div>
+            <div class="buildsheet-section flex flex-row">
+                <h1 class="text-xl font-bold">Operating System</h1>
+                <div class="text-right grow self-center">
+                    {% if build.operating_system %}
+                        <p>{{ build.operating_system }}</p>
+                    {% else %}
+                        <p><b>NONE</b></p>
+                    {% endif %}
+                </div>
+            </div>
             {% for processor in build.processors %}
                 <div class="buildsheet-section flex flex-row">
                     <h1 class="text-xl font-bold">Processor{% if not (loop.first and loop.last) %} #{{ loop.index }}{% endif %}</h1>
@@ -84,9 +94,9 @@
                     {% else %}
                         <p class="text-xl font-bold">{{ "%.1f"|format(total_memory) }} GB</p>
                         <p>{{ build.memory[0].type }} {{ build.memory[0].clock }} Mhz</p>
-                    {% endif %}
                     {% if not build.memory[0].upgradable %}
                         <p><b>Not User Upgradable</b></p>
+                    {% endif %}
                     {% endif %}
                 </div>
             </div>
