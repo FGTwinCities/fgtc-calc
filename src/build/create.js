@@ -21,6 +21,10 @@ function addTemplateListItem(templateElementId, listElementId) {
     template.find("#processor-search").keyup(onProcessorSearchKeyup);
     template.find("#gpu-search").keyup(onGraphicsSearchKeyup);
 
+    let form = new FormData($("#create-form").get(0));
+    template.find("#processor-upgradable").prop("checked", form.get("type") !== "laptop");
+    template.find("#gpu-upgradable").prop("checked", form.get("type") !== "laptop");
+
     $("#"+listElementId).append(template);
     return template
 }
@@ -268,6 +272,10 @@ function updateVisibleFields() {
     $("#fieldset-display").prop('hidden', !(isLaptop || isOther));
     $("#fieldset-battery").prop('hidden', !(isLaptop || isOther));
     $("#fieldset-networking").prop('hidden', !(isComputer || isOther));
+
+    $("#processor-upgradable").prop("checked", !isLaptop);
+    $("#gpu-upgradable").prop("checked", !isLaptop);
+
 }
 
 window.onload = async function() {
