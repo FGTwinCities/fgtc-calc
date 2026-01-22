@@ -140,6 +140,7 @@ export function convertFormToDto() {
     dto["wired_networking"] = wired === "none" ? null : parseInt(wired);
     var wireless = formData.get("networking-wireless");
     dto["wireless_networking"] = wireless === "none" ? null : wireless;
+    dto["bluetooth"] = Boolean(formData.get("bluetooth"));
 
     console.log("Converted build DTO:");
     console.log(JSON.stringify(dto));
@@ -229,6 +230,7 @@ export function fillFormFromDto(dto) {
     // Fill networking information
     $("input[name=networking-wired][value=" + (dto["wired_networking"] == null ? "none" : dto["wired_networking"]) + "]").prop("checked", true);
     $("input[name=networking-wireless][value=" + (dto["wireless_networking"] == null ? "none" : dto["wireless_networking"]) + "]").prop("checked", true);
+    $("input[name=bluetooth]").prop("checked", dto["bluetooth"]);
 }
 
 async function onCreateFormSubmit() {

@@ -154,6 +154,12 @@
                     {{ format_wired(build.wired_networking) }}
                 </div>
             </div>
+            <div class="buildsheet-section flex flex-row">
+                <h1 class="text-xl font-bold">Bluetooth?</h1>
+                <div class="text-right grow self-center">
+                    <p><b>{% if build.bluetooth %}Yes{% else %}No{% endif %}</b></p>
+                </div>
+            </div>
         </div>
     </div>
     <div>

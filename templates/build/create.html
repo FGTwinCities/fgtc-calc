@@ -213,33 +213,40 @@
             <div id="battery-list"></div>
             <button type="button" id="add-battery-button" class="btn">Add Battery</button>
         </fieldset>
-        <fieldset id="fieldset-networking" class="build-section">
+        <fieldset id="fieldset-networking" class="build-section flex flex-col gap-4">
             <legend>Networking</legend>
-            <b>Wired:</b>
-            <input type="radio" name="networking-wired" id="networking-wired-none" value="none" class="radio radio-primary" checked>
-            <label for="networking-wired-none">None</label>
-            <input type="radio" name="networking-wired" id="networking-wired-fast" value="100" class="radio radio-primary">
-            <label for="networking-wired-fast">10/100</label>
-            <input type="radio" name="networking-wired" id="networking-wired-gigabit" value="1000" class="radio radio-primary">
-            <label for="networking-wired-gigabit">Gigabit</label>
-            <input type="radio" name="networking-wired" id="networking-wired-2gig" value="2500" class="radio radio-primary">
-            <label for="networking-wired-2gig">2.5GbE</label>
-            <input type="radio" name="networking-wired" id="networking-wired-10gig" value="10000" class="radio radio-primary">
-            <label for="networking-wired-10gig">10GbE</label>
-            <br>
-            <b>Wireless:</b>
-            <input type="radio" name="networking-wireless" id="networking-wireless-none" value="none" class="radio radio-primary" checked>
-            <label for="networking-wireless-none">None</label>
-            <input type="radio" name="networking-wireless" id="networking-wireless-bg" value="bg" class="radio radio-primary">
-            <label for="networking-wireless-bg">WiFi 3 or older</label>
-            <input type="radio" name="networking-wireless" id="networking-wireless-n" value="n" class="radio radio-primary">
-            <label for="networking-wireless-n">WiFi 4 (n)</label>
-            <input type="radio" name="networking-wireless" id="networking-wireless-ac" value="ac" class="radio radio-primary">
-            <label for="networking-wireless-ac">WiFi 5 (ac)</label>
-            <input type="radio" name="networking-wireless" id="networking-wireless-ax" value="ax" class="radio radio-primary">
-            <label for="networking-wireless-ax">WiFi 6 (ax)</label>
-            <input type="radio" name="networking-wireless" id="networking-wireless-be" value="be" class="radio radio-primary">
-            <label for="networking-wireless-be">WiFi 7 (be)</label>
+            <div>
+                <b class="mr-2">Wired:</b>
+                <input type="radio" name="networking-wired" id="networking-wired-none" value="none" class="radio radio-primary" checked>
+                <label for="networking-wired-none">None</label>
+                <input type="radio" name="networking-wired" id="networking-wired-fast" value="100" class="radio radio-primary">
+                <label for="networking-wired-fast">10/100</label>
+                <input type="radio" name="networking-wired" id="networking-wired-gigabit" value="1000" class="radio radio-primary">
+                <label for="networking-wired-gigabit">Gigabit</label>
+                <input type="radio" name="networking-wired" id="networking-wired-2gig" value="2500" class="radio radio-primary">
+                <label for="networking-wired-2gig">2.5GbE</label>
+                <input type="radio" name="networking-wired" id="networking-wired-10gig" value="10000" class="radio radio-primary">
+                <label for="networking-wired-10gig">10GbE</label>
+            </div>
+            <div>
+                <b class="mr-2">Wireless:</b>
+                <input type="radio" name="networking-wireless" id="networking-wireless-none" value="none" class="radio radio-primary" checked>
+                <label for="networking-wireless-none">None</label>
+                <input type="radio" name="networking-wireless" id="networking-wireless-bg" value="bg" class="radio radio-primary">
+                <label for="networking-wireless-bg">WiFi 3 or older</label>
+                <input type="radio" name="networking-wireless" id="networking-wireless-n" value="n" class="radio radio-primary">
+                <label for="networking-wireless-n">WiFi 4 (n)</label>
+                <input type="radio" name="networking-wireless" id="networking-wireless-ac" value="ac" class="radio radio-primary">
+                <label for="networking-wireless-ac">WiFi 5 (ac)</label>
+                <input type="radio" name="networking-wireless" id="networking-wireless-ax" value="ax" class="radio radio-primary">
+                <label for="networking-wireless-ax">WiFi 6 (ax)</label>
+                <input type="radio" name="networking-wireless" id="networking-wireless-be" value="be" class="radio radio-primary">
+                <label for="networking-wireless-be">WiFi 7 (be)</label>
+            </div>
+            <div>
+                <b class="mr-2">Bluetooth:</b>
+                <input type="checkbox" name="bluetooth" class="toggle toggle-primary" />
+            </div>
         </fieldset>
         <button type="button" id="submit-button" class="btn btn-primary">Submit</button>
     </form>
