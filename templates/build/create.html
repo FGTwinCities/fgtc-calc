@@ -22,7 +22,7 @@
 {% block content %}
 <div>
     <form action="/build" onsubmit="return false;" id="create-form">
-        <fieldset class="build-section">
+        <fieldset class="build-section flex flex-col gap-4">
             <legend>Computer Type</legend>
             <div class="filter">
                 <input type="radio" name="type" value="desktop" id="type-desktop" class="btn checked:bg-primary" aria-label="Desktop">
@@ -30,15 +30,17 @@
                 <input type="radio" name="type" value="other" id="type-other" class="btn checked:bg-primary" aria-label="Other">
                 <input type="radio" name="type" aria-label="×" class="btn btn-square filter-reset">
             </div>
-            <br>
-            <label class="floating-label mt-5">
+            <label class="floating-label">
                 <span class="label">Manufacturer</span>
                 <input type="text" name="manufacturer" id="manufacturer" placeholder="Manufacturer" class="input">
             </label>
-            <br>
             <label class="floating-label">
                 <span class="label">Model</span>
                 <input type="text" name="model" id="model" placeholder="Model" class="input">
+            </label>
+            <label class="floating-label">
+                <span class="label">Operating System</span>
+                <input type="text" name="operating-system" id="operating-system" placeholder="Operating System" class="input">
             </label>
         </fieldset>
         <fieldset id="fieldset-processor" class="build-section">

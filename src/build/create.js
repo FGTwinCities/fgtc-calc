@@ -34,6 +34,7 @@ export function convertFormToDto() {
     dto["type"] = formData.get("type");
     dto["manufacturer"] = formData.get("manufacturer");
     dto["model"] = formData.get("model");
+    dto["operating_system"] = formData.get("operating-system");
 
     // Collect processors
     dto["processors"] = [];
@@ -146,8 +147,9 @@ export function fillFormFromDto(dto) {
     $("input[name=type][value=" + dto["type"] + "]").prop("checked", true);
     updateVisibleFields();
 
-    $("input[name=manufacturer]").val(dto["manufacturer"])
-    $("input[name=model]").val(dto["model"])
+    $("input[name=manufacturer]").val(dto["manufacturer"]);
+    $("input[name=model]").val(dto["model"]);
+    $("input[name=operating-system]").val(dto["operating_system"]);
 
     // Fill processor information
     for (let i = 0; i < dto["processors"].length; i++) {

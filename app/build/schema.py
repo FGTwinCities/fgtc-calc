@@ -50,6 +50,7 @@ class BuildCreate:
 
     manufacturer: str | None = field()
     model: str | None = field()
+    operating_system: str | None = field()
 
     wired_networking: int | None = field()
     wireless_networking: WirelessNetworkingStandard | None = field()
