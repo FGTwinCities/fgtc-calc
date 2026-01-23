@@ -3,12 +3,12 @@ from litestar.exceptions import ValidationException
 from app.db.model import Processor
 
 
-def processor_model_func(x: float, a: float, b: float, c: float) -> float:
-    return (a * x ** 2) + (b * x) + c
+def processor_model_func(x: float, a: float, b: float) -> float:
+    return (a * x) + b
 
 
 class ProcessorPricingModel:
-    passmark_parameters = (0, 1, 0)
+    passmark_parameters = (1, 0)
 
     def compute(self, processor: Processor) -> float:
         if not processor.multithread_score:

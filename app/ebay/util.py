@@ -37,3 +37,11 @@ def cull_outliers(x, outlierConstant):
     result = a[np.where((a >= quartileSet[0]) & (a <= quartileSet[1]))]
 
     return result.tolist()
+
+
+def item_has_category(item, category_id) -> bool:
+    for category in item['categories']:
+        if category['category_id'] == str(category_id):
+            return True
+
+    return False

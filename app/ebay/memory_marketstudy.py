@@ -9,7 +9,7 @@ from scipy.optimize import curve_fit
 from app.db.enum import MemoryType
 from app.db.model import MemoryModule
 from app.ebay.ebay_connection import EbayConnection
-from app.ebay.storage_marketstudy import category_filter
+from app.ebay.storage_marketstudy import item_has_category
 from app.ebay.util import parse_capacity
 from app.price.model.memory import MemoryPricingModel, memory_model_func
 
@@ -53,7 +53,7 @@ async def fetch_memory_marketdata_query(conn: EbayConnection, query: str, limit:
 		if item is None:
 			continue
 
-		if not category_filter(item, 170083):
+		if not item_has_category(item, 170083):
 			continue
 
 		try:

@@ -6,19 +6,21 @@ import numpy as np
 from aiostream import stream
 from scipy.optimize import curve_fit
 
+from app.db.model import Processor
 from app.ebay.ebay_connection import EbayConnection
-from app.ebay.storage_marketstudy import category_filter
+from app.ebay.util import item_has_category
 from app.passmark.passmark_scraper import PassmarkScraper
 from app.price.model.processor import ProcessorPricingModel, processor_model_func
 
-SAMPLE_SIZE = 10
+PROCESSOR_SAMPLE_SIZE = 25
+SAMPLE_SIZE_PER_PROCESSOR = 50
 
 
 async def fetch_processor_marketdata_query(conn, query_obj, limit) -> AsyncGenerator[dict]:
     query = query_obj["name"]
     results = await conn.fetch_query_results(query, limit)
     for result in results:
-        if not category_filter(result, 0):
+        if not item_has_category(result, 164):
             continue
 
         if result.get("price", {}).get("currency") != "USD":
@@ -32,27 +34,34 @@ async def fetch_processor_marketdata_query(conn, query_obj, limit) -> AsyncGener
 
 async def run_processor_marketstudy() -> ProcessorPricingModel:
     conn = EbayConnection()
-
-    queries = []
-
-    # Pick SAMPLE_SIZE number of random CPUs from passmark that are socketable desktop/server CPUs
     pm = PassmarkScraper()
-    full_cpu_list = await pm.search_cpu()
-    for i in range(len(full_cpu_list) * 2):
-        cpu = random.choice(full_cpu_list)
 
-        details = await pm.retrieve_cpu(cpu)
-        if details.cpu_class and details.socket:
-            if details.cpu_class.lower() in ["desktop", "server"]:
-                queries.append({"name": cpu.name, "score": details.multithread_score})
+    queries = [
+        "Intel Core i",
+        "Intel Core Ultra",
+        "AMD Ryzen",
+    ]
 
-        if len(queries) > SAMPLE_SIZE:
+    cpu_query_candidates = []
+    for query in queries:
+        cpu_results = await pm.search_cpu(query)
+        cpu_query_candidates.extend(cpu_results)
+
+    query_objects = []
+    random.shuffle(cpu_query_candidates)
+    for cpu_result in cpu_query_candidates:
+        cpu_result = await pm.retrieve_cpu(cpu_result)
+        if cpu_result.cpu_class and cpu_result.socket:
+            if cpu_result.cpu_class.lower() in ["desktop", "server"]:
+                query_objects.append({"name": cpu_result.name, "score": cpu_result.multithread_score})
+
+        if len(query_objects) >= PROCESSOR_SAMPLE_SIZE:
             break
 
     prices = []
     scores = []
 
-    combine = stream.merge(*[fetch_processor_marketdata_query(conn, q, 25) for q in queries])
+    combine = stream.merge(*[fetch_processor_marketdata_query(conn, q, SAMPLE_SIZE_PER_PROCESSOR) for q in query_objects])
     async with combine.stream() as streamer:
         async for data in streamer:
             prices.append(data.get("price"))
@@ -70,4 +79,10 @@ async def run_processor_marketstudy() -> ProcessorPricingModel:
 
 if __name__ == "__main__":
     model = asyncio.run(run_processor_marketstudy())
+
+    test_proc = Processor()
+    test_proc.multithread_score = 62245
+
+    print(f"Price: {model.compute(test_proc)}")
+
     print("Complete")

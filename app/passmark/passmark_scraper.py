@@ -19,6 +19,8 @@ def _parse_pe_core_details(tag: Tag) -> PassmarkCoreDetails:
 
 
 class PassmarkScraper:
+    _cached_cpu_list: list[PassmarkSearchResult] = None
+
     def _create_cpu_session(self):
         return ClientSession(
             base_url="https://www.cpubenchmark.net",
@@ -27,11 +29,13 @@ class PassmarkScraper:
             }
         )
 
-    async def search_cpu(self, query: str = None) -> list[PassmarkSearchResult]:
-        results = []
+    async def retrieve_cpu_list(self) -> list[PassmarkSearchResult]:
+        if self._cached_cpu_list is not None:
+            return self._cached_cpu_list
 
+        results = []
         async with self._create_cpu_session() as session:
-            async with session.get("cpu_list.php") as response:
+            async with session.get("/cpu-list/all") as response:
                 if response.status != 200:
                     raise RuntimeError("Request to server was not successful.")
 
@@ -40,10 +44,6 @@ class PassmarkScraper:
 
                 for tag in tags:
                     cpu_name = tag.find("a").text
-
-                    if query:
-                        if query.lower() not in cpu_name.lower():
-                            continue
 
                     cpu_id = int(re.search(r'\d+', tag.get("id")).group())
                     score = int(re.search(r'\d+', tag.find_all("td")[1].text).group())
@@ -54,7 +54,26 @@ class PassmarkScraper:
                         multithread_score=score,
                     ))
 
-        return results
+        self._cached_cpu_list = results
+        return self._cached_cpu_list
+
+    async def search_cpu(self, query: str = None) -> list[PassmarkSearchResult]:
+        if query is None:
+            return await self.retrieve_cpu_list()
+        else:
+            results = []
+            for cpu in await self.retrieve_cpu_list():
+                if query.lower() in cpu.name.lower(): #TODO: Better search algorithm
+                    results.append(cpu)
+            return results
+
+
+    async def find_cpu(self, query: str = None) -> PassmarkSearchResult | None:
+        results = await self.search_cpu(query)
+        if len(results) >= 1:
+            return results[0]
+        else:
+            return None
 
 
     async def retrieve_cpu(self, cpu: PassmarkSearchResult) -> PassmarkCpuDetails:

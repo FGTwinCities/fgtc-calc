@@ -54,8 +54,6 @@ class EbayConnection:
 		filters = []
 		buying_option = "FIXED_PRICE"
 		filters.append("buyingOptions:{" + buying_option + "}")
-		currency = "USD"
-		filters.append(f"priceCurrency:{currency}")
 		filter_ = ",".join(filters)
 
 		items = []

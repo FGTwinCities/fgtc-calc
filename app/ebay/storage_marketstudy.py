@@ -6,7 +6,7 @@ from aiostream import stream
 from scipy.optimize import curve_fit
 
 from app.ebay.ebay_connection import EbayConnection
-from app.ebay.util import parse_capacity
+from app.ebay.util import parse_capacity, item_has_category
 from app.lib.util import try_int
 from app.price.model.storage import StoragePricingModel, storage_model_func
 
@@ -82,9 +82,6 @@ async def disk_marketstudy(conn: EbayConnection, queries: list, limit: int, filt
 
     return popt
 
-def category_filter(item: dict, category_id: int) -> bool:
-    return int(item.get("category_id")) == category_id
-
 
 def interface_filter(item: dict, interface: str) -> bool:
     for aspect in item.get("localized_aspects", []):
@@ -95,15 +92,15 @@ def interface_filter(item: dict, interface: str) -> bool:
 
 
 def filter_hard_dries(item: dict) -> bool:
-    return category_filter(item, 56083)
+    return item_has_category(item, 56083)
 
 
 def filter_sata_ssd(item: dict) -> bool:
-    return category_filter(item, 175669) and interface_filter(item, "sata")
+    return item_has_category(item, 175669) and interface_filter(item, "sata")
 
 
 def filter_nvme_ssd(item: dict) -> bool:
-    return category_filter(item, 175669) and interface_filter(item, "nvme")
+    return item_has_category(item, 175669) and interface_filter(item, "nvme")
 
 
 async def run_storage_marketstudy() -> StoragePricingModel:

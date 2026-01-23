@@ -2,15 +2,7 @@ import numpy as np
 
 from app.db.model import Processor, GraphicsProcessor
 from app.ebay.ebay_connection import EbayConnection
-from app.ebay.util import cull_outliers
-
-
-def item_has_category(item, category_id) -> bool:
-    for category in item['categories']:
-        if category['category_id'] == str(category_id):
-            return True
-
-    return False
+from app.ebay.util import cull_outliers, item_has_category
 
 
 class EbayPriceEstimator:
