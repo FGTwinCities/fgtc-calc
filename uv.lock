@@ -415,6 +415,19 @@ wheels = [
 ]
 
 [[package]]
+name = "croniter"
+version = "6.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "python-dateutil" },
+    { name = "pytz" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ad/2f/44d1ae153a0e27be56be43465e5cb39b9650c781e001e7864389deb25090/croniter-6.0.0.tar.gz", hash = "sha256:37c504b313956114a983ece2c2b07790b1f1094fe9d81cc94739214748255577", size = 64481, upload-time = "2024-12-17T17:17:47.32Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/07/4b/290b4c3efd6417a8b0c284896de19b1d5855e6dbdb97d2a35e68fa42de85/croniter-6.0.0-py2.py3-none-any.whl", hash = "sha256:2f878c3856f17896979b2a4379ba1f09c83e374931ea15cc835c5dd2eee9b368", size = 25468, upload-time = "2024-12-17T17:17:45.359Z" },
+]
+
+[[package]]
 name = "cryptography"
 version = "46.0.3"
 source = { registry = "https://pypi.org/simple" }
@@ -590,9 +603,11 @@ dependencies = [
     { name = "ebay-rest" },
     { name = "ipykernel" },
     { name = "litestar", extra = ["standard"] },
+    { name = "litestar-saq" },
     { name = "litestar-vite" },
     { name = "matplotlib" },
     { name = "numpy" },
+    { name = "redis" },
     { name = "requests-async" },
     { name = "scipy" },
     { name = "sniffio" },
@@ -611,9 +626,11 @@ requires-dist = [
     { name = "ebay-rest", specifier = ">=1.1.3" },
     { name = "ipykernel", specifier = ">=7.1.0" },
     { name = "litestar", extras = ["standard"], specifier = ">=2.18.0" },
+    { name = "litestar-saq", specifier = ">=0.6.4" },
     { name = "litestar-vite", specifier = ">=0.15.0" },
     { name = "matplotlib", specifier = ">=3.10.8" },
     { name = "numpy", specifier = ">=2.4.0" },
+    { name = "redis", specifier = ">=7.1.0" },
     { name = "requests-async", specifier = ">=0.2.4" },
     { name = "scipy", specifier = ">=1.17.0" },
     { name = "sniffio", specifier = ">=1.3.1" },
@@ -1051,6 +1068,19 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/3f/b9/7e296aa1adada25cce8e5f89a996b0e38d852d93b1b656a2058226c542a2/litestar_htmx-0.5.0.tar.gz", hash = "sha256:e02d1a3a92172c874835fa3e6749d65ae9fc626d0df46719490a16293e2146fb", size = 119755, upload-time = "2025-06-11T21:19:45.573Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f2/24/8d99982f0aa9c1cd82073c6232b54a0dbe6797c7d63c0583a6c68ee3ddf2/litestar_htmx-0.5.0-py3-none-any.whl", hash = "sha256:92833aa47e0d0e868d2a7dbfab75261f124f4b83d4f9ad12b57b9a68f86c50e6", size = 9970, upload-time = "2025-06-11T21:19:44.465Z" },
+]
+
+[[package]]
+name = "litestar-saq"
+version = "0.6.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "litestar" },
+    { name = "saq" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f8/73/f2b5d84f26e0d2f9b69839d9ab975d99e8b92179e24cae16518acfd90276/litestar_saq-0.6.4.tar.gz", hash = "sha256:4661415cd88de77dbc0d8a4c206681754c7edd9673ae8e2deff512dbed58a982", size = 242223, upload-time = "2026-01-21T05:56:36.071Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/69/e2/fdbfdcba6d2f17d94c02a21143fec8cc47ec760f2971e940760262e008b7/litestar_saq-0.6.4-py3-none-any.whl", hash = "sha256:ac8e5648c58a3947cca05e8c18c4d3a12c9ddaa00a648f590369f0876fa1c957", size = 33050, upload-time = "2026-01-21T05:56:34.565Z" },
 ]
 
 [[package]]
@@ -1679,6 +1709,15 @@ wheels = [
 ]
 
 [[package]]
+name = "pytz"
+version = "2025.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/f8/bf/abbd3cdfb8fbc7fb3d4d38d320f2441b1e7cbe29be4f23797b4a2b5d8aac/pytz-2025.2.tar.gz", hash = "sha256:360b9e3dbb49a209c21ad61809c7fb453643e048b38924c765813546746e81c3", size = 320884, upload-time = "2025-03-25T02:25:00.538Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/81/c4/34e93fe5f5429d7570ec1fa436f1986fb1f00c3e0f43a589fe2bbcd22c3f/pytz-2025.2-py2.py3-none-any.whl", hash = "sha256:5ddf76296dd8c44c26eb8f4b6f35488f3ccbf6fbbd7adee0b7262d43f0ec2f00", size = 509225, upload-time = "2025-03-25T02:24:58.468Z" },
+]
+
+[[package]]
 name = "pyyaml"
 version = "6.0.3"
 source = { registry = "https://pypi.org/simple" }
@@ -1758,6 +1797,15 @@ wheels = [
 ]
 
 [[package]]
+name = "redis"
+version = "7.1.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/43/c8/983d5c6579a411d8a99bc5823cc5712768859b5ce2c8afe1a65b37832c81/redis-7.1.0.tar.gz", hash = "sha256:b1cc3cfa5a2cb9c2ab3ba700864fb0ad75617b41f01352ce5779dabf6d5f9c3c", size = 4796669, upload-time = "2025-11-19T15:54:39.961Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/89/f0/8956f8a86b20d7bb9d6ac0187cf4cd54d8065bc9a1a09eb8011d4d326596/redis-7.1.0-py3-none-any.whl", hash = "sha256:23c52b208f92b56103e17c5d06bdc1a6c2c0b3106583985a76a18f83b265de2b", size = 354159, upload-time = "2025-11-19T15:54:38.064Z" },
+]
+
+[[package]]
 name = "requests"
 version = "2.32.5"
 source = { registry = "https://pypi.org/simple" }
@@ -1809,6 +1857,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/bf/d8/f2c1b7e9a645ba40f756d7a5b195fc104729bc6b19061ba3ab385f342931/rich_click-1.9.4.tar.gz", hash = "sha256:af73dc68e85f3bebb80ce302a642b9fe3b65f3df0ceb42eb9a27c467c1b678c8", size = 73632, upload-time = "2025-10-25T01:08:49.142Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/5b/6a/1f03adcb3cc7beb6f63aecc21565e9d515ccee653187fc4619cd0b42713b/rich_click-1.9.4-py3-none-any.whl", hash = "sha256:d70f39938bcecaf5543e8750828cbea94ef51853f7d0e174cda1e10543767389", size = 70245, upload-time = "2025-10-25T01:08:47.939Z" },
+]
+
+[[package]]
+name = "saq"
+version = "0.26.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "croniter" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/27/db/1d9e93dd0b4e70dd58bda8a44eb81ac5a134ef3ce18e707fc2a6971d310c/saq-0.26.1.tar.gz", hash = "sha256:27f97fd7f5668fabb9816a5a986512ac2948a3bb73541369a8a56065dc98a32c", size = 74439, upload-time = "2026-01-08T19:01:38.946Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/7a/b0/36d29e59b3ef2c89bbfa2862df820413ea7579be625a8424a30540259846/saq-0.26.1-py3-none-any.whl", hash = "sha256:332a52bd9e9b4e97237b4f733e2410ee045bdba857e33d6ffaea6958dde19d27", size = 62932, upload-time = "2026-01-08T19:01:37.961Z" },
 ]
 
 [[package]]

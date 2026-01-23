@@ -12,13 +12,17 @@ from litestar.di import Provide
 from litestar.logging import LoggingConfig
 from litestar.plugins.base import InitPluginProtocol, CLIPluginProtocol
 from litestar.template.config import TemplateConfig
+from litestar_saq import startup_logger, shutdown_logger, timing_before_process, timing_after_process
+from litestar_saq.base import CronJob
+from litestar_saq.config import SAQConfig, QueueConfig
+from litestar_saq.plugin import SAQPlugin
 from litestar_vite import VitePlugin, PathConfig
 from litestar_vite.config import ViteConfig
 
 from app.build.controller.build import BuildController
 from app.build.controller.graphics import GraphicsController
 from app.build.controller.processor import ProcessorController
-from app.db.service.pricing import provide_pricing_model_service, PricingModelService
+from app.db.service.pricing import provide_pricing_model_service, generate_pricing_model_job
 from app.lib.deps import provide_services
 from app.price.controller import PriceController
 from app.static_controller import StaticController
@@ -42,6 +46,31 @@ vite_config = ViteConfig(
     )
 )
 
+saq_config = SAQConfig(
+    web_enabled=True,
+    use_server_lifespan=True,
+    queue_configs=[
+        QueueConfig(
+            dsn=os.getenv("REDIS_URL", "redis://localhost:6379/0"),
+            name="default",
+            tasks=[
+                generate_pricing_model_job,
+            ],
+            scheduled_tasks=[
+                CronJob(
+                    function=generate_pricing_model_job,
+                    cron="0 0 * * MON", #Midnight, every monday
+                    timeout=3600,
+                ),
+            ],
+            startup=[startup_logger],
+            shutdown=[shutdown_logger],
+            before_process=[timing_before_process],
+            after_process=[timing_after_process],
+        )
+    ]
+)
+
 
 class ApplicationCore(InitPluginProtocol, CLIPluginProtocol):
     def on_cli_init(self, cli: Group) -> None:
@@ -60,6 +89,7 @@ class ApplicationCore(InitPluginProtocol, CLIPluginProtocol):
                 SQLAlchemyInitPlugin(config=sqlalchemy_config),
                 SQLAlchemySerializationPlugin(),
                 VitePlugin(config=vite_config),
+                SAQPlugin(config=saq_config),
             ]
         )
 
