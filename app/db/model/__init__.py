@@ -7,6 +7,7 @@ from app.db.model.memory import MemoryModule
 from app.db.model.storage import StorageDisk
 from app.db.model.display import Display
 from app.db.model.battery import Battery
+from app.db.model.stored_pricing_model import StoredPricingModel
 
 __all__ = (
     "Build",
@@ -18,4 +19,5 @@ __all__ = (
     "StorageDisk",
     "Display",
     "Battery",
+    "StoredPricingModel",
 )

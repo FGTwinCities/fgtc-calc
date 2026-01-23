@@ -1,10 +1,12 @@
 import datetime
 
+from advanced_alchemy.extensions.litestar.providers import create_service_provider
+from advanced_alchemy.repository import SQLAlchemyAsyncRepository
+from advanced_alchemy.service import SQLAlchemyAsyncRepositoryService
 from litestar.exceptions import ValidationException
-from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.db import model as m
 from app.db.model.stored_pricing_model import StoredPricingModel
-from app.db.repository import PricingModelRepository, provide_pricing_model_repo
 from app.ebay.memory_marketstudy import run_memory_marketstudy
 from app.ebay.storage_marketstudy import run_storage_marketstudy
 from app.lib.datetime import now
@@ -13,12 +15,12 @@ from app.price.model.pricing import PricingModel
 MODEL_VALID_LIFESPAN = datetime.timedelta(days=7)
 
 
-class PricingModelService:
-    _repo: PricingModelRepository
+class PricingModelService(SQLAlchemyAsyncRepositoryService[m.StoredPricingModel]):
 
-    def __init__(self, repo: PricingModelRepository):
-        self._repo = repo
+    class Repository(SQLAlchemyAsyncRepository[m.StoredPricingModel]):
+        model_type = m.StoredPricingModel
 
+    repository_type = Repository
 
     async def generate_model(self):
         model = PricingModel()
@@ -27,7 +29,7 @@ class PricingModelService:
 
         stored = model.to_stored()
 
-        await self._repo.add(stored, auto_commit=True)
+        await self.create(stored, auto_commit=True)
 
 
     async def get_model(self) -> PricingModel:
@@ -43,5 +45,4 @@ class PricingModelService:
         return PricingModel.from_stored(stored_model)
 
 
-async def provide_pricing_model_service(db_session: AsyncSession) -> PricingModelService:
-    return PricingModelService(await provide_pricing_model_repo(db_session))
+provide_pricing_model_service = create_service_provider(PricingModelService)

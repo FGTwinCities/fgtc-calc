@@ -12,11 +12,11 @@ from app.db.repository import MemoryModuleRepository, provide_memory_repo, provi
     StorageDiskRepository, DisplayRepository, provide_display_repo, BatteryRepository, provide_battery_repo
 from app.db.service.build import provide_build_service, BuildService
 from app.db.service.graphics import provide_graphics_service, GraphicsProcessorService
+from app.db.service.pricing import PricingModelService
 from app.db.service.processor import provide_processor_service, ProcessorService
 from app.ebay.price_estimator import EbayPriceEstimator
 from app.lib.datetime import now
 from app.price.dto import BuildPrice, WithPrice, Price
-from app.price.model.service import PricingModelService
 
 PRICE_VALID_TIMESPAN = datetime.timedelta(days=7)
 

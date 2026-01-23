@@ -84,7 +84,7 @@ async def disk_marketstudy(conn: EbayConnection, queries: list, limit: int, filt
 
 
 def interface_filter(item: dict, interface: str) -> bool:
-    for aspect in item.get("localized_aspects", []):
+    for aspect in item.get("localized_aspects") or []:
         if aspect.get("name", "").lower() == "interface":
             if interface.lower() in aspect.get("value", "").lower():
                 return True

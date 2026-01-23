@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 
+import anyio
 from advanced_alchemy.config import AsyncSessionConfig
 from advanced_alchemy.extensions.litestar import SQLAlchemyInitPlugin, SQLAlchemySerializationPlugin, \
     SQLAlchemyAsyncConfig
@@ -17,34 +18,42 @@ from litestar_vite.config import ViteConfig
 from app.build.controller.build import BuildController
 from app.build.controller.graphics import GraphicsController
 from app.build.controller.processor import ProcessorController
+from app.db.service.pricing import provide_pricing_model_service, PricingModelService
+from app.lib.deps import provide_services
 from app.price.controller import PriceController
-from app.price.model.service import provide_pricing_model_service
 from app.static_controller import StaticController
+
+session_config = AsyncSessionConfig(expire_on_commit=False)
+sqlalchemy_config = SQLAlchemyAsyncConfig(
+    connection_string=os.getenv("DATABASE_URL", "sqlite+aiosqlite:///database.sqlite"),
+    before_send_handler="autocommit",
+    session_config=session_config,
+    create_all=True,
+)
+
+vite_config = ViteConfig(
+    dev_mode=os.getenv("DEV_MODE", "True").lower() in ("true", 1, "t"),
+    mode="template",
+    types=False,
+    paths=PathConfig(
+        bundle_dir="public",
+        resource_dir="src",
+        static_dir="assets",
+    )
+)
 
 
 class ApplicationCore(InitPluginProtocol, CLIPluginProtocol):
     def on_cli_init(self, cli: Group) -> None:
-        pass
+        @cli.command()
+        def generate_pricing_model():
+            async def generate_pricing_model():
+                async with provide_services(provide_pricing_model_service) as (pricing_model_service,):
+                    await pricing_model_service.generate_model()
+
+            anyio.run(generate_pricing_model)
 
     def on_app_init(self, app_config: AppConfig) -> AppConfig:
-        session_config = AsyncSessionConfig(expire_on_commit=False)
-        sqlalchemy_config = SQLAlchemyAsyncConfig(
-            connection_string=os.getenv("DATABASE_URL", "sqlite+aiosqlite:///database.sqlite"),
-            before_send_handler="autocommit",
-            session_config=session_config,
-            create_all=True,
-        )
-
-        vite_config = ViteConfig(
-            dev_mode=os.getenv("DEV_MODE", "True").lower() in ("true", 1, "t"),
-            mode="template",
-            types=False,
-            paths=PathConfig(
-                bundle_dir="public",
-                resource_dir="src",
-                static_dir="assets",
-            )
-        )
 
         app_config.plugins.extend(
             [
