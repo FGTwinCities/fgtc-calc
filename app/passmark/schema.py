@@ -32,3 +32,8 @@ class PassmarkStandardCpuDetails(PassmarkCoreDetails, PassmarkCpuDetails):
 class PassmarkPECoreCpuDetails(PassmarkCpuDetails):
     performance_cores: PassmarkCoreDetails = None
     efficient_cores: PassmarkCoreDetails = None
+
+
+@dataclass
+class PassmarkGpuDetails(PassmarkSearchResult):
+    score_g2d: int = None

@@ -6,8 +6,9 @@ from urllib.parse import urlencode
 from aiohttp import ClientSession, ClientResponse
 from bs4 import BeautifulSoup, Tag
 
+from app.lib.util import try_int
 from app.passmark.schema import PassmarkCoreDetails, PassmarkSearchResult, PassmarkCpuDetails, PassmarkPECoreCpuDetails, \
-    PassmarkStandardCpuDetails
+    PassmarkStandardCpuDetails, PassmarkGpuDetails
 
 
 def _parse_pe_core_details(tag: Tag) -> PassmarkCoreDetails:
@@ -82,23 +83,36 @@ class PassmarkScraper:
         return self._cached_gpu_list
 
 
-    async def search_cpu(self, query: str = None) -> list[PassmarkSearchResult]:
+    async def _search(self, ret_callable, query: str = None) -> list[PassmarkSearchResult]:
         if query is None:
-            return await self.retrieve_cpu_list()
+            return await ret_callable()
         else:
             results = []
-            for cpu in await self.retrieve_cpu_list():
-                if query.lower() in cpu.name.lower(): #TODO: Better search algorithm
-                    results.append(cpu)
+            for item in await ret_callable():
+                if query.lower() in item.name.lower(): #TODO: Better search algorithm
+                    results.append(item)
             return results
 
 
-    async def find_cpu(self, query: str = None) -> PassmarkSearchResult | None:
-        results = await self.search_cpu(query)
+    async def _find(self, ret_callable, query: str) -> PassmarkSearchResult | None:
+        results = await self._search(ret_callable, query)
         if len(results) >= 1:
             return results[0]
         else:
             return None
+
+
+    async def search_cpu(self, query: str = None) -> list[PassmarkSearchResult]:
+        return await self._search(self.retrieve_cpu_list, query)
+
+    async def find_cpu(self, query: str) -> PassmarkSearchResult | None:
+        return await self._find(self.retrieve_cpu_list, query)
+
+    async def search_gpu(self, query: str = None) -> list[PassmarkSearchResult]:
+        return await self._search(self.retrieve_gpu_list, query)
+
+    async def find_gpu(self, query: str) -> PassmarkSearchResult | None:
+        return await self._find(self.retrieve_gpu_list, query)
 
 
     async def retrieve_cpu(self, cpu: PassmarkSearchResult) -> PassmarkCpuDetails:
@@ -182,7 +196,38 @@ class PassmarkScraper:
         return result
 
 
+    async def retrieve_gpu(self, gpu: PassmarkSearchResult) -> PassmarkGpuDetails:
+        return await self.retrieve_gpu_by_id(gpu.passmark_id)
+
+
+    async def retrieve_gpu_by_id(self, gpu_id: int) -> PassmarkGpuDetails:
+        result = None
+
+        async with self._create_gpu_session() as session:
+            async with session.get("gpu.php?" + urlencode({"id": gpu_id})) as response:
+                if response.status != 200:
+                    raise RuntimeError("Request to server was not successful.")
+
+                soup = BeautifulSoup(await response.text(), "html.parser")
+
+                gpu_name = soup.find(["span", "p"], class_="cpuname").text
+                header_r = soup.find("div", string=re.compile(r'[Aa]verage\s+[Gg]3[Dd]\s+[Mm]ark'))
+                g3d_score = try_int(header_r.find_next_sibling("span").text)
+
+                g2d_score = try_int(re.search(r'[Aa]verage\s+[Gg]2[Dd]\s+[Mm]ark:?\s*(\d+)', header_r.parent.text).group(1))
+
+                result = PassmarkGpuDetails(
+                    name=gpu_name,
+                    passmark_id=gpu_id,
+                    score=g3d_score,
+                    score_g2d=g2d_score,
+                )
+
+        return result
+
+
+
 if __name__ == "__main__":
     pm = PassmarkScraper()
-    res = asyncio.run(pm.retrieve_gpu_list())
+    res = asyncio.run(pm.retrieve_gpu_by_id(4284))
     print(res)
