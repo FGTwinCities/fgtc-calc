@@ -36,4 +36,5 @@ class PassmarkPECoreCpuDetails(PassmarkCpuDetails):
 
 @dataclass
 class PassmarkGpuDetails(PassmarkSearchResult):
+    gpu_category: str = None
     score_g2d: int = None

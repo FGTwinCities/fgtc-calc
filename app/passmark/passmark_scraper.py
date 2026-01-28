@@ -216,11 +216,17 @@ class PassmarkScraper:
 
                 g2d_score = try_int(re.search(r'[Aa]verage\s+[Gg]2[Dd]\s+[Mm]ark:?\s*(\d+)', header_r.parent.text).group(1))
 
+                desc_body = soup.find("div", class_="desc-body")
+                category = re.search(r'[Vv]ideo[Cc]ard\s*[Cc]ategory:?\s*(\w+)', desc_body.text)
+                if category is not None:
+                    category = category.group(1)
+
                 result = PassmarkGpuDetails(
                     name=gpu_name,
                     passmark_id=gpu_id,
                     score=g3d_score,
                     score_g2d=g2d_score,
+                    gpu_category=category,
                 )
 
         return result
