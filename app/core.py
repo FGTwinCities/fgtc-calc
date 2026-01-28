@@ -42,7 +42,7 @@ sqlalchemy_config = SQLAlchemyAsyncConfig(
 )
 
 vite_config = ViteConfig(
-    dev_mode=getenv_bool("VITE_DEVMODE", True),
+    dev_mode=getenv_bool("VITE_DEV_MODE", True),
     mode="template",
     types=False,
     paths=PathConfig(
