@@ -41,7 +41,7 @@ class PricingModelService(SQLAlchemyAsyncRepositoryService[m.StoredPricingModel]
 
 
     async def get_model(self) -> PricingModel:
-        models = await self._repo.list(
+        models = await self.list(
             StoredPricingModel.created_at > (now() - MODEL_VALID_LIFESPAN)
         )
 

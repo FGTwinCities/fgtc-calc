@@ -11,7 +11,7 @@ from app.price.model.storage import StoragePricingModel
 
 
 class PricingModel:
-    adjustment: Polynomial = Polynomial([0, 1, 0])
+    adjustment: Polynomial = Polynomial([0, 0.75, 0])
 
     def compute_adjustment(self, price: float) -> float:
         return self.adjustment(price)
@@ -44,6 +44,15 @@ class PricingModel:
         for disk in build.storage:
             submodule_prices.append(WithPrice(item=disk, price=self.storage_model.compute(disk)))
 
+        for submodule in submodule_prices:
+            price += submodule.price
+            debug.append(submodule)
+
+        adjusted = self.compute_adjustment(price)
+        debug.append(PriceAdjustment(price=adjusted - price, comment="Store Adjustment"))
+        price = adjusted
+
+        submodule_prices = []
         for display in build.display:
             submodule_prices.append(WithPrice(item=display, price=self.display_model.compute(display)))
 
@@ -54,12 +63,8 @@ class PricingModel:
             price += submodule.price
             debug.append(submodule)
 
-        adjusted = self.compute_adjustment(price)
-        debug.append(PriceAdjustment(price=adjusted-price, comment="Store Adjustment"))
-        price = round(adjusted, 2)
-
         return BuildPrice(
-            price=price,
+            price=round(price, 2),
             component_pricing=debug,
         )
 

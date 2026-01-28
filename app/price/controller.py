@@ -63,7 +63,7 @@ class PriceController(Controller):
             if not processor.passmark_id:
                 await update_processor_specs(processor)
             if not processor.price or not processor.priced_at or now() > (processor.priced_at + PRICE_VALID_TIMESPAN):
-                await _update_processor_price(processor)
+                await _update_processor_price(processor, pricing_model_service)
 
         for gpu in build.graphics:
             if not gpu.price or gpu.priced_at or now() > (gpu.priced_at + PRICE_VALID_TIMESPAN):
