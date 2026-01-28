@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 import anyio
-from advanced_alchemy.config import AsyncSessionConfig
+from advanced_alchemy.config import AsyncSessionConfig, AlembicAsyncConfig
 from advanced_alchemy.extensions.litestar import SQLAlchemyInitPlugin, SQLAlchemySerializationPlugin, \
     SQLAlchemyAsyncConfig
 from click import Group
@@ -28,12 +28,17 @@ from app.lib.util import getenv_bool
 from app.price.controller import PriceController
 from app.static_controller import StaticController
 
+alembic_config = AlembicAsyncConfig(
+    script_config="alembic.ini",
+    script_location="alembic",
+)
+
 session_config = AsyncSessionConfig(expire_on_commit=False)
 sqlalchemy_config = SQLAlchemyAsyncConfig(
     connection_string=os.getenv("DATABASE_URL", "sqlite+aiosqlite:///database.sqlite"),
     before_send_handler="autocommit",
     session_config=session_config,
-    create_all=True,
+    alembic_config=alembic_config,
 )
 
 vite_config = ViteConfig(

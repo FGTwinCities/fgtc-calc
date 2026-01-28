@@ -22,6 +22,7 @@ class Build(UUIDAuditBase, PriceMixin):
     type: Mapped[BuildType] = mapped_column(nullable=False)
     manufacturer: Mapped[str | None] = mapped_column(nullable=True, default=None)
     model: Mapped[str | None] = mapped_column(nullable=True, default=None)
+    operating_system: Mapped[str | None] = mapped_column(nullable=True, default=None)
     wired_networking: Mapped[int | None] = mapped_column(nullable=True, default=None) #TODO: Handle multiple, store connector type
     wireless_networking: Mapped[WirelessNetworkingStandard | None] = mapped_column(nullable=True, default=None)
     bluetooth: Mapped[bool] = mapped_column(nullable=False, default=False)

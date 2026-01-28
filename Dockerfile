@@ -39,9 +39,14 @@ RUN apk add --no-cache npm
 ENV LITESTAR_APP="app.asgi:create_app" \
     DEV_MODE=0
 
+COPY docker-entrypoint.sh /
+RUN chmod +x /docker-entrypoint.sh
+
 COPY --from=builder /app/dist/*.whl /tmp/
 
 WORKDIR /app
+
+COPY --parents alembic/ alembic.ini /app/
 
 RUN uv venv && \
     uv pip install --quiet --disable-pip-version-check --no-cache-dir /tmp/*.whl && \
@@ -52,4 +57,5 @@ COPY --from=builder /app/public /app/public
 STOPSIGNAL SIGTERM
 EXPOSE 8000
 
+ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["uv", "run", "app", "run", "--host", "0.0.0.0", "--port", "8000"]
