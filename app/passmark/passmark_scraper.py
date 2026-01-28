@@ -232,8 +232,13 @@ class PassmarkScraper:
         return result
 
 
+async def test():
+    pm = PassmarkScraper()
+
+    list = await pm.retrieve_gpu_list()
+    for gpu in list:
+        print(await pm.retrieve_gpu(gpu))
+
 
 if __name__ == "__main__":
-    pm = PassmarkScraper()
-    res = asyncio.run(pm.retrieve_gpu_by_id(4284))
-    print(res)
+    asyncio.run(test())

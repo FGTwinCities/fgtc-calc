@@ -75,14 +75,3 @@ async def run_processor_marketstudy() -> ProcessorPricingModel:
     model = ProcessorPricingModel()
     model.passmark_parameters = popt
     return model
-
-
-if __name__ == "__main__":
-    model = asyncio.run(run_processor_marketstudy())
-
-    test_proc = Processor()
-    test_proc.multithread_score = 62245
-
-    print(f"Price: {model.compute(test_proc)}")
-
-    print("Complete")
