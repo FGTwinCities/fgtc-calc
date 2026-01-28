@@ -5,7 +5,7 @@ from app.db.model.battery import Battery
 
 
 class BatteryPricingModel:
-    capacity_ratio_func: Polynomial
+    capacity_ratio_func: Polynomial = Polynomial([0, -30, 0])
 
     def compute(self, battery: Battery) -> float:
         return self.capacity_ratio_func(battery.remaining_capacity / battery.design_capacity)

@@ -5,10 +5,10 @@ from app.db.model.display import Display
 
 
 class DisplayPricingModel:
-    resolution_func: Polynomial
-    size_func: Polynomial
-    refreshrate_func: Polynomial
-    touchscreen_value: float
+    resolution_func: Polynomial = Polynomial([-2.0736, 0.001, 0])
+    size_func: Polynomial = Polynomial([0, 1, 0])
+    refreshrate_func: Polynomial = Polynomial([-19.8, 0.33, 0])
+    touchscreen_value: float = 15
 
     def compute(self, display: Display) -> float:
         megapixels = (display.resolution.x * display.resolution.y) / 1000
