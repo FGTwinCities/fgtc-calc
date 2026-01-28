@@ -5,6 +5,7 @@ from app.db.model.stored_pricing_model import StoredPricingModel
 from app.price.dto import BuildPrice, PriceAdjustment, WithPrice
 from app.price.model.battery import BatteryPricingModel
 from app.price.model.display import DisplayPricingModel
+from app.price.model.graphics import GraphicsProcessorPricingModel
 from app.price.model.memory import MemoryPricingModel
 from app.price.model.processor import ProcessorPricingModel
 from app.price.model.storage import StoragePricingModel
@@ -17,6 +18,7 @@ class PricingModel:
         return self.adjustment(price)
 
     processor_model: ProcessorPricingModel = ProcessorPricingModel()
+    graphics_model: GraphicsProcessorPricingModel = GraphicsProcessorPricingModel()
     memory_model: MemoryPricingModel = MemoryPricingModel()
     storage_model: StoragePricingModel = StoragePricingModel()
     display_model: DisplayPricingModel = DisplayPricingModel()
@@ -78,6 +80,12 @@ class PricingModel:
             stored_model.processor_param_b,
         )
 
+        model.graphics_model = GraphicsProcessorPricingModel()
+        model.graphics_model.passmark_parameters = (
+            stored_model.graphics_param_a,
+            stored_model.graphics_param_b,
+        )
+
         model.memory_model = MemoryPricingModel()
         model.memory_model.parameters = (
             stored_model.memory_param_a,
@@ -111,6 +119,9 @@ class PricingModel:
 
         stored.processor_param_a = self.processor_model.passmark_parameters[0]
         stored.processor_param_b = self.processor_model.passmark_parameters[1]
+
+        stored.graphics_param_a = self.graphics_model.passmark_parameters[0]
+        stored.graphics_param_b = self.graphics_model.passmark_parameters[1]
 
         stored.memory_param_a = self.memory_model.parameters[0]
         stored.memory_param_b = self.memory_model.parameters[1]

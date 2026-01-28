@@ -1,4 +1,3 @@
-import asyncio
 import random
 from typing import AsyncGenerator
 
@@ -38,6 +37,8 @@ async def run_graphics_marketstudy() -> GraphicsProcessorPricingModel:
     queries = [
         "GeForce GTX",
         "GeForce RTX",
+        "Intel Arc",
+        "Radeon RX",
     ]
 
     query_candidates = []

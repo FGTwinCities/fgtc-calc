@@ -9,6 +9,9 @@ class StoredPricingModel(UUIDAuditBase):
     processor_param_a: Mapped[float | None] = mapped_column()
     processor_param_b: Mapped[float | None] = mapped_column()
 
+    graphics_param_a: Mapped[float | None] = mapped_column()
+    graphics_param_b: Mapped[float | None] = mapped_column()
+
     memory_param_a: Mapped[float | None] = mapped_column()
     memory_param_b: Mapped[float | None] = mapped_column()
     memory_param_c: Mapped[float | None] = mapped_column()
