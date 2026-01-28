@@ -5,11 +5,13 @@ from dataclasses import dataclass
 class PassmarkSearchResult:
     name: str = None
     passmark_id: int = None
+    multithread_score: int = None
 
 
 @dataclass
 class PassmarkCpuDetails(PassmarkSearchResult):
-    multithread_score: int = None
+    cpu_class: str = None
+    socket: str = None
     single_thread_score: int = None
 
 

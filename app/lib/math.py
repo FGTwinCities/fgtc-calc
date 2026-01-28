@@ -16,3 +16,6 @@ def mb2gb(mb: float) -> float:
 
 def gb2mb(gb: float) -> float:
     return gb * 1000
+
+def tb2mb(tb: float) -> float:
+    return gb2mb(tb * 1000)

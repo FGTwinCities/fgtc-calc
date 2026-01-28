@@ -1,24 +1,26 @@
 from numpy.polynomial.polynomial import Polynomial
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.model.build import Build
+from app.db.model.stored_pricing_model import StoredPricingModel
 from app.price.dto import BuildPrice, PriceAdjustment, WithPrice
-from app.price.model.battery import BatteryPricingModel, provide_battery_pricing_model
-from app.price.model.display import DisplayPricingModel, provide_display_pricing_model
-from app.price.model.memory import MemoryPricingModel, provide_memory_pricing_model
-from app.price.model.storage import StoragePricingModel, provide_storage_pricing_model
+from app.price.model.battery import BatteryPricingModel
+from app.price.model.display import DisplayPricingModel
+from app.price.model.memory import MemoryPricingModel
+from app.price.model.processor import ProcessorPricingModel
+from app.price.model.storage import StoragePricingModel
 
 
 class PricingModel:
-    adjustment: Polynomial = Polynomial([0, 1, 0])
+    adjustment: Polynomial = Polynomial([0, 0.75, 0])
 
     def compute_adjustment(self, price: float) -> float:
         return self.adjustment(price)
 
-    memory_model: MemoryPricingModel
-    storage_model: StoragePricingModel
-    display_model: DisplayPricingModel
-    battery_model: BatteryPricingModel
+    processor_model: ProcessorPricingModel = ProcessorPricingModel()
+    memory_model: MemoryPricingModel = MemoryPricingModel()
+    storage_model: StoragePricingModel = StoragePricingModel()
+    display_model: DisplayPricingModel = DisplayPricingModel()
+    battery_model: BatteryPricingModel = BatteryPricingModel()
 
     async def compute(self, build: Build) -> BuildPrice:
         debug = []
@@ -42,6 +44,15 @@ class PricingModel:
         for disk in build.storage:
             submodule_prices.append(WithPrice(item=disk, price=self.storage_model.compute(disk)))
 
+        for submodule in submodule_prices:
+            price += submodule.price
+            debug.append(submodule)
+
+        adjusted = self.compute_adjustment(price)
+        debug.append(PriceAdjustment(price=adjusted - price, comment="Store Adjustment"))
+        price = adjusted
+
+        submodule_prices = []
         for display in build.display:
             submodule_prices.append(WithPrice(item=display, price=self.display_model.compute(display)))
 
@@ -52,21 +63,69 @@ class PricingModel:
             price += submodule.price
             debug.append(submodule)
 
-        adjusted = self.compute_adjustment(price)
-        debug.append(PriceAdjustment(price=adjusted-price, comment="Store Adjustment"))
-        price = round(adjusted, 2)
-
         return BuildPrice(
-            price=price,
+            price=round(price, 2),
             component_pricing=debug,
         )
 
+    @classmethod
+    def from_stored(cls, stored_model: StoredPricingModel):
+        model = PricingModel()
 
-async def provide_default_pricing_model(db_session: AsyncSession) -> PricingModel:
-    model = PricingModel()
-    model.adjustment = Polynomial([0, 0.5, 0])
-    model.memory_model = await provide_memory_pricing_model(db_session)
-    model.storage_model = await provide_storage_pricing_model(db_session)
-    model.display_model = await provide_display_pricing_model(db_session)
-    model.battery_model = await provide_battery_pricing_model(db_session)
-    return model
+        model.processor_model = ProcessorPricingModel()
+        model.processor_model.passmark_parameters = (
+            stored_model.processor_param_a,
+            stored_model.processor_param_b,
+        )
+
+        model.memory_model = MemoryPricingModel()
+        model.memory_model.parameters = (
+            stored_model.memory_param_a,
+            stored_model.memory_param_b,
+            stored_model.memory_param_c,
+            stored_model.memory_param_d,
+            stored_model.memory_param_e,
+        )
+
+        model.storage_model = StoragePricingModel()
+        model.storage_model.hdd_parameters = (
+            stored_model.storage_hdd_param_a,
+            stored_model.storage_hdd_param_b,
+            stored_model.storage_hdd_param_c,
+        )
+        model.storage_model.sata_ssd_parameters = (
+            stored_model.storage_sata_ssd_param_a,
+            stored_model.storage_sata_ssd_param_b,
+            stored_model.storage_sata_ssd_param_c,
+        )
+        model.storage_model.nvme_ssd_parameters = (
+            stored_model.storage_nvme_ssd_param_a,
+            stored_model.storage_nvme_ssd_param_b,
+            stored_model.storage_nvme_ssd_param_c,
+        )
+
+        return model
+
+    def to_stored(self) -> StoredPricingModel:
+        stored = StoredPricingModel()
+
+        stored.processor_param_a = self.processor_model.passmark_parameters[0]
+        stored.processor_param_b = self.processor_model.passmark_parameters[1]
+
+        stored.memory_param_a = self.memory_model.parameters[0]
+        stored.memory_param_b = self.memory_model.parameters[1]
+        stored.memory_param_c = self.memory_model.parameters[2]
+        stored.memory_param_d = self.memory_model.parameters[3]
+        stored.memory_param_e = self.memory_model.parameters[4]
+
+        stored.storage_hdd_param_a = self.storage_model.hdd_parameters[0]
+        stored.storage_hdd_param_b = self.storage_model.hdd_parameters[1]
+        stored.storage_hdd_param_c = self.storage_model.hdd_parameters[2]
+        stored.storage_sata_ssd_param_a = self.storage_model.sata_ssd_parameters[0]
+        stored.storage_sata_ssd_param_b = self.storage_model.sata_ssd_parameters[1]
+        stored.storage_sata_ssd_param_c = self.storage_model.sata_ssd_parameters[2]
+        stored.storage_nvme_ssd_param_a = self.storage_model.nvme_ssd_parameters[0]
+        stored.storage_nvme_ssd_param_b = self.storage_model.nvme_ssd_parameters[1]
+        stored.storage_nvme_ssd_param_c = self.storage_model.nvme_ssd_parameters[2]
+
+        return stored

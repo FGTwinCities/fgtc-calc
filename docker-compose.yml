@@ -1,5 +1,7 @@
 services:
   application:
+    profiles:
+      - ''
     build:
       context: ./
     container_name: "application"
@@ -8,14 +10,20 @@ services:
     environment:
       VITE_DEV_MODE: "false"
       DATABASE_URL: "postgresql+asyncpg://app:app@database:5432/app"
+      REDIS_URL: "redis://redis:6379/0"
     restart: unless-stopped
     env_file: .env
     depends_on:
       database:
         condition: service_healthy
+      redis:
+        condition: service_healthy
 
   database:
     image: postgres:18.1-alpine3.23
+    profiles:
+      - ''
+      - infra
     environment:
       POSTGRES_DB: "app"
       POSTGRES_USER: "app"
@@ -35,5 +43,25 @@ services:
       timeout: 3s
       retries: 40
 
+  redis:
+    image: redis:8.4-alpine3.22
+    profiles:
+      - ''
+      - infra
+    hostname: cache
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    environment:
+      ALLOW_EMPTY_PASSWORD: "yes"
+    healthcheck:
+      test:
+        - CMD
+        - redis-cli
+        - ping
+    volumes:
+      - redis-data:/data
+
 volumes:
   db-data: {}
+  redis-data: {}

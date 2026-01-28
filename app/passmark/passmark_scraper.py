@@ -1,4 +1,5 @@
 import re
+from typing import overload
 from urllib.parse import urlencode
 
 from aiohttp import ClientSession
@@ -18,6 +19,8 @@ def _parse_pe_core_details(tag: Tag) -> PassmarkCoreDetails:
 
 
 class PassmarkScraper:
+    _cached_cpu_list: list[PassmarkSearchResult] = None
+
     def _create_cpu_session(self):
         return ClientSession(
             base_url="https://www.cpubenchmark.net",
@@ -26,11 +29,13 @@ class PassmarkScraper:
             }
         )
 
-    async def search_cpu(self, query: str = None) -> list[PassmarkSearchResult]:
-        results = []
+    async def retrieve_cpu_list(self) -> list[PassmarkSearchResult]:
+        if self._cached_cpu_list is not None:
+            return self._cached_cpu_list
 
+        results = []
         async with self._create_cpu_session() as session:
-            async with session.get("cpu_list.php") as response:
+            async with session.get("/cpu-list/all") as response:
                 if response.status != 200:
                     raise RuntimeError("Request to server was not successful.")
 
@@ -39,21 +44,43 @@ class PassmarkScraper:
 
                 for tag in tags:
                     cpu_name = tag.find("a").text
-                    cpu_id = int(re.search(r'\d+', tag.get("id")).group())
 
-                    if query:
-                        if query.lower() not in cpu_name.lower():
-                            continue
+                    cpu_id = int(re.search(r'\d+', tag.get("id")).group())
+                    score = int(re.search(r'\d+', tag.find_all("td")[1].text).group())
 
                     results.append(PassmarkSearchResult(
                         name=cpu_name,
                         passmark_id=cpu_id,
+                        multithread_score=score,
                     ))
 
-        return results
+        self._cached_cpu_list = results
+        return self._cached_cpu_list
+
+    async def search_cpu(self, query: str = None) -> list[PassmarkSearchResult]:
+        if query is None:
+            return await self.retrieve_cpu_list()
+        else:
+            results = []
+            for cpu in await self.retrieve_cpu_list():
+                if query.lower() in cpu.name.lower(): #TODO: Better search algorithm
+                    results.append(cpu)
+            return results
 
 
-    async def retrieve_cpu(self, cpu_id: int) -> PassmarkCpuDetails:
+    async def find_cpu(self, query: str = None) -> PassmarkSearchResult | None:
+        results = await self.search_cpu(query)
+        if len(results) >= 1:
+            return results[0]
+        else:
+            return None
+
+
+    async def retrieve_cpu(self, cpu: PassmarkSearchResult) -> PassmarkCpuDetails:
+        return await self.retrieve_cpu_by_id(cpu.passmark_id)
+
+
+    async def retrieve_cpu_by_id(self, cpu_id: int) -> PassmarkCpuDetails:
         result = None
 
         async with self._create_cpu_session() as session:
@@ -65,6 +92,15 @@ class PassmarkScraper:
 
                 cpu_name = soup.find(["span", "p"], class_="cpuname").text
 
+                class_elem = soup.find(["p", "strong", "b"], string=re.compile(r'[Cc]lass:')).parent
+                cpu_class = re.search(r'[Cc]lass:\s*([\w]+)', class_elem.text)
+                if cpu_class:
+                    cpu_class = cpu_class.group(1)
+
+                socket_elem = soup.find(["p", "strong", "b"], string=re.compile(r'[Ss]ocket:')).parent
+                socket = re.search(r'[Ss]ocket:\s*([\w\d]+)', socket_elem.text)
+                if socket:
+                    socket = socket.group(1)
 
                 total_cores_threads = soup.find(["p", "strong", "b"], string=re.compile(r'[Tt]otal\s[Cc]ores:'))
 
@@ -73,6 +109,8 @@ class PassmarkScraper:
                     result = PassmarkPECoreCpuDetails(
                         name=cpu_name,
                         passmark_id=cpu_id,
+                        cpu_class=cpu_class,
+                        socket=socket,
                     )
 
                     try:
@@ -87,6 +125,8 @@ class PassmarkScraper:
                     result = PassmarkStandardCpuDetails(
                         name=cpu_name,
                         passmark_id=cpu_id,
+                        cpu_class=cpu_class,
+                        socket=socket,
                     )
 
                     try:
