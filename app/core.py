@@ -24,6 +24,7 @@ from app.build.controller.graphics import GraphicsController
 from app.build.controller.processor import ProcessorController
 from app.db.service.pricing import provide_pricing_model_service, generate_pricing_model_job
 from app.lib.deps import provide_services
+from app.lib.util import getenv_bool
 from app.price.controller import PriceController
 from app.static_controller import StaticController
 
@@ -36,7 +37,7 @@ sqlalchemy_config = SQLAlchemyAsyncConfig(
 )
 
 vite_config = ViteConfig(
-    dev_mode=os.getenv("DEV_MODE", "True").lower() in ("true", 1, "t"),
+    dev_mode=getenv_bool("VITE_DEVMODE", True),
     mode="template",
     types=False,
     paths=PathConfig(
@@ -47,8 +48,8 @@ vite_config = ViteConfig(
 )
 
 saq_config = SAQConfig(
-    web_enabled=True,
-    use_server_lifespan=True,
+    web_enabled=getenv_bool("SAQ_WEB_ENABLED", False),
+    use_server_lifespan=getenv_bool("SAQ_USE_SERVER_LIFESPAN", True),
     queue_configs=[
         QueueConfig(
             dsn=os.getenv("REDIS_URL", "redis://localhost:6379/0"),
