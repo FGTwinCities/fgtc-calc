@@ -6,6 +6,7 @@ from app.price.dto import BuildPrice, PriceAdjustment, WithPrice
 from app.price.model.battery import BatteryPricingModel
 from app.price.model.display import DisplayPricingModel
 from app.price.model.memory import MemoryPricingModel
+from app.price.model.processor import ProcessorPricingModel
 from app.price.model.storage import StoragePricingModel
 
 
@@ -15,6 +16,7 @@ class PricingModel:
     def compute_adjustment(self, price: float) -> float:
         return self.adjustment(price)
 
+    processor_model: ProcessorPricingModel = ProcessorPricingModel()
     memory_model: MemoryPricingModel = MemoryPricingModel()
     storage_model: StoragePricingModel = StoragePricingModel()
     display_model: DisplayPricingModel = DisplayPricingModel()
@@ -65,6 +67,12 @@ class PricingModel:
     def from_stored(cls, stored_model: StoredPricingModel):
         model = PricingModel()
 
+        model.processor_model = ProcessorPricingModel()
+        model.processor_model.passmark_parameters = (
+            stored_model.processor_param_a,
+            stored_model.processor_param_b,
+        )
+
         model.memory_model = MemoryPricingModel()
         model.memory_model.parameters = (
             stored_model.memory_param_a,
@@ -95,6 +103,9 @@ class PricingModel:
 
     def to_stored(self) -> StoredPricingModel:
         stored = StoredPricingModel()
+
+        stored.processor_param_a = self.processor_model.passmark_parameters[0]
+        stored.processor_param_b = self.processor_model.passmark_parameters[1]
 
         stored.memory_param_a = self.memory_model.parameters[0]
         stored.memory_param_b = self.memory_model.parameters[1]

@@ -21,9 +21,14 @@ from app.price.dto import BuildPrice, WithPrice, Price
 PRICE_VALID_TIMESPAN = datetime.timedelta(days=7)
 
 
-async def _update_processor_price(processor: Processor) -> None:
-    estimator = EbayPriceEstimator()
-    price = await estimator.estimate_processor(processor)
+async def _update_processor_price(processor: Processor, pricing_model_service: PricingModelService) -> None:
+    try:
+        estimator = EbayPriceEstimator()
+        price = await estimator.estimate_processor(processor)
+    except Exception:
+        model = await pricing_model_service.get_model()
+        price = model.processor_model.compute(processor)
+
     processor.price = price
     processor.priced_at = now()
 
