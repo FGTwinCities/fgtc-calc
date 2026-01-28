@@ -5,7 +5,7 @@ from dataclasses import dataclass
 class PassmarkSearchResult:
     name: str = None
     passmark_id: int = None
-    multithread_score: int = None
+    score: int = None
 
 
 @dataclass

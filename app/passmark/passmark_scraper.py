@@ -1,8 +1,9 @@
+import asyncio
 import re
 from typing import overload
 from urllib.parse import urlencode
 
-from aiohttp import ClientSession
+from aiohttp import ClientSession, ClientResponse
 from bs4 import BeautifulSoup, Tag
 
 from app.passmark.schema import PassmarkCoreDetails, PassmarkSearchResult, PassmarkCpuDetails, PassmarkPECoreCpuDetails, \
@@ -20,6 +21,7 @@ def _parse_pe_core_details(tag: Tag) -> PassmarkCoreDetails:
 
 class PassmarkScraper:
     _cached_cpu_list: list[PassmarkSearchResult] = None
+    _cached_gpu_list: list[PassmarkSearchResult] = None
 
     def _create_cpu_session(self):
         return ClientSession(
@@ -29,33 +31,56 @@ class PassmarkScraper:
             }
         )
 
+    def _create_gpu_session(self):
+        return ClientSession(
+            base_url="https://www.videocardbenchmark.net",
+            headers={
+                "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:134.0) Gecko/20100101 Firefox/134.0",
+            }
+        )
+
+
+    async def _retrieve_list(self, response: ClientResponse) -> list[PassmarkSearchResult]:
+        results = []
+        if response.status != 200:
+            raise RuntimeError("Request to server was not successful.")
+
+        soup = BeautifulSoup(await response.text(), "html.parser")
+        tags = soup.find_all("tr", id=re.compile(r'^[cg]pu\d+$'))
+
+        for tag in tags:
+            name = tag.find("a").text
+
+            id = int(re.search(r'\d+', tag.get("id")).group())
+            score = int(re.search(r'\d+', tag.find_all("td")[1].text).group())
+
+            results.append(PassmarkSearchResult(
+                name=name,
+                passmark_id=id,
+                score=score,
+            ))
+        return results
+
+
     async def retrieve_cpu_list(self) -> list[PassmarkSearchResult]:
         if self._cached_cpu_list is not None:
             return self._cached_cpu_list
 
-        results = []
         async with self._create_cpu_session() as session:
             async with session.get("/cpu-list/all") as response:
-                if response.status != 200:
-                    raise RuntimeError("Request to server was not successful.")
-
-                soup = BeautifulSoup(await response.text(), "html.parser")
-                tags = soup.find_all("tr", id=re.compile(r'^cpu\d+$'))
-
-                for tag in tags:
-                    cpu_name = tag.find("a").text
-
-                    cpu_id = int(re.search(r'\d+', tag.get("id")).group())
-                    score = int(re.search(r'\d+', tag.find_all("td")[1].text).group())
-
-                    results.append(PassmarkSearchResult(
-                        name=cpu_name,
-                        passmark_id=cpu_id,
-                        multithread_score=score,
-                    ))
-
-        self._cached_cpu_list = results
+                self._cached_cpu_list = await self._retrieve_list(response)
         return self._cached_cpu_list
+
+
+    async def retrieve_gpu_list(self) -> list[PassmarkSearchResult]:
+        if self._cached_gpu_list is not None:
+            return self._cached_gpu_list
+
+        async with self._create_gpu_session() as session:
+            async with session.get("/gpu_list.php") as response:
+                self._cached_gpu_list = await self._retrieve_list(response)
+        return self._cached_gpu_list
+
 
     async def search_cpu(self, query: str = None) -> list[PassmarkSearchResult]:
         if query is None:
@@ -150,8 +175,14 @@ class PassmarkScraper:
 
                 # Parse CPU ratings
                 multi_label = soup.find("div", string=re.compile(r'[Mm]ultithread\s+[Rr]ating'))
-                result.multithread_score = int(multi_label.find_next_sibling("div").text)
+                result.score = int(multi_label.find_next_sibling("div").text)
                 single_label = soup.find("div", string=re.compile(r'[Ss]ingle\s+[Tt]hread\s+[Rr]ating'))
                 result.single_thread_score = int(single_label.find_next_sibling("div").text)
 
         return result
+
+
+if __name__ == "__main__":
+    pm = PassmarkScraper()
+    res = asyncio.run(pm.retrieve_gpu_list())
+    print(res)
