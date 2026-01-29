@@ -34,11 +34,15 @@ async def _update_processor_price(processor: Processor, pricing_model_service: P
     processor.priced_at = now()
 
 
-async def _update_graphics_price(graphics: GraphicsProcessor) -> None:
-    estimator = EbayPriceEstimator()
-    price = await estimator.estimate_graphics(graphics)
-    graphics.price = price
-    graphics.priced_at = now()
+async def _update_graphics_price(gpu: GraphicsProcessor, pricing_model_service: PricingModelService) -> None:
+    try:
+        estimator = EbayPriceEstimator()
+        price = await estimator.estimate_graphics(gpu)
+    except Exception:
+        model = await pricing_model_service.get_model()
+        price = await model.graphics_model.compute(gpu)
+    gpu.price = price
+    gpu.priced_at = now()
 
 
 class PriceController(Controller):
