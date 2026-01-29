@@ -268,7 +268,7 @@ async function onCreateFormSubmit() {
 function updateVisibleFields() {
     let form = new FormData(document.getElementById("create-form"));
     let isOther = form.get("type") === "other";
-    let isAny = form.get("type") !== "";
+    let isAny = !(form.get("type") === "" || form.get("type") === null);
     let isDesktop = form.get("type") === "desktop";
     let isLaptop = form.get("type") === "laptop";
     let isComputer = isDesktop || isLaptop;
