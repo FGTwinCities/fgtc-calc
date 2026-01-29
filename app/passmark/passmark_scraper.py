@@ -1,6 +1,5 @@
 import asyncio
 import re
-from typing import overload
 from urllib.parse import urlencode
 
 from aiohttp import ClientSession, ClientResponse
@@ -9,6 +8,24 @@ from bs4 import BeautifulSoup, Tag
 from app.lib.util import try_int
 from app.passmark.schema import PassmarkCoreDetails, PassmarkSearchResult, PassmarkCpuDetails, PassmarkPECoreCpuDetails, \
     PassmarkStandardCpuDetails, PassmarkGpuDetails
+
+
+def attempt_cpu_parse(query: str) -> str:
+    query = re.sub(r'\s{2,}', ' ', query)
+
+    ryzen = re.search(r'(?:r?y?zen)[-_\s]*(\d)[-_\s]*(pro)?[-_\s]*(\d+\w*)', query.lower())
+    intel_core_i = re.search(r'(i\d)[-_\s]*(\d+)(\w*)', query.lower())
+    if ryzen:
+        query = f"amd ryzen {ryzen.group(1)} {ryzen.group(2) or ""} {ryzen.group(3)}"
+    elif intel_core_i:
+        query = f"intel core {intel_core_i.group(1)}-{intel_core_i.group(2)}{intel_core_i.group(3) or ''}"
+
+    query = re.sub(r'\s{2,}', ' ', query)
+    return query
+
+
+def attempt_gpu_parse(query: str) -> str:
+    return query
 
 
 def _parse_pe_core_details(tag: Tag) -> PassmarkCoreDetails:
@@ -103,16 +120,16 @@ class PassmarkScraper:
 
 
     async def search_cpu(self, query: str = None) -> list[PassmarkSearchResult]:
-        return await self._search(self.retrieve_cpu_list, query)
+        return await self._search(self.retrieve_cpu_list, attempt_cpu_parse(query))
 
     async def find_cpu(self, query: str) -> PassmarkSearchResult | None:
-        return await self._find(self.retrieve_cpu_list, query)
+        return await self._find(self.retrieve_cpu_list, attempt_cpu_parse(query))
 
     async def search_gpu(self, query: str = None) -> list[PassmarkSearchResult]:
-        return await self._search(self.retrieve_gpu_list, query)
+        return await self._search(self.retrieve_gpu_list, attempt_gpu_parse(query))
 
     async def find_gpu(self, query: str) -> PassmarkSearchResult | None:
-        return await self._find(self.retrieve_gpu_list, query)
+        return await self._find(self.retrieve_gpu_list, attempt_gpu_parse(query))
 
 
     async def retrieve_cpu(self, cpu: PassmarkSearchResult) -> PassmarkCpuDetails:
@@ -230,15 +247,3 @@ class PassmarkScraper:
                 )
 
         return result
-
-
-async def test():
-    pm = PassmarkScraper()
-
-    list = await pm.retrieve_gpu_list()
-    for gpu in list:
-        print(await pm.retrieve_gpu(gpu))
-
-
-if __name__ == "__main__":
-    asyncio.run(test())
