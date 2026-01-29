@@ -28,8 +28,11 @@
                 <input type="radio" name="type" value="desktop" id="type-desktop" class="btn checked:bg-primary" aria-label="Desktop">
                 <input type="radio" name="type" value="laptop" id="type-laptop" class="btn checked:bg-primary" aria-label="Laptop">
                 <input type="radio" name="type" value="other" id="type-other" class="btn checked:bg-primary" aria-label="Other">
-                <input type="radio" name="type" aria-label="×" class="btn btn-square filter-reset">
+                <input type="radio" name="type" value="" aria-label="×" class="btn btn-square filter-reset">
             </div>
+        </fieldset>
+        <fieldset id="fieldset-info" class="build-section">
+            <legend>Basic Info</legend>
             <label class="floating-label">
                 <span class="label">Manufacturer</span>
                 <input type="text" name="manufacturer" id="manufacturer" placeholder="Manufacturer" class="input">
@@ -247,6 +250,10 @@
                 <b class="mr-2">Bluetooth:</b>
                 <input type="checkbox" name="bluetooth" class="toggle toggle-primary" />
             </div>
+        </fieldset>
+        <fieldset id="fieldset-notes" class="build-section">
+            <legend>Notes</legend>
+            <textarea name="notes" class="textarea"></textarea>
         </fieldset>
         <button type="button" id="submit-button" class="btn btn-primary">Submit</button>
     </form>

@@ -6,6 +6,8 @@ from advanced_alchemy.config import AsyncSessionConfig, AlembicAsyncConfig
 from advanced_alchemy.extensions.litestar import SQLAlchemyInitPlugin, SQLAlchemySerializationPlugin, \
     SQLAlchemyAsyncConfig
 from click import Group
+from jinja2 import Environment, PackageLoader
+from jinja_markdown2 import MarkdownExtension
 from litestar.config.app import AppConfig
 from litestar.contrib.jinja import JinjaTemplateEngine
 from litestar.di import Provide
@@ -38,6 +40,7 @@ sqlalchemy_config = SQLAlchemyAsyncConfig(
     connection_string=os.getenv("DATABASE_URL", "sqlite+aiosqlite:///database.sqlite"),
     before_send_handler="autocommit",
     session_config=session_config,
+    create_all=getenv_bool("DATABASE_CREATE_ALL", True),
     alembic_config=alembic_config,
 )
 
@@ -77,6 +80,13 @@ saq_config = SAQConfig(
     ]
 )
 
+jinja_environment = Environment(
+    loader=PackageLoader("app"),
+    extensions=[
+        MarkdownExtension,
+    ]
+)
+
 
 class ApplicationCore(InitPluginProtocol, CLIPluginProtocol):
     def on_cli_init(self, cli: Group) -> None:
@@ -110,8 +120,7 @@ class ApplicationCore(InitPluginProtocol, CLIPluginProtocol):
         )
 
         app_config.template_config = TemplateConfig(
-            directory=Path(__file__).parent.parent / "templates",
-            engine=JinjaTemplateEngine,
+            engine=JinjaTemplateEngine.from_environment(jinja_environment),
         )
 
         app_config.logging_config = LoggingConfig(log_exceptions="always")

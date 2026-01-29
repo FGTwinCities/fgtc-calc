@@ -35,10 +35,11 @@ export function convertFormToDto() {
     let dto = {};
 
     // Collect values that can be pulled directly from the form into the build object
-    dto["type"] = formData.get("type");
+    dto["type"] = formData.get("type") == "" ? null : formData.get("type");
     dto["manufacturer"] = formData.get("manufacturer") == "" ? null : formData.get("manufacturer");
     dto["model"] = formData.get("model") == "" ? null : formData.get("model");
     dto["operating_system"] = formData.get("operating-system") == "" ? null : formData.get("operating-system");
+    dto["notes"] = formData.get("notes") == "" ? null : formData.get("notes");
 
     // Collect processors
     dto["processors"] = [];
@@ -155,6 +156,7 @@ export function fillFormFromDto(dto) {
     $("input[name=manufacturer]").val(dto["manufacturer"]);
     $("input[name=model]").val(dto["model"]);
     $("input[name=operating-system]").val(dto["operating_system"]);
+    $("textarea[name=notes]").val(dto["notes"]);
 
     // Fill processor information
     for (let i = 0; i < dto["processors"].length; i++) {
@@ -262,11 +264,12 @@ async function onCreateFormSubmit() {
 function updateVisibleFields() {
     let form = new FormData(document.getElementById("create-form"));
     let isOther = form.get("type") === "other";
-
+    let isAny = form.get("type") !== "";
     let isDesktop = form.get("type") === "desktop";
     let isLaptop = form.get("type") === "laptop";
     let isComputer = isDesktop || isLaptop;
 
+    $("#fieldset-info").prop('hidden', !isAny)
     $("#fieldset-processor").prop('hidden', !(isComputer || isOther));
     $("#fieldset-memory").prop('hidden', !(isComputer || isOther));
     $("#fieldset-storage").prop('hidden', !(isComputer || isOther));
@@ -274,6 +277,7 @@ function updateVisibleFields() {
     $("#fieldset-display").prop('hidden', !(isLaptop || isOther));
     $("#fieldset-battery").prop('hidden', !(isLaptop || isOther));
     $("#fieldset-networking").prop('hidden', !(isComputer || isOther));
+    $("#fieldset-notes").prop('hidden', !isAny);
 
     $("#processor-upgradable").prop("checked", !isLaptop);
     $("#gpu-upgradable").prop("checked", !isLaptop);

@@ -64,3 +64,5 @@ class BuildCreate:
 
     batteries: list[BuildCreateBattery] = field(default_factory=list)
     display: BuildCreateDisplay | None = field(default=None)
+
+    notes: str | None = field(default=None)

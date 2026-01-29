@@ -602,6 +602,7 @@ dependencies = [
     { name = "beautifulsoup4" },
     { name = "ebay-rest" },
     { name = "ipykernel" },
+    { name = "jinja-markdown2" },
     { name = "litestar", extra = ["standard"] },
     { name = "litestar-saq" },
     { name = "litestar-vite" },
@@ -625,6 +626,7 @@ requires-dist = [
     { name = "beautifulsoup4", specifier = ">=4.14.3" },
     { name = "ebay-rest", specifier = ">=1.1.3" },
     { name = "ipykernel", specifier = ">=7.1.0" },
+    { name = "jinja-markdown2", specifier = ">=0.4.0" },
     { name = "litestar", extras = ["standard"], specifier = ">=2.18.0" },
     { name = "litestar-saq", specifier = ">=0.6.4" },
     { name = "litestar-vite", specifier = ">=0.15.0" },
@@ -917,6 +919,19 @@ wheels = [
 ]
 
 [[package]]
+name = "jinja-markdown2"
+version = "0.4.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "jinja2" },
+    { name = "markdown2" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/18/bc/f5905398419e4683cf1385eb5ba1217529f49e937b907ca1704d3276de4b/jinja_markdown2-0.4.0.tar.gz", hash = "sha256:51addceeec19f4dffb90d495c423bf5196fe721991ebb67f08af637332224790", size = 2764, upload-time = "2024-06-14T18:19:47.856Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/79/e4/145cc23195b673d73f5cd27c760f7dc1fd1b890d9a4088413e9afe57cc38/jinja_markdown2-0.4.0-py3-none-any.whl", hash = "sha256:ee43255a20f97874006a1d003d13bdd27ba8c39708738df8bd5cd1ce6029ab01", size = 3520, upload-time = "2024-06-14T18:19:46.285Z" },
+]
+
+[[package]]
 name = "jinja2"
 version = "3.1.6"
 source = { registry = "https://pypi.org/simple" }
@@ -1120,6 +1135,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/5b/f5/4ec618ed16cc4f8fb3b701563655a69816155e79e24a17b651541804721d/markdown_it_py-4.0.0.tar.gz", hash = "sha256:cb0a2b4aa34f932c007117b194e945bd74e0ec24133ceb5bac59009cda1cb9f3", size = 73070, upload-time = "2025-08-11T12:57:52.854Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/94/54/e7d793b573f298e1c9013b8c4dade17d481164aa517d1d7148619c2cedbf/markdown_it_py-4.0.0-py3-none-any.whl", hash = "sha256:87327c59b172c5011896038353a81343b6754500a08cd7a4973bb48c6d578147", size = 87321, upload-time = "2025-08-11T12:57:51.923Z" },
+]
+
+[[package]]
+name = "markdown2"
+version = "2.5.4"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/42/f8/b2ae8bf5f28f9b510ae097415e6e4cb63226bb28d7ee01aec03a755ba03b/markdown2-2.5.4.tar.gz", hash = "sha256:a09873f0b3c23dbfae589b0080587df52ad75bb09a5fa6559147554736676889", size = 145652, upload-time = "2025-07-27T16:16:24.307Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b8/06/2697b5043c3ecb720ce0d243fc7cf5024c0b5b1e450506e9b21939019963/markdown2-2.5.4-py3-none-any.whl", hash = "sha256:3c4b2934e677be7fec0e6f2de4410e116681f4ad50ec8e5ba7557be506d3f439", size = 49954, upload-time = "2025-07-27T16:16:23.026Z" },
 ]
 
 [[package]]

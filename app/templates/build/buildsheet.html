@@ -164,8 +164,12 @@
     </div>
     <div>
         <div class="buildsheet-section min-h-64 border-2">
-            <h1 class="text-xl font-bold">Additional Notes</h1>
-            <p>{{ build.notes }}</p>
+            <h1 class="text-xl font-bold mb-1">Additional Notes</h1>
+            <p>
+                {% markdown %}
+                {{ build.notes | replace("\n", "<br>") }}
+                {% endmarkdown %}
+            </p>
         </div>
         <p class="text-md text-center">
             Any hardware issue not detailed above is COVERED within 30 days of purchase.
