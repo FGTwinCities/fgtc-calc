@@ -6,6 +6,7 @@ from litestar import get, post
 from litestar.controller import Controller
 from litestar.di import Provide
 
+from app.build.controller.graphics import update_graphics_specs
 from app.build.controller.processor import update_processor_specs
 from app.db.model import Processor, GraphicsProcessor, MemoryModule, StorageDisk, Display, Battery, Build
 from app.db.repository import MemoryModuleRepository, provide_memory_repo, provide_storage_repo, \
@@ -66,7 +67,9 @@ class PriceController(Controller):
                 await _update_processor_price(processor, pricing_model_service)
 
         for gpu in build.graphics:
-            if not gpu.price or gpu.priced_at or now() > (gpu.priced_at + PRICE_VALID_TIMESPAN):
+            if not gpu.passmark_id:
+                await update_graphics_specs(gpu)
+            if not gpu.price or not gpu.priced_at or now() > (gpu.priced_at + PRICE_VALID_TIMESPAN):
                 await _update_graphics_price(gpu)
 
         price = await model.compute(build)

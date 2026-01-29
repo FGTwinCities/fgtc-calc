@@ -11,7 +11,10 @@ class GraphicsProcessor(UUIDAuditBase, PriceMixin):
     __tablename__ = "graphics_processor"
 
     model: Mapped[str] = mapped_column(nullable=False, unique=True)
-    #TODO: Specifications
+
+    passmark_id: Mapped[int | None] = mapped_column(nullable=True)
+    score: Mapped[int | None] = mapped_column(nullable=True)
+    score_g2d: Mapped[int | None] = mapped_column(nullable=True)
 
     def __hash__(self):
         return hash(self.id)

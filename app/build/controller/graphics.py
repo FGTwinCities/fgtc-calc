@@ -1,19 +1,34 @@
-import datetime
 from typing import Sequence
 from uuid import UUID
-from zoneinfo import ZoneInfo
 
 from advanced_alchemy.filters import LimitOffset, OrderBy
 from litestar import get, post, delete
 from litestar.controller import Controller
 from litestar.di import Provide
+from litestar.exceptions import ValidationException
 
 from app.db.model.graphics import GraphicsProcessor
 from app.db.service.graphics import provide_graphics_service, GraphicsProcessorService
-from app.ebay.price_estimator import EbayPriceEstimator
 from app.lib.math import clamp
+from app.passmark.passmark_scraper import PassmarkScraper
 
 MAX_SEARCH_ITEMS = 100
+
+
+async def update_graphics_specs(gpu: GraphicsProcessor, rebind: bool = False):
+    scraper = PassmarkScraper()
+
+    if not gpu.passmark_id or rebind:
+        res = await scraper.find_gpu(gpu.model)
+        if not res:
+            raise ValidationException("GPU not found on Passmark GPU list.")
+
+        gpu.passmark_id = res.passmark_id
+
+    specs = await scraper.retrieve_gpu_by_id(gpu.passmark_id)
+
+    gpu.score = specs.score
+    gpu.score_g2d = specs.score_g2d
 
 
 class GraphicsController(Controller):
@@ -52,3 +67,11 @@ class GraphicsController(Controller):
             OrderBy("model"),
             LimitOffset(limit=clamp(limit, 0, MAX_SEARCH_ITEMS), offset=0),
         )
+
+
+    @get("/{gpu_id: uuid}/update_specs")
+    async def update_gpu_specs(self, gpu_id: UUID, graphics_service: GraphicsProcessorService, rebind: bool = False) -> GraphicsProcessor:
+        gpu = await graphics_service.get(gpu_id)
+        await update_graphics_specs(gpu, rebind)
+        await graphics_service.update(gpu, auto_commit=True, auto_refresh=True)
+        return gpu
