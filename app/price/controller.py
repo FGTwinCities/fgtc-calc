@@ -74,7 +74,7 @@ class PriceController(Controller):
             if not gpu.passmark_id:
                 await update_graphics_specs(gpu)
             if not gpu.price or not gpu.priced_at or now() > (gpu.priced_at + PRICE_VALID_TIMESPAN):
-                await _update_graphics_price(gpu)
+                await _update_graphics_price(gpu, pricing_model_service)
 
         price = await model.compute(build)
 
