@@ -192,7 +192,7 @@
             {% for gpu in build.graphics|unique %}
                 <div class="buildsheet-section">
                     <h1 class="text-xl font-bold">GPU Details ({{ gpu.model }})</h1>
-                    <!-- TODO: GPU Specs -->
+                    <p><b>Passmark Rating:</b> {{ gpu.score }} 3D, {{ gpu.score_g2d }} 2D</p>
                 </div>
             {% endfor %}
             <div class="buildsheet-section">

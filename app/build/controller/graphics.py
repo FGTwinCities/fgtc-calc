@@ -27,6 +27,7 @@ async def update_graphics_specs(gpu: GraphicsProcessor, rebind: bool = False):
 
     specs = await scraper.retrieve_gpu_by_id(gpu.passmark_id)
 
+    gpu.model = specs.name
     gpu.score = specs.score
     gpu.score_g2d = specs.score_g2d
 
