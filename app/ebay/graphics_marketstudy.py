@@ -49,10 +49,7 @@ async def run_graphics_marketstudy() -> GraphicsProcessorPricingModel:
     query_objects = []
     random.shuffle(query_candidates)
     for result in query_candidates:
-        result = await pm.retrieve_gpu(result)
-        if result.gpu_category:
-            if result.gpu_category.lower() in ["desktop", "server", "workstation"]:
-                query_objects.append({"name": result.name, "score": result.score})
+        query_objects.append({"name": result.name, "score": result.score})
 
         if len(query_objects) >= GPU_SAMPLE_SIZE:
             break
