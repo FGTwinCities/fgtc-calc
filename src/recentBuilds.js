@@ -1,3 +1,5 @@
+import {addLoadingTask, removeLoadingTask} from "./main.js";
+
 function timeSince(date) {
     var seconds = Math.floor((new Date() - date) / 1000);
     var interval = seconds / 31536000;
@@ -26,6 +28,7 @@ function timeSince(date) {
 
 async function onClickGeneratePrice(build_id) {
     try {
+        addLoadingTask("generate-price_" + build_id);
         await $.ajax(`/price/${build_id}`)
     } catch(err) {
         console.log(err);
@@ -34,9 +37,11 @@ async function onClickGeneratePrice(build_id) {
 
     await fetchRecentBuildsPage();
     $(`.build-entry[build-id=${build_id}]`).find("input[type=radio]").prop("checked", true);
+    removeLoadingTask("generate-price_" + build_id);
 }
 
 async function onClickSetPrice(build_id) {
+    addLoadingTask("set-price_" + build_id);
     let price = parseFloat($(`.build-entry[build-id=${build_id}]`).find("#entry-set-price-field").val());
     let dto = {
         'price': price,
@@ -50,6 +55,7 @@ async function onClickSetPrice(build_id) {
 
     await fetchRecentBuildsPage();
     $(`.build-entry[build-id=${build_id}]`).find("input[type=radio]").prop("checked", true);
+    removeLoadingTask("set-price_" + build_id);
 }
 
 function onClickPrintBuildsheet(build_id) {
@@ -66,8 +72,10 @@ async function onClickDeleteBuild(build_id) {
         return;
     }
 
+    addLoadingTask("delete-build_" + build_id);
     await $.ajax(`/build/${build_id}`, {"method": "DELETE"});
-    fetchRecentBuildsPage();
+    await fetchRecentBuildsPage();
+    removeLoadingTask("delete-build_" + build_id);
 }
 
 async function fetchRecentBuildsPage() {
@@ -126,6 +134,11 @@ async function fetchRecentBuildsPage() {
     }
 }
 
-window.onload = function() {
-    fetchRecentBuildsPage();
-};
+window.addEventListener("load", function() {
+    try {
+        addLoadingTask("fetch-recent-builds");
+        fetchRecentBuildsPage();
+    } finally {
+        removeLoadingTask("fetch-recent-builds");
+    }
+});

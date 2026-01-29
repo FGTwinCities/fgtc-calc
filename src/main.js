@@ -1,10 +1,34 @@
-import htmx from "htmx.org";
-
-import { registerHtmxExtension } from "litestar-vite-plugin/helpers";
-
 import './style.css';
 
-window.htmx = htmx;
+window.addEventListener("load", function() {
+    updateLoaderVisibility();
+});
 
-registerHtmxExtension();
-htmx.process(document.body);
+let loadingTasks = [];
+
+function updateLoaderVisibility() {
+    let modal = $("#page_loader_modal").get(0);
+
+    if (loadingTasks.length > 0) {
+        if (!modal.open) {
+            modal.showModal();
+        }
+    } else {
+        if (modal.open) {
+            modal.close();
+        }
+    }
+}
+
+export function addLoadingTask(task) {
+    loadingTasks.push(task);
+    updateLoaderVisibility();
+}
+
+export function removeLoadingTask(task) {
+    let index = loadingTasks.indexOf(task);
+    if (index !== -1) {
+        loadingTasks.splice(index, 1);
+    }
+    updateLoaderVisibility();
+}

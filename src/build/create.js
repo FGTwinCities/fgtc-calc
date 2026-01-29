@@ -1,4 +1,5 @@
 import {onProcessorSearchKeyup, onGraphicsSearchKeyup} from "./search.js";
+import {addLoadingTask, removeLoadingTask} from "../main.js";
 
 function normalizeDataSizeMegabytes(quantity, unit) {
     quantity = parseInt(quantity);
@@ -253,11 +254,14 @@ async function onCreateFormSubmit() {
     }
 
     try {
+        addLoadingTask("submit-build");
         let response = await $.ajax(url, settings);
         window.location.href = `/?select=${response['id']}`;
     } catch(err) {
         console.log(err);
         alert("Build rejected by server. Details can be found in log.")
+    } finally {
+        removeLoadingTask("submit-build");
     }
 }
 
@@ -284,7 +288,7 @@ function updateVisibleFields() {
 
 }
 
-window.onload = async function() {
+window.addEventListener("load", async function() {
     // Bind events for page
     $("input[name=type]").change(updateVisibleFields);
     $("#add-processor-button").click(() => addTemplateListItem('processor-template', 'processor-list'));
@@ -297,7 +301,9 @@ window.onload = async function() {
     const urlParams = new URLSearchParams(window.location.search);
     let editId = urlParams.get('edit');
     if (editId) {
+        addLoadingTask("load-build");
         fillFormFromDto(await $.ajax(`/build/${editId}`));
+        removeLoadingTask("load-build");
     } else {
         // Automatically add a CPU, Memory Module, Disk and Battery on page load
         addTemplateListItem('processor-template', 'processor-list');
@@ -307,7 +313,7 @@ window.onload = async function() {
 
         updateVisibleFields();
     }
-}
+});
 
 window.convertFormToDto = convertFormToDto;
 window.fillFormFromDto = fillFormFromDto;
