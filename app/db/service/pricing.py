@@ -8,10 +8,10 @@ from saq.types import Context
 
 from app.db import model as m
 from app.db.model.stored_pricing_model import StoredPricingModel
-from app.ebay.graphics_marketstudy import run_graphics_marketstudy
-from app.ebay.memory_marketstudy import run_memory_marketstudy
-from app.ebay.processor_marketstudy import run_processor_marketstudy
-from app.ebay.storage_marketstudy import run_storage_marketstudy
+from app.extern.ebay.graphics_marketstudy import run_graphics_marketstudy
+from app.extern.ebay import run_memory_marketstudy
+from app.extern.ebay import run_processor_marketstudy
+from app.extern.ebay.storage_marketstudy import run_storage_marketstudy
 from app.lib.datetime import now
 from app.lib.deps import provide_services
 from app.price.model.pricing import PricingModel

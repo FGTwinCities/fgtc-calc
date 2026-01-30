@@ -15,7 +15,7 @@ from app.db.service.build import provide_build_service, BuildService
 from app.db.service.graphics import provide_graphics_service, GraphicsProcessorService
 from app.db.service.pricing import PricingModelService
 from app.db.service.processor import provide_processor_service, ProcessorService
-from app.ebay.price_estimator import EbayPriceEstimator
+from app.extern.ebay.price_estimator import EbayPriceEstimator
 from app.lib.datetime import now
 from app.price.dto import BuildPrice, WithPrice, Price
 

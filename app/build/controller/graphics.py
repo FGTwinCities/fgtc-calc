@@ -10,7 +10,7 @@ from litestar.exceptions import ValidationException
 from app.db.model.graphics import GraphicsProcessor
 from app.db.service.graphics import provide_graphics_service, GraphicsProcessorService
 from app.lib.math import clamp
-from app.passmark.passmark_scraper import PassmarkScraper
+from app.extern.benchmark.passmark import PassmarkScraper
 
 MAX_SEARCH_ITEMS = 100
 

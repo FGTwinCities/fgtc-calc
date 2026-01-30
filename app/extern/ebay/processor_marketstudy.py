@@ -1,4 +1,3 @@
-import asyncio
 import random
 from typing import AsyncGenerator
 
@@ -6,10 +5,9 @@ import numpy as np
 from aiostream import stream
 from scipy.optimize import curve_fit
 
-from app.db.model import Processor
-from app.ebay.ebay_connection import EbayConnection
-from app.ebay.util import item_has_category
-from app.passmark.passmark_scraper import PassmarkScraper
+from app.extern.ebay.ebay_connection import EbayConnection
+from app.extern.ebay.util import item_has_category
+from app.extern.benchmark.passmark.passmark_scraper import PassmarkScraper
 from app.price.model.processor import ProcessorPricingModel, processor_model_func
 
 PROCESSOR_SAMPLE_SIZE = 25

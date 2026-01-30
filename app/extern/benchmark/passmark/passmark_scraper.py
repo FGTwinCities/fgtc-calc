@@ -1,4 +1,3 @@
-import asyncio
 import re
 from urllib.parse import urlencode
 
@@ -6,7 +5,7 @@ from aiohttp import ClientSession, ClientResponse
 from bs4 import BeautifulSoup, Tag
 
 from app.lib.util import try_int
-from app.passmark.schema import PassmarkCoreDetails, PassmarkSearchResult, PassmarkCpuDetails, PassmarkPECoreCpuDetails, \
+from app.extern.benchmark.passmark.schema import PassmarkCoreDetails, PassmarkSearchResult, PassmarkCpuDetails, PassmarkPECoreCpuDetails, \
     PassmarkStandardCpuDetails, PassmarkGpuDetails
 
 

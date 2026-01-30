@@ -5,8 +5,8 @@ import numpy as np
 from aiostream import stream
 from scipy.optimize import curve_fit
 
-from app.ebay.ebay_connection import EbayConnection
-from app.ebay.util import parse_capacity, item_has_category
+from app.extern.ebay.ebay_connection import EbayConnection
+from app.extern.ebay.util import parse_capacity, item_has_category
 from app.lib.util import try_int
 from app.price.model.storage import StoragePricingModel, storage_model_func
 

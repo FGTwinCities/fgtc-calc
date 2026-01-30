@@ -1,8 +1,8 @@
 import numpy as np
 
 from app.db.model import Processor, GraphicsProcessor
-from app.ebay.ebay_connection import EbayConnection
-from app.ebay.util import cull_outliers, item_has_category
+from app.extern.ebay.ebay_connection import EbayConnection
+from app.extern.ebay.util import cull_outliers, item_has_category
 
 
 class EbayPriceEstimator:
