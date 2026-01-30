@@ -5,7 +5,7 @@
 # ===============================================
 FROM astral/uv:python3.13-alpine3.23 as builder
 
-RUN apk add --no-cache npm
+RUN apk add --no-cache tzdata npm
 
 ENV UV_NO_DEV=1
 ENV UV_LINK_MODE=copy
