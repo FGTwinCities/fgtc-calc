@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+from app.db.model import Processor, GraphicsProcessor
 from app.extern.benchmark.schema import BenchmarkComponentResult
 
 
@@ -26,4 +27,12 @@ class BenchmarkDataSource(ABC):
 
     @abstractmethod
     async def find_gpu(self, query: str) -> BenchmarkComponentResult | None:
+        raise NotImplemented
+
+    @abstractmethod
+    async def update_cpu(self, processor: Processor, rebind: bool = False) -> None:
+        raise NotImplemented
+
+    @abstractmethod
+    async def update_gpu(self, gpu: GraphicsProcessor, rebind: bool = False) -> None:
         raise NotImplemented

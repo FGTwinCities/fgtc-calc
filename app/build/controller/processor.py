@@ -1,3 +1,4 @@
+import logging
 from typing import Sequence
 from uuid import UUID
 
@@ -9,6 +10,7 @@ from litestar.exceptions import ValidationException
 
 from app.db.model.processor import Processor
 from app.db.service.processor import provide_processor_service, ProcessorService
+from app.extern.benchmark.geekbench.geekbench import GeekbenchDataSource
 from app.lib.math import clamp
 from app.extern.benchmark.passmark import PassmarkScraper
 from app.extern.benchmark.passmark import PassmarkPECoreCpuDetails
@@ -17,41 +19,17 @@ MAX_SEARCH_ITEMS = 100
 
 
 async def update_processor_specs(processor: Processor, rebind: bool = False):
-    scraper = PassmarkScraper()
+    try:
+        scraper = PassmarkScraper()
+        await scraper.update_cpu(processor, rebind)
+    except RuntimeError as e:
+        logging.warn("Failed to update CPU specifications from Passmark", e)
 
-    if not processor.passmark_id or rebind:
-        search_results = await scraper.search_cpu(processor.model)
-        if len(search_results) <= 0:
-            raise ValidationException("CPU not found on Passmark CPU list.")
-
-        processor.passmark_id = search_results[0].passmark_id
-
-    specs = await scraper.retrieve_cpu_by_id(processor.passmark_id)
-
-    processor.model = specs.name
-    processor.passmark_multithread_score = specs.score
-    processor.passmark_single_thread_score = specs.single_thread_score
-
-    if isinstance(specs, PassmarkPECoreCpuDetails):
-        processor.performance_core_count = specs.performance_cores.cores
-        processor.performance_thread_count = specs.performance_cores.threads
-        if specs.performance_cores.clock:
-            processor.performance_clock = round(specs.performance_cores.clock * 1000)
-        if specs.performance_cores.turbo_clock:
-            processor.performance_turbo_clock = round(specs.performance_cores.turbo_clock * 1000)
-        processor.efficient_core_count = specs.efficient_cores.cores
-        processor.efficient_thread_count = specs.efficient_cores.threads
-        if specs.efficient_cores.clock:
-            processor.efficient_clock = round(specs.efficient_cores.clock * 1000)
-        if specs.efficient_cores.turbo_clock:
-            processor.efficient_turbo_clock = round(specs.efficient_cores.turbo_clock * 1000)
-    else:
-        processor.performance_core_count = specs.cores
-        processor.performance_thread_count = specs.threads
-        if specs.clock:
-            processor.performance_clock = round(specs.clock * 1000)
-        if specs.turbo_clock:
-            processor.performance_turbo_clock = round(specs.turbo_clock * 1000)
+    try:
+        source = GeekbenchDataSource()
+        await source.update_cpu(processor, rebind)
+    except RuntimeError as e:
+        logging.warn("Failed to update CPU specifications from Geekbench", e)
 
 
 class ProcessorController(Controller):

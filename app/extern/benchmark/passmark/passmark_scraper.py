@@ -4,11 +4,13 @@ from urllib.parse import urlencode
 from aiohttp import ClientSession, ClientResponse
 from bs4 import BeautifulSoup, Tag
 
+from app.db.model import Processor, GraphicsProcessor
 from app.extern.benchmark.benchmark_data_source import BenchmarkDataSource
+from app.extern.benchmark.passmark.schema import PassmarkCoreDetails, PassmarkSearchResult, PassmarkCpuDetails, \
+    PassmarkPECoreCpuDetails, \
+    PassmarkStandardCpuDetails, PassmarkGpuDetails
 from app.extern.benchmark.schema import BenchmarkComponentResult
 from app.lib.util import try_int
-from app.extern.benchmark.passmark.schema import PassmarkCoreDetails, PassmarkSearchResult, PassmarkCpuDetails, PassmarkPECoreCpuDetails, \
-    PassmarkStandardCpuDetails, PassmarkGpuDetails
 
 
 def attempt_cpu_parse(query: str) -> str:
@@ -250,3 +252,53 @@ class PassmarkScraper(BenchmarkDataSource):
                 )
 
         return result
+
+
+    async def update_cpu(self, processor: Processor, rebind: bool = False) -> None:
+        if not processor.passmark_id or rebind:
+            search_results = await self.search_cpu(processor.model)
+            if len(search_results) <= 0:
+                raise RuntimeError("CPU not found on Passmark CPU list.")
+
+            processor.passmark_id = search_results[0].passmark_id
+
+        specs = await self.retrieve_cpu_by_id(processor.passmark_id)
+
+        processor.model = specs.name
+        processor.passmark_multithread_score = specs.score
+        processor.passmark_single_thread_score = specs.single_thread_score
+
+        if isinstance(specs, PassmarkPECoreCpuDetails):
+            processor.performance_core_count = specs.performance_cores.cores
+            processor.performance_thread_count = specs.performance_cores.threads
+            if specs.performance_cores.clock:
+                processor.performance_clock = round(specs.performance_cores.clock * 1000)
+            if specs.performance_cores.turbo_clock:
+                processor.performance_turbo_clock = round(specs.performance_cores.turbo_clock * 1000)
+            processor.efficient_core_count = specs.efficient_cores.cores
+            processor.efficient_thread_count = specs.efficient_cores.threads
+            if specs.efficient_cores.clock:
+                processor.efficient_clock = round(specs.efficient_cores.clock * 1000)
+            if specs.efficient_cores.turbo_clock:
+                processor.efficient_turbo_clock = round(specs.efficient_cores.turbo_clock * 1000)
+        else:
+            processor.performance_core_count = specs.cores
+            processor.performance_thread_count = specs.threads
+            if specs.clock:
+                processor.performance_clock = round(specs.clock * 1000)
+            if specs.turbo_clock:
+                processor.performance_turbo_clock = round(specs.turbo_clock * 1000)
+
+    async def update_gpu(self, gpu: GraphicsProcessor, rebind: bool = False) -> None:
+        if not gpu.passmark_id or rebind:
+            res = await self.find_gpu(gpu.model)
+            if not res:
+                raise RuntimeError("GPU not found on Passmark GPU list.")
+
+            gpu.passmark_id = res.passmark_id
+
+        specs = await self.retrieve_gpu_by_id(gpu.passmark_id)
+
+        gpu.model = specs.name
+        gpu.passmark_score = specs.score
+        gpu.passmark_score_g2d = specs.score_g2d

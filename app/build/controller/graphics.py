@@ -1,3 +1,4 @@
+import logging
 from typing import Sequence
 from uuid import UUID
 
@@ -9,6 +10,7 @@ from litestar.exceptions import ValidationException
 
 from app.db.model.graphics import GraphicsProcessor
 from app.db.service.graphics import provide_graphics_service, GraphicsProcessorService
+from app.extern.benchmark.geekbench.geekbench import GeekbenchDataSource
 from app.lib.math import clamp
 from app.extern.benchmark.passmark import PassmarkScraper
 
@@ -16,20 +18,17 @@ MAX_SEARCH_ITEMS = 100
 
 
 async def update_graphics_specs(gpu: GraphicsProcessor, rebind: bool = False):
-    scraper = PassmarkScraper()
+    try:
+        scraper = PassmarkScraper()
+        await scraper.update_gpu(gpu, rebind)
+    except (ValidationException | RuntimeError) as e:
+        logging.warn("Failed to update CPU specifications from Passmark", e)
 
-    if not gpu.passmark_id or rebind:
-        res = await scraper.find_gpu(gpu.model)
-        if not res:
-            raise ValidationException("GPU not found on Passmark GPU list.")
-
-        gpu.passmark_id = res.passmark_id
-
-    specs = await scraper.retrieve_gpu_by_id(gpu.passmark_id)
-
-    gpu.model = specs.name
-    gpu.passmark_score = specs.score
-    gpu.passmark_score_g2d = specs.score_g2d
+    try:
+        source = GeekbenchDataSource()
+        await source.update_gpu(gpu, rebind)
+    except (ValidationException | RuntimeError) as e:
+        logging.warn("Failed to update CPU specifications from Geekbench", e)
 
 
 class GraphicsController(Controller):

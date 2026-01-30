@@ -1,10 +1,9 @@
-import asyncio
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from aiohttp import ClientSession
 
+from app.db.model import Processor, GraphicsProcessor
 from app.extern.benchmark.benchmark_data_source import BenchmarkDataSource
-from app.extern.benchmark.passmark import PassmarkScraper
 from app.extern.benchmark.schema import BenchmarkComponentResult
 
 
@@ -95,8 +94,48 @@ class GeekbenchDataSource(BenchmarkDataSource):
     async def find_gpu(self, query: str) -> BenchmarkComponentResult:
         return await self._find(self.retrieve_gpu_list, query)
 
+    async def retrieve_cpu_by_id(self, id: int) -> GeekbenchComponentResult | None:
+        for cpu in await self.retrieve_cpu_list():
+            if not isinstance(cpu, GeekbenchComponentResult):
+                raise RuntimeError
 
-if __name__ == "__main__":
-    gb = PassmarkScraper()
-    res = asyncio.run(gb.find_cpu("i7-10700k"))
-    print(res)
+            if cpu.geekbench_id == id:
+                return cpu
+
+        return None
+
+    async def retrieve_gpu_by_id(self, id: int) -> GeekbenchComponentResult | None:
+        for gpu in await self.retrieve_gpu_list():
+            if not isinstance(gpu, GeekbenchComponentResult):
+                raise RuntimeError
+
+            if gpu.geekbench_id == id:
+                return gpu
+
+        return None
+
+    async def update_cpu(self, processor: Processor, rebind: bool = False) -> None:
+        result: GeekbenchComponentResult
+        if not processor.geekbench_id or rebind:
+            result = await self.find_cpu(processor.model)
+            if result is None:
+                raise RuntimeError("CPU was not found on Geekbench")
+        else:
+            result = await self.retrieve_cpu_by_id(processor.geekbench_id)
+
+        processor.model = result.name
+        processor.geekbench_id = result.geekbench_id
+        processor.geekbench_multithread_score = result.score
+
+    async def update_gpu(self, gpu: GraphicsProcessor, rebind: bool = False) -> None:
+        result: GeekbenchComponentResult
+        if not gpu.geekbench_id or rebind:
+            result = await self.find_gpu(gpu.model)
+            if result is None:
+                raise RuntimeError("GPU was not found on Geekbench")
+        else:
+            result = await self.retrieve_gpu_by_id(gpu.geekbench_id)
+
+        gpu.model = result.name
+        gpu.geekbench_id = result.geekbench_id
+        gpu.geekbench_score = result.score
