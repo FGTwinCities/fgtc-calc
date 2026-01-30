@@ -21,13 +21,13 @@ async def update_graphics_specs(gpu: GraphicsProcessor, rebind: bool = False):
     try:
         scraper = PassmarkScraper()
         await scraper.update_gpu(gpu, rebind)
-    except (ValidationException | RuntimeError) as e:
+    except RuntimeError as e:
         logging.warn("Failed to update CPU specifications from Passmark", e)
 
     try:
         source = GeekbenchDataSource()
         await source.update_gpu(gpu, rebind)
-    except (ValidationException | RuntimeError) as e:
+    except RuntimeError as e:
         logging.warn("Failed to update CPU specifications from Geekbench", e)
 
 

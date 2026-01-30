@@ -185,18 +185,28 @@
                     <p><b>Total Cores:</b> {{ cpu.performance_core_count + cpu.efficient_core_count }} Cores, {{ cpu.performance_thread_count + cpu.efficient_thread_count }} Threads</p>
                     <p><b>Performance Cores:</b> {{ cpu.performance_core_count }} Cores, {{ cpu.performance_thread_count }} Threads @ {{ cpu.performance_clock / 1000 if cpu.performance_clock else 'None' }} GHz Base{% if cpu.performance_turbo_clock %}, {{ cpu.performance_turbo_clock / 1000 }} GHz Turbo{% endif %}</p>
                     <p><b>Efficiency Cores:</b> {{ cpu.efficient_core_count }} Cores, {{ cpu.efficient_thread_count }} Threads @ {{ cpu.efficient_clock / 1000 if cpu.efficient_clock else 'None' }} GHz Base{% if cpu.efficient_turbo_clock %}, {{ cpu.efficient_turbo_clock / 1000 }} GHz Turbo{% endif %}</p>
-                    {% else %}
+                    {% elif cpu.performance_core_count %}
                     <p><b>Base Clock:</b> {{ cpu.performance_clock / 1000 if cpu.performance_clock else 'None' }} Ghz</p>
                     {% if cpu.performance_turbo_clock %}<p><b>Turbo Clock:</b> {{ cpu.performance_turbo_clock / 1000 }}</p>{% endif %}
                     <p><b>Cores:</b> {{ cpu.performance_core_count }} <b>Threads:</b> {{ cpu.performance_thread_count }}</p>
                     {% endif %}
-                    <p><b>Passmark Rating:</b> {{ cpu.passmark_multithread_score }} Multithreaded, {{ cpu.passmark_single_thread_score }} Single Threaded</p>
+                    {% if cpu.passmark_multithread_score %}
+                    <p><b>Passmark Rating:</b> {{ cpu.passmark_multithread_score }} Multithreaded{% if cpu.passmark_single_thread_score %}, {{ cpu.passmark_single_thread_score }} Single Threaded{% endif %}</p>
+                    {% endif %}
+                    {% if cpu.geekbench_multithread_score %}
+                    <p><b>Geekbench Rating:</b> {{ cpu.geekbench_multithread_score }} Multithreaded{% if cpu.geekbench_single_thread_score %}, {{ cpu.geekbench_single_thread_score }} Single Threaded{% endif %}</p>
+                    {% endif %}
                 </div>
             {% endfor %}
             {% for gpu in build.graphics|unique %}
                 <div class="buildsheet-section">
                     <h1 class="text-xl font-bold">GPU Details ({{ gpu.model }})</h1>
+                    {% if gpu.passmark_score %}
                     <p><b>Passmark Rating:</b> {{ gpu.passmark_score }} 3D, {{ gpu.passmark_score_g2d }} 2D</p>
+                    {% endif %}
+                    {% if gpu.geekbench_score %}
+                    <p><b>Geekbench Rating:</b> {{ gpu.geekbench_score }} Vulkan</p>
+                    {% endif %}
                 </div>
             {% endfor %}
             <div class="buildsheet-section">
