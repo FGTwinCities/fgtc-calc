@@ -5,9 +5,12 @@ import numpy as np
 from aiostream import stream
 from scipy.optimize import curve_fit
 
+from app.extern.benchmark.benchmark_data_source import BenchmarkDataSource
+from app.extern.benchmark.geekbench.geekbench import GeekbenchDataSource
 from app.extern.ebay.ebay_connection import EbayConnection
 from app.extern.ebay.util import item_has_category
 from app.extern.benchmark.passmark.passmark_scraper import PassmarkScraper
+from app.lib.util import getenv_bool
 from app.price.model.processor import ProcessorPricingModel, processor_model_func
 
 PROCESSOR_SAMPLE_SIZE = 25
@@ -32,7 +35,12 @@ async def fetch_processor_marketdata_query(conn, query_obj, limit) -> AsyncGener
 
 async def run_processor_marketstudy() -> ProcessorPricingModel:
     conn = EbayConnection()
-    pm = PassmarkScraper()
+
+    datasource: BenchmarkDataSource
+    if getenv_bool("USE_PASSMARK_PRICINGMODEL", True):
+        datasource = PassmarkScraper()
+    else:
+        datasource = GeekbenchDataSource()
 
     queries = [
         "Intel Core i",
@@ -42,7 +50,7 @@ async def run_processor_marketstudy() -> ProcessorPricingModel:
 
     cpu_query_candidates = []
     for query in queries:
-        cpu_results = await pm.search_cpu(query)
+        cpu_results = await datasource.search_cpu(query)
         cpu_query_candidates.extend(cpu_results)
 
     query_objects = []

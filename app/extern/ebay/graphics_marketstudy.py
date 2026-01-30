@@ -5,9 +5,12 @@ import numpy as np
 from aiostream import stream
 from scipy.optimize import curve_fit
 
+from app.extern.benchmark.benchmark_data_source import BenchmarkDataSource
+from app.extern.benchmark.geekbench.geekbench import GeekbenchDataSource
 from app.extern.ebay.ebay_connection import EbayConnection
 from app.extern.ebay.util import item_has_category
 from app.extern.benchmark.passmark.passmark_scraper import PassmarkScraper
+from app.lib.util import getenv_bool
 from app.price.model.graphics import GraphicsProcessorPricingModel, graphics_model_func
 
 GPU_SAMPLE_SIZE = 25
@@ -32,7 +35,12 @@ async def _fetch_graphics_marketdata_query(conn, query_obj, limit) -> AsyncGener
 
 async def run_graphics_marketstudy() -> GraphicsProcessorPricingModel:
     conn = EbayConnection()
-    pm = PassmarkScraper()
+
+    datasource: BenchmarkDataSource
+    if getenv_bool("USE_PASSMARK_PRICINGMODEL", True):
+        datasource = PassmarkScraper()
+    else:
+        datasource = GeekbenchDataSource()
 
     queries = [
         "GeForce GTX",
@@ -43,7 +51,7 @@ async def run_graphics_marketstudy() -> GraphicsProcessorPricingModel:
 
     query_candidates = []
     for query in queries:
-        gpu_result = await pm.search_gpu(query)
+        gpu_result = await datasource.search_gpu(query)
         query_candidates.extend(gpu_result)
 
     query_objects = []
