@@ -73,7 +73,7 @@ class PassmarkScraper(BenchmarkDataSource):
             name = tag.find("a").text
 
             id = int(re.search(r'\d+', tag.get("id")).group())
-            score = int(re.search(r'\d+', tag.find_all("td")[1].text).group())
+            score = int(re.search(r'\d+', tag.find_all("td")[1].text.replace(',','')).group())
 
             results.append(PassmarkSearchResult(
                 name=name,

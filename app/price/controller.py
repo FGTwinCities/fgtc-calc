@@ -1,10 +1,12 @@
 import datetime
+import logging
 from uuid import UUID
 from zoneinfo import ZoneInfo
 
 from litestar import get, post
 from litestar.controller import Controller
 from litestar.di import Provide
+from litestar.exceptions import ValidationException
 
 from app.build.controller.graphics import update_graphics_specs
 from app.build.controller.processor import update_processor_specs
@@ -27,6 +29,8 @@ async def _update_processor_price(processor: Processor, pricing_model_service: P
         estimator = EbayPriceEstimator()
         price = await estimator.estimate_processor(processor)
     except Exception:
+        if processor.multithread_score is None:
+            raise ValidationException("Unable to price CPU: Failed to find CPU on eEbay, no benchmark score to price.")
         model = await pricing_model_service.get_model()
         price = model.processor_model.compute(processor)
 
@@ -39,8 +43,11 @@ async def _update_graphics_price(gpu: GraphicsProcessor, pricing_model_service: 
         estimator = EbayPriceEstimator()
         price = await estimator.estimate_graphics(gpu)
     except Exception:
+        if gpu.score is None:
+            raise ValidationException("Unable to price GPU: Failed to find GPU on eEbay, no benchmark score to price.")
         model = await pricing_model_service.get_model()
-        price = await model.graphics_model.compute(gpu)
+        price = model.graphics_model.compute(gpu)
+
     gpu.price = price
     gpu.priced_at = now()
 
@@ -66,13 +73,20 @@ class PriceController(Controller):
         # If prices/specs for associated processors or GPUs are not present or too old, update those first
         for processor in build.processors:
             if not processor.passmark_id:
-                await update_processor_specs(processor)
+                try:
+                    await update_processor_specs(processor)
+                except RuntimeError as e:
+                    logging.warn("Failed to fetch CPU specs", e)
+
             if not processor.price or not processor.priced_at or now() > (processor.priced_at + PRICE_VALID_TIMESPAN):
                 await _update_processor_price(processor, pricing_model_service)
 
         for gpu in build.graphics:
             if not gpu.passmark_id:
-                await update_graphics_specs(gpu)
+                try:
+                    await update_graphics_specs(gpu)
+                except RuntimeError as e:
+                    logging.warn("Failed to fetch GPU specs", e)
             if not gpu.price or not gpu.priced_at or now() > (gpu.priced_at + PRICE_VALID_TIMESPAN):
                 await _update_graphics_price(gpu, pricing_model_service)
 

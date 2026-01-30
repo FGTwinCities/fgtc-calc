@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from aiohttp import ClientSession
 
 from app.extern.benchmark.benchmark_data_source import BenchmarkDataSource
+from app.extern.benchmark.passmark import PassmarkScraper
 from app.extern.benchmark.schema import BenchmarkComponentResult
 
 
@@ -96,6 +97,6 @@ class GeekbenchDataSource(BenchmarkDataSource):
 
 
 if __name__ == "__main__":
-    gb = GeekbenchDataSource()
+    gb = PassmarkScraper()
     res = asyncio.run(gb.find_cpu("i7-10700k"))
     print(res)
