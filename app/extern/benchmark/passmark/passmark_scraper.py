@@ -4,6 +4,8 @@ from urllib.parse import urlencode
 from aiohttp import ClientSession, ClientResponse
 from bs4 import BeautifulSoup, Tag
 
+from app.extern.benchmark.benchmark_data_source import BenchmarkDataSource
+from app.extern.benchmark.schema import BenchmarkComponentResult
 from app.lib.util import try_int
 from app.extern.benchmark.passmark.schema import PassmarkCoreDetails, PassmarkSearchResult, PassmarkCpuDetails, PassmarkPECoreCpuDetails, \
     PassmarkStandardCpuDetails, PassmarkGpuDetails
@@ -36,7 +38,7 @@ def _parse_pe_core_details(tag: Tag) -> PassmarkCoreDetails:
     )
 
 
-class PassmarkScraper:
+class PassmarkScraper(BenchmarkDataSource):
     _cached_cpu_list: list[PassmarkSearchResult] = None
     _cached_gpu_list: list[PassmarkSearchResult] = None
 
@@ -81,7 +83,7 @@ class PassmarkScraper:
         return results
 
 
-    async def retrieve_cpu_list(self) -> list[PassmarkSearchResult]:
+    async def retrieve_cpu_list(self) -> list[BenchmarkComponentResult]:
         if self._cached_cpu_list is not None:
             return self._cached_cpu_list
 
@@ -91,7 +93,7 @@ class PassmarkScraper:
         return self._cached_cpu_list
 
 
-    async def retrieve_gpu_list(self) -> list[PassmarkSearchResult]:
+    async def retrieve_gpu_list(self) -> list[BenchmarkComponentResult]:
         if self._cached_gpu_list is not None:
             return self._cached_gpu_list
 
@@ -120,16 +122,16 @@ class PassmarkScraper:
             return None
 
 
-    async def search_cpu(self, query: str = None) -> list[PassmarkSearchResult]:
+    async def search_cpu(self, query: str = None) -> list[BenchmarkComponentResult]:
         return await self._search(self.retrieve_cpu_list, attempt_cpu_parse(query))
 
-    async def find_cpu(self, query: str) -> PassmarkSearchResult | None:
+    async def find_cpu(self, query: str) -> BenchmarkComponentResult | None:
         return await self._find(self.retrieve_cpu_list, attempt_cpu_parse(query))
 
-    async def search_gpu(self, query: str = None) -> list[PassmarkSearchResult]:
+    async def search_gpu(self, query: str = None) -> list[BenchmarkComponentResult]:
         return await self._search(self.retrieve_gpu_list, attempt_gpu_parse(query))
 
-    async def find_gpu(self, query: str) -> PassmarkSearchResult | None:
+    async def find_gpu(self, query: str) -> BenchmarkComponentResult | None:
         return await self._find(self.retrieve_gpu_list, attempt_gpu_parse(query))
 
 

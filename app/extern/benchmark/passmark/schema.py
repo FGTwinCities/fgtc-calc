@@ -1,11 +1,11 @@
 from dataclasses import dataclass
 
+from app.extern.benchmark.schema import BenchmarkComponentResult
+
 
 @dataclass
-class PassmarkSearchResult:
-    name: str = None
+class PassmarkSearchResult(BenchmarkComponentResult):
     passmark_id: int = None
-    score: int = None
 
 
 @dataclass
