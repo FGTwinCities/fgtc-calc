@@ -11,7 +11,7 @@ class ProcessorPricingModel:
     passmark_parameters = (1, 0)
 
     def compute(self, processor: Processor) -> float:
-        if not processor.multithread_score:
+        if not processor.passmark_multithread_score:
             raise ValidationException("Processor does not have a passmark score, cannot evaluate price.")
 
-        return processor_model_func(processor.multithread_score, *self.passmark_parameters)
+        return processor_model_func(processor.passmark_multithread_score, *self.passmark_parameters)

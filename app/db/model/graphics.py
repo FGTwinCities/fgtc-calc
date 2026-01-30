@@ -13,8 +13,11 @@ class GraphicsProcessor(UUIDAuditBase, PriceMixin):
     model: Mapped[str] = mapped_column(nullable=False, unique=True)
 
     passmark_id: Mapped[int | None] = mapped_column(nullable=True)
-    score: Mapped[int | None] = mapped_column(nullable=True)
-    score_g2d: Mapped[int | None] = mapped_column(nullable=True)
+    passmark_score: Mapped[int | None] = mapped_column(nullable=True)
+    passmark_score_g2d: Mapped[int | None] = mapped_column(nullable=True)
+
+    geekbench_id: Mapped[int | None] = mapped_column(nullable=True)
+    geekbench_score: Mapped[int | None] = mapped_column(nullable=True)
 
     def __hash__(self):
         return hash(self.id)

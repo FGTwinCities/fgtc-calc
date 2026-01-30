@@ -29,8 +29,8 @@ async def update_processor_specs(processor: Processor, rebind: bool = False):
     specs = await scraper.retrieve_cpu_by_id(processor.passmark_id)
 
     processor.model = specs.name
-    processor.multithread_score = specs.score
-    processor.single_thread_score = specs.single_thread_score
+    processor.passmark_multithread_score = specs.score
+    processor.passmark_single_thread_score = specs.single_thread_score
 
     if isinstance(specs, PassmarkPECoreCpuDetails):
         processor.performance_core_count = specs.performance_cores.cores

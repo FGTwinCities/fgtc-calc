@@ -29,7 +29,7 @@ async def _update_processor_price(processor: Processor, pricing_model_service: P
         estimator = EbayPriceEstimator()
         price = await estimator.estimate_processor(processor)
     except Exception:
-        if processor.multithread_score is None:
+        if processor.passmark_multithread_score is None:
             raise ValidationException("Unable to price CPU: Failed to find CPU on eEbay, no benchmark score to price.")
         model = await pricing_model_service.get_model()
         price = model.processor_model.compute(processor)
@@ -43,7 +43,7 @@ async def _update_graphics_price(gpu: GraphicsProcessor, pricing_model_service: 
         estimator = EbayPriceEstimator()
         price = await estimator.estimate_graphics(gpu)
     except Exception:
-        if gpu.score is None:
+        if gpu.passmark_score is None:
             raise ValidationException("Unable to price GPU: Failed to find GPU on eEbay, no benchmark score to price.")
         model = await pricing_model_service.get_model()
         price = model.graphics_model.compute(gpu)

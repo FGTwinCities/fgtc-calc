@@ -10,7 +10,7 @@ class GraphicsProcessorPricingModel:
     passmark_parameters = (1, 0)
 
     def compute(self, gpu: GraphicsProcessor) -> float:
-        if not gpu.score:
+        if not gpu.passmark_score:
             raise ValidationException("GPU does not have a passmark score, cannot evaluate price.")
 
-        return graphics_model_func(gpu.score, *self.passmark_parameters)
+        return graphics_model_func(gpu.passmark_score, *self.passmark_parameters)
