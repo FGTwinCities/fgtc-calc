@@ -236,7 +236,70 @@ export function fillFormFromDto(dto) {
     $("input[name=bluetooth]").prop("checked", dto["bluetooth"]);
 }
 
+function validateFormItem(item, message, errors) {
+    if (item === "" || item === null) {
+        errors.push(message);
+        return false;
+    }
+    return true;
+}
+
+function validateFormList(list, message, errors) {
+    for (let i = 0; i < list.length; i++) {
+        if (!validateFormItem(list[i], message, errors)) { return false; }
+    }
+
+    return true;
+}
+
+function validateForm() {
+    let formElement = document.getElementById("create-form");
+    let form = new FormData(formElement);
+
+    let errors = [];
+
+    validateFormItem(form.get("type"), "Computer Type is required", errors);
+
+    validateFormList(form.getAll("processor-name"), "Processor Model is required", errors);
+
+    validateFormItem(form.get("memory-type"), "Memory Type is required", errors);
+    validateFormList(form.getAll("memory-size"), "Memory Size is required", errors);
+    validateFormList(form.getAll("memory-size-unit"), "Memory Size Unit is required", errors);
+    validateFormList(form.getAll("memory-speed"), "Memory Speed is required", errors);
+
+    validateFormList(form.getAll("storage-disk-type"), "Storage Disk Type is required", errors);
+    validateFormList(form.getAll("storage-disk-form"), "Storage Disk Form is required", errors);
+    validateFormList(form.getAll("storage-disk-interface"), "Storage Disk Interface is required", errors);
+    validateFormList(form.getAll("storage-disk-size"), "Storage Disk Size is required", errors);
+    validateFormList(form.getAll("storage-disk-size-unit"), "Storage Disk Size Unit is required", errors);
+
+    validateFormList(form.getAll("gpu-name"), "Graphics Card Model is required");
+
+    let type = form.get("type")
+    if (type === "laptop" || type === "other") {
+        validateFormItem("display-size", "Display Size is required", errors);
+        validateFormItem("display-resolution-horizontal", "Display Resolution is required", errors);
+        validateFormItem("display-resolution-vertical", "Display Resolution is required", errors);
+        validateFormItem("display-refreshrate", "Display Refresh Rate is required", errors);
+
+        validateFormList(form.getAll("battery-designcapacity"), "Battery Design Capacity is required", errors);
+        validateFormList(form.getAll("battery-remainingcapacity"), "Battery Remaining Capacity is required", errors);
+    }
+
+    validateFormItem(form.get("networking-wired"), "Wired Networking Type is required", errors);
+    validateFormItem(form.get("networking-wireless"), "Wireless Networking Type is required", errors);
+
+    if (errors.length > 0) {
+        alert(errors);
+        return false;
+    } else {
+        return true;
+    }
+}
+
 async function onCreateFormSubmit() {
+    if (!validateForm()) { return; }
+
     let dto = convertFormToDto();
 
     var url = "/build";
