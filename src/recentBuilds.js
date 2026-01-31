@@ -32,7 +32,7 @@ async function onClickGeneratePrice(build_id) {
         await $.ajax(`/price/${build_id}`)
     } catch(err) {
         console.log(err);
-        alert("Failed to price build. Details are in log.")
+        alert("Failed to price build: " + err.responseText);
     }
 
     await fetchRecentBuildsPage();

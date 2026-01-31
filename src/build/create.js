@@ -322,7 +322,7 @@ async function onCreateFormSubmit() {
         window.location.href = `/?select=${response['id']}`;
     } catch(err) {
         console.log(err);
-        alert("Build rejected by server. Details can be found in log.")
+        alert("Failed to submit build: " + err.responseText);
     } finally {
         removeLoadingTask("submit-build");
     }
