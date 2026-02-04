@@ -67,8 +67,19 @@ function onClickPrintBuildsheet(build_id) {
     });
 }
 
+async function onClickDuplicateBuild(build_id) {
+    if (confirm("Are you sure you want to duplicate this build?") !== true) {
+        return;
+    }
+
+    addLoadingTask("duplicate-build_" + build_id);
+    await $.ajax(`/build/${build_id}/duplicate`);
+    await fetchRecentBuildsPage();
+    removeLoadingTask("duplicate-build_" + build_id);
+}
+
 async function onClickDeleteBuild(build_id) {
-    if (confirm("Are you sure you want to delete this build?") != true) {
+    if (confirm("Are you sure you want to delete this build?") !== true) {
         return;
     }
 
@@ -122,6 +133,7 @@ async function fetchRecentBuildsPage() {
         entry.find("#entry-set-price-button").click(() => onClickSetPrice(build.id));
         entry.find("#entry-generate-price-button").click(() => onClickGeneratePrice(build.id));
         entry.find("#entry-print-button").click(() => onClickPrintBuildsheet(build.id));
+        entry.find("#entry-duplicate-button").click(() => onClickDuplicateBuild(build.id));
         entry.find("#entry-delete-button").click(() => onClickDeleteBuild(build.id));
 
         entryList.append(entry);

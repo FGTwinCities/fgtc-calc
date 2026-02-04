@@ -1,5 +1,7 @@
 import datetime
+import uuid
 from typing import Sequence
+from unittest.mock import magic_methods
 from uuid import UUID
 from zoneinfo import ZoneInfo
 
@@ -8,6 +10,7 @@ from litestar import get, post, delete, patch
 from litestar.controller import Controller
 from litestar.di import Provide
 from litestar.response import Template
+from sqlalchemy.sql.elements import SQLCoreOperations
 
 from app.build.schema import BuildCreate
 from app.db.model.battery import Battery
@@ -20,7 +23,7 @@ from app.db.model.storage import StorageDisk
 from app.db.service.build import provide_build_service, BuildService
 from app.db.service.graphics import provide_graphics_service, GraphicsProcessorService
 from app.db.service.processor import provide_processor_service, ProcessorService
-from app.lib.attrs import attrcopy
+from app.lib.attrs import attrcopy, attrcopy_allowlist
 from app.lib.math import mb2gb
 
 
@@ -60,7 +63,7 @@ class BuildController(Controller):
 
         build.graphics = []
         await self._deduplicate_graphics_processors(build, data, graphics_service)
-        await self._convert_create_dto_to_model(build, data)
+        self._convert_create_dto_to_model(build, data)
 
         build = await build_service.update(build, auto_commit=True, auto_refresh=True)
         return build
@@ -71,12 +74,12 @@ class BuildController(Controller):
 
         await self._deduplicate_processors(build, data, processor_service)
         await self._deduplicate_graphics_processors(build, data, graphics_service)
-        await self._convert_create_dto_to_model(build, data)
+        self._convert_create_dto_to_model(build, data)
 
         build = await build_service.create(build, auto_commit=True, auto_refresh=True)
         return build
 
-    async def _convert_create_dto_to_model(self, build: Build, data: BuildCreate):
+    def _convert_create_dto_to_model(self, build: Build, data: BuildCreate):
         build.memory = []
         for mem in data.memory:
             module = MemoryModule()
@@ -147,6 +150,49 @@ class BuildController(Controller):
     @delete("/{build_id: uuid}")
     async def delete_build(self, build_id: UUID, build_service: BuildService) -> None:
         await build_service.delete(build_id, auto_commit=True)
+
+    @get("/{build_id: uuid}/duplicate")
+    async def duplicate_build(self, build_id: UUID, build_service: BuildService) -> Build:
+        build = await build_service.get(build_id)
+        new_build = Build()
+
+        attrcopy_allowlist(build, new_build, [
+            "type",
+            "manufacturer",
+            "model",
+            "operating_system",
+            "wired_networking",
+            "wireless_networking",
+            "bluetooth",
+            "notes",
+            "processors",
+            "graphics",
+            "price",
+            "priced_at",
+        ])
+
+        for mem in build.memory:
+            new_mem = MemoryModule()
+            attrcopy(mem, new_mem, ["build_id"])
+            new_build.memory.append(new_mem)
+
+        for disk in build.storage:
+            new_disk = StorageDisk()
+            attrcopy(disk, new_disk, ["build_id"])
+            new_build.storage.append(new_disk)
+
+        for batt in build.batteries:
+            new_batt = Battery()
+            attrcopy(batt, new_batt, ["build_id"])
+            new_build.batteries.append(new_batt)
+
+        for disp in build.display:
+            new_disp = Display()
+            attrcopy(disp, new_disp, ["build_id"])
+            new_build.display.append(new_disp)
+
+        await build_service.create(new_build, auto_commit=True, auto_refresh=True)
+        return new_build
 
 
     @get("/{build_id: uuid}/sheet")
