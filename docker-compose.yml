@@ -5,8 +5,6 @@ services:
     build:
       context: ./
     container_name: "application"
-    ports:
-      - "8000:8000"
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
@@ -21,6 +19,7 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    network_mode: "service:vpn"
 
   database:
     image: postgres:18.1-alpine3.23
@@ -65,6 +64,26 @@ services:
     volumes:
       - redis-data:/data
 
+  vpn:
+    image: qmcgaw/gluetun
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    ports:
+      - 8888:8888/tcp
+      - 8388:8388/tcp
+      - 8388:8388/udp
+      - "8000:8585" # Port forward for application happens here
+    volumes:
+      - gluetun-data:/gluetun
+    environment:
+      - VPN_SERVICE_PROVIDER=ivpn
+      - VPN_TYPE=openvpn
+      - UPDATER_PERIOD=24h
+    env_file: .env
+
 volumes:
   db-data: {}
   redis-data: {}
+  gluetun-data: {}
