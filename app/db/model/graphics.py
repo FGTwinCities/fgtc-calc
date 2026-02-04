@@ -10,7 +10,7 @@ from app.db.model.mixins.price import PriceMixin
 class GraphicsProcessor(UUIDAuditBase, PriceMixin):
     __tablename__ = "graphics_processor"
 
-    model: Mapped[str] = mapped_column(nullable=False, unique=True)
+    model: Mapped[str] = mapped_column(nullable=False, unique=False) #TODO: Make unique and merge
 
     passmark_id: Mapped[int | None] = mapped_column(nullable=True)
     score: Mapped[int | None] = mapped_column(nullable=True)

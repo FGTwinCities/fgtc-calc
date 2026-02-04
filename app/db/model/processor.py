@@ -10,7 +10,7 @@ from app.db.model.mixins.price import PriceMixin
 class Processor(UUIDAuditBase, PriceMixin):
     __tablename__ = "processor"
 
-    model: Mapped[str] = mapped_column(nullable=False, unique=True)
+    model: Mapped[str] = mapped_column(nullable=False, unique=False) #TODO: Make unique and auto-merge
 
     passmark_id: Mapped[int | None] = mapped_column(nullable=True)
     multithread_score: Mapped[int | None] = mapped_column(nullable=True)
