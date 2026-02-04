@@ -1,4 +1,6 @@
 """ Mathematics library functions """
+import math
+from decimal import Decimal
 
 
 def clamp(x: int, min: int, max: int) -> int:
@@ -19,3 +21,7 @@ def gb2mb(gb: float) -> float:
 
 def tb2mb(tb: float) -> float:
     return gb2mb(tb * 1000)
+
+def round_down_exact(num: float, to: float) -> float:
+    num, to = Decimal(str(num)), Decimal(str(to))
+    return float(math.floor(num / to) * to)

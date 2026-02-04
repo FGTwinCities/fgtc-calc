@@ -2,6 +2,7 @@ from numpy.polynomial.polynomial import Polynomial
 
 from app.db.model.build import Build
 from app.db.model.stored_pricing_model import StoredPricingModel
+from app.lib.math import round_down_exact
 from app.price.dto import BuildPrice, PriceAdjustment, WithPrice
 from app.price.model.battery import BatteryPricingModel
 from app.price.model.display import DisplayPricingModel
@@ -13,6 +14,7 @@ from app.price.model.storage import StoragePricingModel
 
 class PricingModel:
     adjustment: Polynomial = Polynomial([0, 0.75, 0])
+    rounding: float = 0.05
 
     def compute_adjustment(self, price: float) -> float:
         return self.adjustment(price)
@@ -64,6 +66,10 @@ class PricingModel:
         for submodule in submodule_prices:
             price += submodule.price
             debug.append(submodule)
+
+        adjusted = round_down_exact(price, self.rounding)
+        debug.append(PriceAdjustment(price=adjusted-price, comment=f"Round down to nearest ${self.rounding}"))
+        price = adjusted
 
         return BuildPrice(
             price=round(price, 2),
