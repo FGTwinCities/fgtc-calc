@@ -40,7 +40,7 @@ async def _update_graphics_price(gpu: GraphicsProcessor, pricing_model_service: 
         price = await estimator.estimate_graphics(gpu)
     except Exception:
         model = await pricing_model_service.get_model()
-        price = await model.graphics_model.compute(gpu)
+        price = model.graphics_model.compute(gpu)
     gpu.price = price
     gpu.priced_at = now()
 
