@@ -14,24 +14,30 @@ def attempt_cpu_parse(query: str) -> str:
     query = query.lower()
 
     # Match and reformat query strings for common CPU model names to have a better chance of being found on Passmark
-    if match := re.search(r'r?y?zen[-_\s]*(\d?[-_\s]+)(threadripper)?[-_\s]*(pro)?[-_\s]*(\d+\w*)', query):
+    if m := re.search(r'r?y?zen[-_\s]*(\d?[-_\s]+)(threadripper)?[-_\s]*(pro)?[-_\s]*(\d+\w*)', query):
         # AMD Ryzen, Ryzen Pro and Ryzen Threadripper CPUs
-        query = f"AMD Ryzen {match.group(1)} {(match.group(2) or "").title()} {(match.group(3) or "").title()} {match.group(4).upper()}"
-    elif match := re.search(r'(?:epyc|epic)[-_\s]*(embedded)?[-_\s]*([\d\w]+)', query):
+        query = f"AMD Ryzen {m.group(1)} {(m.group(2) or "").title()} {(m.group(3) or "").title()} {m.group(4).upper()}"
+    elif m := re.search(r'(?:epyc|epic)[-_\s]*(embedded)?[-_\s]*([\d\w]+)', query):
         # AMD EPYC CPUs
-        query = f"AMD EPYC {(match.group(1) or "").title()} {(match.group(2) or "").upper()}"
-    elif match := re.search(r'opteron[-_\s]*(x?\d+)[-_\s]*(\w*)', query):
+        query = f"AMD EPYC {(m.group(1) or "").title()} {(m.group(2) or "").upper()}"
+    elif m := re.search(r'opteron[-_\s]*(x?\d+)[-_\s]*(\w*)', query):
         # AMD Opteron CPUs
-        query = f"AMD Opteron {match.group(1).upper()} {match.group(2) or ""}"
-    elif match := re.search(r'xeon[-_\s]*(bronze|gold|max|platinum|silver|phi)?[-_\s]*([edw]?\d?(?=[-_\s]+))[-_\s]*([\d\w]+)[-_\s]*(v\d)?', query):
+        query = f"AMD Opteron {m.group(1).upper()} {m.group(2) or ""}"
+    elif m := re.search(r'xeon[-_\s]*(bronze|gold|max|platinum|silver|phi)?[-_\s]*([edw]?\d?(?=[-_\s]+))[-_\s]*([\d\w]+)[-_\s]*(v\d)?', query):
         # Intel Xeon CPUs
-        query = f"Intel Xeon {(match.group(1) or "").title()} {match.group(2).upper() + "-" if match.group(2) != '' else ' '}{(match.group(3) or "").upper()} {match.group(4) or ""}"
-    elif match := re.search(r'ultra[-_\s]*(x?\d?(?:[-_\s]*))(\d+\w*)((?:[-_\s]*)plus)?', query):
+        query = f"Intel Xeon {(m.group(1) or "").title()} {m.group(2).upper() + "-" if m.group(2) != '' else ' '}{(m.group(3) or "").upper()} {m.group(4) or ""}"
+    elif m := re.search(r'(pentium|celeron|atom)[-_\s]*(gold|silver|extreme\sedition|dual|iii)?[-_\s]*(\w?\d?-|(?=[_\s]))[-_\s]*([\d\w]+)', query):
+        # Intel Pentium/Celeron/Atom CPUs
+        query = f"Intel {(m.group(1) or "").title()} {(m.group(2) or "").title()} {(m.group(3) or "").upper()} {m.group(4).upper()}"
+    elif m := re.search(r'core\s?2[-_\s]*(duo|quad|extreme|solo)?[-_\s]*([\w\d]+)', query):
+        # Intel Core2 CPUs
+        query = f"Intel Core2 {(m.group(1) or "").title()} {m.group(2).upper()}"
+    elif m := re.search(r'ultra[-_\s]*(x?\d?(?:[-_\s]*))(\d+\w*)((?:[-_\s]*)plus)?', query):
         # Intel Core Ultra CPUs
-        query = f"Intel Core Ultra {match.group(1) or ""} {(match.group(2) or "").upper()} {(match.group(3) or "").title()}"
-    elif match := re.search(r'(i\d)[-_\s]*(\d+)(\w*)', query):
+        query = f"Intel Core Ultra {m.group(1) or ""} {(m.group(2) or "").upper()} {(m.group(3) or "").title()}"
+    elif m := re.search(r'(i\d)[-_\s]*(\d+)(\w*)', query):
         # Intel Core i CPUs
-        query = f"Intel Core {match.group(1)}-{match.group(2)}{(match.group(3) or "").upper()}"
+        query = f"Intel Core {m.group(1)}-{m.group(2)}{(m.group(3) or "").upper()}"
 
     query = re.sub(r'\s{2,}', ' ', query)
     return query
