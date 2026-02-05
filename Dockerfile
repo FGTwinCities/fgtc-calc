@@ -1,11 +1,17 @@
 # syntax=docker.io/docker/dockerfile:1.7-labs
 
 # ===============================================
-# Stage 1: Builder
+# Stage 0: Base Image
 # ===============================================
-FROM astral/uv:python3.13-alpine3.23 as builder
+FROM astral/uv:python3.13-alpine3.23 as base
 
 RUN apk add --no-cache tzdata npm
+
+
+# ===============================================
+# Stage 1: Builder
+# ===============================================
+FROM base as builder
 
 ENV UV_NO_DEV=1
 ENV UV_LINK_MODE=copy
@@ -21,20 +27,18 @@ COPY --parents pyproject.toml uv.lock package.json package-lock.json /app/
 
 RUN npm install
 
-RUN uv venv && \
-    uv sync --frozen --no-editable --no-install-project
+RUN uv sync --frozen --no-editable --no-install-project
 
 COPY --parents app/ src/ assets/ templates/ vite.config.ts README.md /app/
 
 RUN uv run app assets build && \
     uv build
 
+
 # ===============================================
 # Stage 2: Runtime
 # ===============================================
-FROM astral/uv:python3.13-alpine3.23 as runtime
-
-RUN apk add --no-cache npm
+FROM base as runtime
 
 ENV LITESTAR_APP="app.asgi:create_app" \
     DEV_MODE=0
