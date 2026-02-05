@@ -50,7 +50,10 @@ async def run_processor_marketstudy() -> ProcessorPricingModel:
     query_objects = []
     random.shuffle(cpu_query_candidates)
     for cpu_result in cpu_query_candidates:
-        query_objects.append({"name": cpu_result.name, "score": cpu_result.score})
+        cpu_result = await pm.retrieve_cpu(cpu_result)
+        if cpu_result.cpu_class and cpu_result.socket:
+            if cpu_result.cpu_class.lower() in ["desktop", "server"]:
+                query_objects.append({"name": cpu_result.name, "score": cpu_result.score})
 
         if len(query_objects) >= PROCESSOR_SAMPLE_SIZE:
             break
