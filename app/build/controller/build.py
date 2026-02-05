@@ -1,7 +1,5 @@
 import datetime
-import uuid
 from typing import Sequence
-from unittest.mock import magic_methods
 from uuid import UUID
 from zoneinfo import ZoneInfo
 
@@ -10,7 +8,6 @@ from litestar import get, post, delete, patch
 from litestar.controller import Controller
 from litestar.di import Provide
 from litestar.response import Template
-from sqlalchemy.sql.elements import SQLCoreOperations
 
 from app.build.schema import BuildCreate
 from app.db.model.battery import Battery
@@ -25,6 +22,7 @@ from app.db.service.graphics import provide_graphics_service, GraphicsProcessorS
 from app.db.service.processor import provide_processor_service, ProcessorService
 from app.lib.attrs import attrcopy, attrcopy_allowlist
 from app.lib.math import mb2gb
+from app.passmark.passmark_scraper import attempt_cpu_parse, attempt_gpu_parse
 
 
 class BuildController(Controller):
@@ -112,6 +110,8 @@ class BuildController(Controller):
                                                graphics_service: GraphicsProcessorService):
         # Find existing GPUs by name
         for i in range(0, len(data.graphics)):
+            data.graphics[i].model = attempt_gpu_parse(data.graphics[i].model)
+
             found_gpus = await graphics_service.list(GraphicsProcessor.model.contains(data.graphics[i].model))
 
             is_found = False
@@ -130,6 +130,8 @@ class BuildController(Controller):
     async def _deduplicate_processors(self, build: Build, data: BuildCreate, processor_service: ProcessorService):
         # Find existing processors by name
         for i in range(0, len(data.processors)):
+            data.processors[i].model = attempt_cpu_parse(data.processors[i].model)
+
             # For some dumb reason, model.is_() breaks everything when using postgres, so query by contains and do final comparison here
             # TODO: Please find a fix
             found_processors = await processor_service.list(Processor.model.contains(data.processors[i].model))
