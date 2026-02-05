@@ -349,6 +349,7 @@ function updateVisibleFields() {
     $("#fieldset-notes").prop('hidden', !isAny);
 
     $("#processor-upgradable").prop("checked", !isLaptop);
+    $("#memory-upgradable").prop("checked", !isLaptop);
     $("#gpu-upgradable").prop("checked", !isLaptop);
 
 }
