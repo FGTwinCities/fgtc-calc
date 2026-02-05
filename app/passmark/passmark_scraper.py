@@ -12,24 +12,26 @@ from app.passmark.schema import PassmarkCoreDetails, PassmarkSearchResult, Passm
 
 def attempt_cpu_parse(query: str) -> str:
     query = query.lower()
-    query = re.sub(r'\s{2,}', ' ', query)
 
     # Match and reformat query strings for common CPU model names to have a better chance of being found on Passmark
     if match := re.search(r'r?y?zen[-_\s]*(\d?[-_\s]+)(threadripper)?[-_\s]*(pro)?[-_\s]*(\d+\w*)', query):
         # AMD Ryzen, Ryzen Pro and Ryzen Threadripper CPUs
-        query = f"AMD Ryzen {match.group(1)} {match.group(2) or ""} {match.group(3) or ""} {match.group(4)}"
+        query = f"AMD Ryzen {match.group(1)} {(match.group(2) or "").title()} {(match.group(3) or "").title()} {match.group(4).upper()}"
     elif match := re.search(r'(?:epyc|epic)[-_\s]*(embedded)?[-_\s]*([\d\w]+)', query):
         # AMD EPYC CPUs
-        query = f"AMD EPYC {match.group(1).title() or ""} {match.group(2).upper() or ""}"
+        query = f"AMD EPYC {(match.group(1) or "").title()} {(match.group(2) or "").upper()}"
     elif match := re.search(r'opteron[-_\s]*(x?\d+)[-_\s]*(\w*)', query):
         # AMD Opteron CPUs
         query = f"AMD Opteron {match.group(1).upper()} {match.group(2) or ""}"
+    elif match := re.search(r'xeon[-_\s]*(bronze|gold|max|platinum|silver|phi)?[-_\s]*([edw]?\d?(?=[-_\s]+))[-_\s]*([\d\w]+)[-_\s]*(v\d)?', query):
+        # Intel Xeon CPUs
+        query = f"Intel Xeon {(match.group(1) or "").title()} {match.group(2).upper() + "-" if match.group(2) != '' else ' '}{(match.group(3) or "").upper()} {match.group(4) or ""}"
     elif match := re.search(r'ultra[-_\s]*(x?\d?(?:[-_\s]*))(\d+\w*)((?:[-_\s]*)plus)?', query):
         # Intel Core Ultra CPUs
-        query = f"Intel Core Ultra {match.group(1) or ""} {match.group(2).upper() or ""} {match.group(3).title() or ""}"
+        query = f"Intel Core Ultra {match.group(1) or ""} {(match.group(2) or "").upper()} {(match.group(3) or "").title()}"
     elif match := re.search(r'(i\d)[-_\s]*(\d+)(\w*)', query):
         # Intel Core i CPUs
-        query = f"Intel Core {match.group(1)}-{match.group(2)}{match.group(3) or ''}"
+        query = f"Intel Core {match.group(1)}-{match.group(2)}{(match.group(3) or "").upper()}"
 
     query = re.sub(r'\s{2,}', ' ', query)
     return query
