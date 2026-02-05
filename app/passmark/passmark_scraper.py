@@ -44,6 +44,28 @@ def attempt_cpu_parse(query: str) -> str:
 
 
 def attempt_gpu_parse(query: str) -> str:
+    query = query.lower()
+
+    # Nvidia Quadro GPUs
+    if m := re.search(r'quadro[-_\s]*(fx|nvs|rtx)?[-_\s]*(\w*\d+\w*)[-_\s]*(laptop|with\smax-q\sdesign|\(?mobile\)?)?', query):
+        query = f"Quadro {(m.group(1) or "").upper()} {m.group(2).upper()} {(m.group(3) or "").title()}"
+    # Nvidia GeForce GT/GTX/RTX GPUs
+    if m := re.search(r'([gr]t[xs]?)[-_\s]*(\w+)[-_\s]*(black|force|x|z|se|v\d)?[-_\s]*(ti)?[-_\s]*(super)?[-_\s]*(\d+gb)?[-_\s]*(laptop|with\smax-q\sdesign|\(?mobile\)?)?', query):
+        query = f"GeForce {m.group(1).upper()} {m.group(2).upper()} {(m.group(3) or "").title()} {(m.group(4) or "").title()} {(m.group(5) or "").upper()} {(m.group(6) or "").upper()} {(m.group(7) or "").title()}"
+    # Intel Iris/Arc GPUs
+    elif m := re.search(r'(iris|arc)[-_\s]*(pro|plus|xe)?[-_\s]*(max)?[-_\s]*(\w*)', query):
+        query = f"Intel {m.group(1).title()} {(m.group(2) or "").title()} {(m.group(3) or "").upper()} {m.group(4).upper()}"
+    # Intel HD/UHD GPUs
+    elif m := re.search(r'intel[-_\s]*(hd|uhd\sgraphics|uhd)[-_\s]*(\w+)', query):
+        query = f"Intel {m.group(1).title()} {m.group(2).upper()}"
+    # AMD Radeon HD/RX/R* GPUs
+    elif m := re.search(r'(hd|rx|r\d)[-_\s]*(\w?\d+\w*)[^\n]?(\w*)', query):
+        query = "Radeon " + f"{m.group(1) or ""} {m.group(2) or ""} {m.group(3) or ""}".upper()
+    # Nvidia GeForce GPUs not covered by GT/GTX/RTX case above
+    elif m := re.search(r'geforce[-_\s]*(.+)', query):
+        query = f"GeForce {m.group(1).upper()}"
+
+    query = re.sub(r'\s{2,}', ' ', query)
     return query
 
 
