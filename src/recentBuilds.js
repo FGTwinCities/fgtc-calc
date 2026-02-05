@@ -1,3 +1,5 @@
+import {$} from "jquery";
+
 import {addLoadingTask, removeLoadingTask} from "./main.js";
 
 function timeSince(date) {

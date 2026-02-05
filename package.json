@@ -11,7 +11,8 @@
     "update": "npm update"
   },
   "dependencies": {
-    "htmx.org": "latest"
+    "htmx.org": "latest",
+    "jquery": "^4.0.0"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.18",

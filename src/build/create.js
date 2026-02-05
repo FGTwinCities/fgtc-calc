@@ -1,3 +1,5 @@
+import {$} from "jquery";
+
 import {onProcessorSearchKeyup, onGraphicsSearchKeyup} from "./search.js";
 import {addLoadingTask, removeLoadingTask} from "../main.js";
 

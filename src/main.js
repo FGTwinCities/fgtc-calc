@@ -1,3 +1,5 @@
+import {$} from "jquery";
+
 import './style.css';
 
 window.addEventListener("load", function() {

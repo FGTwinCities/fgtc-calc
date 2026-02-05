@@ -1,3 +1,5 @@
+import {$} from "jquery";
+
 class AsyncSearchResultsFetcher {
     constructor(endpoint, callback) {
         this.endpoint = endpoint;
