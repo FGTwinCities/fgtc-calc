@@ -43,7 +43,15 @@
             </label>
             <label class="floating-label">
                 <span class="label">Operating System</span>
-                <input type="text" name="operating-system" id="operating-system" placeholder="Operating System" class="input">
+                <input type="text" name="operating-system" id="operating-system" placeholder="Operating System" class="input" list="operating-system-list" autocomplete="off">
+                <datalist id="operating-system-list">
+                    <option value="Windows 10 Home" />
+                    <option value="Windows 10 Pro" />
+                    <option value="Windows 11 Home" />
+                    <option value="Windows 11 Pro" />
+                    <option value="Linux Mint 22.3" />
+                    <option value="Linux Mint 22.4" />
+                </datalist>
             </label>
         </fieldset>
         <fieldset id="fieldset-processor" class="build-section">
