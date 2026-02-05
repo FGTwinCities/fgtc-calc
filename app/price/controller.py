@@ -119,20 +119,20 @@ class PriceController(Controller):
 
 
     @get("/processor/{processor_id: uuid}")
-    async def update_processor_price(self, processor_id: UUID, processor_service: ProcessorService) -> Processor:
+    async def update_processor_price(self, processor_id: UUID, processor_service: ProcessorService, pricing_model_service: PricingModelService) -> Processor:
         processor = await processor_service.get(processor_id)
 
-        await _update_processor_price(processor)
+        await _update_processor_price(processor, pricing_model_service)
 
         await processor_service.update(processor, auto_commit=True, auto_refresh=True)
         return processor
 
 
     @get("/graphics/{gpu_id: uuid}")
-    async def update_gpu_price(self, gpu_id: UUID, graphics_service: GraphicsProcessorService) -> GraphicsProcessor:
+    async def update_gpu_price(self, gpu_id: UUID, graphics_service: GraphicsProcessorService, pricing_model_service: PricingModelService) -> GraphicsProcessor:
         gpu = await graphics_service.get(gpu_id)
 
-        await _update_graphics_price(gpu)
+        await _update_graphics_price(gpu, pricing_model_service)
 
         await graphics_service.update(gpu, auto_commit=True, auto_refresh=True)
         return gpu

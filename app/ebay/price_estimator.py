@@ -15,7 +15,7 @@ class EbayPriceEstimator:
         results = filter(lambda i: item_has_category(i, 164), results)
 
         prices = [float(r['price']['value']) for r in results]
-        prices = cull_outliers(prices, 0.1)
+        #TODO: Better outlier culling
         price = np.mean(prices)
 
         return round(price, 2)
@@ -27,7 +27,7 @@ class EbayPriceEstimator:
         results = filter(lambda i: item_has_category(i, 27386), results)
 
         prices = [float(r['price']['value']) for r in results]
-        prices = cull_outliers(prices, 0.1)
+        #TODO: Better outlier culling
         price = np.mean(prices)
 
         return round(price, 2)
