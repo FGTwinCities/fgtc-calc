@@ -1,10 +1,10 @@
-import asyncio
 import re
 from urllib.parse import urlencode
 
 from aiohttp import ClientSession, ClientResponse
 from bs4 import BeautifulSoup, Tag
 
+from app.lib.rate_limit_middleware import RateLimitMiddleware
 from app.lib.util import try_int
 from app.passmark.schema import PassmarkCoreDetails, PassmarkSearchResult, PassmarkCpuDetails, PassmarkPECoreCpuDetails, \
     PassmarkStandardCpuDetails, PassmarkGpuDetails
@@ -77,29 +77,30 @@ def _parse_pe_core_details(tag: Tag) -> PassmarkCoreDetails:
         turbo_clock=float(re.search(r'(\d+\.?\d*)(\s*[GgHhZz]+\s*[Tt]urbo)', tag.text).group(1)),
     )
 
+_rate_limiter = RateLimitMiddleware(3, 0.1)
+
 
 class PassmarkScraper:
     _cached_cpu_list: list[PassmarkSearchResult] = None
     _cached_gpu_list: list[PassmarkSearchResult] = None
 
-    def _create_cpu_session(self):
+    def _create_session(self, base_url: str) -> ClientSession:
         return ClientSession(
-            base_url="https://www.cpubenchmark.net",
+            base_url=base_url,
             headers={
-                "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:134.0) Gecko/20100101 Firefox/134.0",
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36",
             },
+            middlewares=(
+                _rate_limiter,
+            ),
             trust_env=True,
         )
 
-    def _create_gpu_session(self):
-        return ClientSession(
-            base_url="https://www.videocardbenchmark.net",
-            headers={
-                "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:134.0) Gecko/20100101 Firefox/134.0",
-            },
-            trust_env=True,
-        )
+    def _create_cpu_session(self) -> ClientSession:
+        return self._create_session("https://cpubenchmark.net")
 
+    def _create_gpu_session(self) -> ClientSession:
+        return self._create_session("https://videocardbenchmark.net")
 
     async def _retrieve_list(self, response: ClientResponse) -> list[PassmarkSearchResult]:
         results = []
