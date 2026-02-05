@@ -14,4 +14,4 @@ class ProcessorPricingModel:
         if not processor.multithread_score:
             raise ValidationException("Processor does not have a passmark score, cannot evaluate price.")
 
-        return processor_model_func(processor.multithread_score, *self.passmark_parameters)
+        return max(processor_model_func(processor.multithread_score, *self.passmark_parameters), 0)

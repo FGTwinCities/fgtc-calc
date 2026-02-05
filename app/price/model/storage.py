@@ -1,10 +1,7 @@
 from litestar.exceptions import ValidationException
-from numpy.polynomial.polynomial import Polynomial
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.enum import StorageDiskType, StorageDiskInterface
 from app.db.model.storage import StorageDisk
-from app.lib.math import mb2gb
 
 
 def storage_model_func(x: float, a: float, b: float, c: float) -> float:
@@ -18,13 +15,15 @@ class StoragePricingModel:
 
     def compute(self, disk: StorageDisk) -> float:
         if disk.type == StorageDiskType.HDD:
-            return storage_model_func(disk.size, *self.hdd_parameters)
+            parameters = self.hdd_parameters
         elif disk.type == StorageDiskType.SSD:
             if disk.interface == StorageDiskInterface.SATA:
-                return storage_model_func(disk.size, *self.sata_ssd_parameters)
+                parameters = self.sata_ssd_parameters
             elif disk.interface == StorageDiskInterface.NVME:
-                return storage_model_func(disk.size, *self.nvme_ssd_parameters)
+                parameters = self.nvme_ssd_parameters
             else:
                 raise ValidationException("Invalid interface for SSD: " + disk.interface.__str__())
         else:
             raise ValidationException("Invalid configuration.")
+
+        return max(storage_model_func(disk.size, *parameters), 0)

@@ -1,5 +1,3 @@
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from app.db.model.memory import MemoryModule
 
 
@@ -11,4 +9,4 @@ class MemoryPricingModel:
     parameters = (1, 1, 1, 1, 1)
 
     def compute(self, module: MemoryModule) -> float:
-        return memory_model_func((module.size, module.clock), *self.parameters)
+        return max(memory_model_func((module.size, module.clock), *self.parameters), 0)

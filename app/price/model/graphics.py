@@ -13,4 +13,4 @@ class GraphicsProcessorPricingModel:
         if not gpu.score:
             raise ValidationException("GPU does not have a passmark score, cannot evaluate price.")
 
-        return graphics_model_func(gpu.score, *self.passmark_parameters)
+        return max(graphics_model_func(gpu.score, *self.passmark_parameters), 0)
