@@ -1,17 +1,15 @@
-import datetime
+import re
 from typing import Sequence
 from uuid import UUID
-from zoneinfo import ZoneInfo
 
 from advanced_alchemy.filters import LimitOffset, OrderBy
 from litestar import get, post, delete
 from litestar.controller import Controller
 from litestar.di import Provide
-from litestar.exceptions import InternalServerException, ValidationException
+from litestar.exceptions import ValidationException
 
 from app.db.model.processor import Processor
 from app.db.service.processor import provide_processor_service, ProcessorService
-from app.ebay.price_estimator import EbayPriceEstimator
 from app.lib.math import clamp
 from app.passmark.passmark_scraper import PassmarkScraper
 from app.passmark.schema import PassmarkPECoreCpuDetails
@@ -30,6 +28,9 @@ async def update_processor_specs(processor: Processor, rebind: bool = False):
         processor.passmark_id = search_results[0].passmark_id
 
     specs = await scraper.retrieve_cpu_by_id(processor.passmark_id)
+
+    # Remove the '@ x.y Ghz' from the end of Intel CPU models
+    specs.name = re.sub(r'\s*@\s*\d+\.?\d*\+?\s?[MmGgHhZz]+$', '', specs.name)
 
     processor.model = specs.name
     processor.multithread_score = specs.score
