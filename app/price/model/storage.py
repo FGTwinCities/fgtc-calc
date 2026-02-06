@@ -21,6 +21,8 @@ class StoragePricingModel:
                 parameters = self.sata_ssd_parameters
             elif disk.interface == StorageDiskInterface.NVME:
                 parameters = self.nvme_ssd_parameters
+            elif disk.interface == StorageDiskInterface.EMMC:
+                parameters = self.hdd_parameters
             else:
                 raise ValidationException("Invalid interface for SSD: " + disk.interface.__str__())
         else:

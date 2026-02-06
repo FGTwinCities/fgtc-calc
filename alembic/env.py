@@ -7,6 +7,8 @@ from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
+import alembic_postgresql_enum
+
 from alembic import context
 
 # this is the Alembic Config object, which provides

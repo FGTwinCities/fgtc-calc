@@ -29,6 +29,7 @@ class StorageDiskForm(Enum):
     INCH35 = "3.5"
     M2 = "m2"
     PCIE = "pcie"
+    SOLDERED = "soldered"
 
     def __str__(self) -> str:
         match self:
@@ -40,6 +41,8 @@ class StorageDiskForm(Enum):
                 return "m.2"
             case StorageDiskForm.PCIE:
                 return "PCIe"
+            case StorageDiskForm.SOLDERED:
+                return "Soldered"
             case _:
                 return str(self.value)
 
@@ -49,6 +52,7 @@ class StorageDiskInterface(Enum):
     SAS = "sas"
     SATA = "sata"
     NVME = "nvme"
+    EMMC = "emmc"
 
     def __str__(self) -> str:
         match self:
@@ -56,6 +60,8 @@ class StorageDiskInterface(Enum):
                 return str(self.value).upper()
             case StorageDiskInterface.NVME:
                 return "NVMe"
+            case StorageDiskInterface.EMMC:
+                return "eMMC"
             case _:
                 return str(self.value)
 
