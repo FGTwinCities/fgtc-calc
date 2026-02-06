@@ -137,6 +137,9 @@ export function convertFormToDto() {
             battery["remaining_capacity"] = parseInt(remain[i]);
             dto["batteries"].push(battery);
         }
+
+        dto["webcam"] = Boolean(formData.get("webcam"));
+        dto["microphone"] = Boolean(formData.get("microphone"));
     }
 
     // Collect networking information
@@ -231,6 +234,9 @@ export function fillFormFromDto(dto) {
         field.find("input[name=battery-remainingcapacity]").val(dto["batteries"][i]["remaining_capacity"]);
         batteryList.append(field);
     }
+
+    $("input[name=webcam]").prop("checked", dto["webcam"]);
+    $("input[name=microphone]").prop("checked", dto["microphone"]);
 
     // Fill networking information
     $("input[name=networking-wired][value=" + (dto["wired_networking"] == null ? "none" : dto["wired_networking"]) + "]").prop("checked", true);
@@ -345,6 +351,7 @@ function updateVisibleFields() {
     $("#fieldset-gpu").prop('hidden', !(isComputer || isOther));
     $("#fieldset-display").prop('hidden', !(isLaptop || isOther));
     $("#fieldset-battery").prop('hidden', !(isLaptop || isOther));
+    $("#fieldset-webcam").prop('hidden', !(isLaptop || isOther))
     $("#fieldset-networking").prop('hidden', !(isComputer || isOther));
     $("#fieldset-notes").prop('hidden', !isAny);
 

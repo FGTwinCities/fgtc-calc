@@ -160,6 +160,22 @@
                     <p><b>{% if build.bluetooth %}Yes{% else %}No{% endif %}</b></p>
                 </div>
             </div>
+            {% if build.type.value == "laptop" or build.webcam or build.microphone %}
+            <div class="buildsheet-section flex flex-row">
+                <h1 class="text-xl font-bold">Webcam & Microphone?</h1>
+                <div class="text-right grow self-center">
+                    {% if build.webcam and build.microphone %}
+                    <p><b>Yes</b></p>
+                    {% elif build.webcam %}
+                    <p>Webcam Only</p>
+                    {% elif build.microphone %}
+                    <p>Microphone Only</p>
+                    {% else %}
+                    <p><b>No</b></p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
         </div>
     </div>
     <div>

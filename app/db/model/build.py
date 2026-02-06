@@ -27,6 +27,8 @@ class Build(UUIDAuditBase, PriceMixin):
     wired_networking: Mapped[int | None] = mapped_column(nullable=True, default=None) #TODO: Handle multiple, store connector type
     wireless_networking: Mapped[WirelessNetworkingStandard | None] = mapped_column(nullable=True, default=None)
     bluetooth: Mapped[bool] = mapped_column(nullable=False, default=False)
+    webcam: Mapped[bool] = mapped_column(nullable=False, default=False)
+    microphone: Mapped[bool] = mapped_column(nullable=False, default=False)
     notes: Mapped[str | None] = mapped_column(nullable=True, default=None)
 
     # ORM Relationships

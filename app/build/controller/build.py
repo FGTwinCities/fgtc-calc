@@ -166,6 +166,8 @@ class BuildController(Controller):
             "wired_networking",
             "wireless_networking",
             "bluetooth",
+            "webcam",
+            "microphone",
             "notes",
             "processors",
             "graphics",

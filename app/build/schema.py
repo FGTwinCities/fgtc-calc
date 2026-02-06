@@ -55,6 +55,8 @@ class BuildCreate:
     wired_networking: int | None = field()
     wireless_networking: WirelessNetworkingStandard | None = field()
     bluetooth: bool = field(default=False)
+    webcam: bool = field(default=False)
+    microphone: bool = field(default=False)
 
     processors: list[BuildCreateProcessor] = field(default_factory=list)
     graphics: list[BuildCreateProcessor] = field(default_factory=list)
