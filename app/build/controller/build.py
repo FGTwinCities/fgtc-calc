@@ -10,6 +10,7 @@ from litestar.di import Provide
 from litestar.response import Template
 
 from app.build.schema import BuildCreate
+from app.db.model import BuildProcessorAssociation, BuildGraphicsAssociation
 from app.db.model.battery import Battery
 from app.db.model.build import Build
 from app.db.model.display import Display
@@ -117,7 +118,10 @@ class BuildController(Controller):
             is_found = False
             for gpu in found_gpus:
                 if gpu.model == data.graphics[i].model:
-                    build.graphics.append(gpu)
+                    build.graphics_associations.append(BuildGraphicsAssociation(
+                        graphics=gpu,
+                        upgradable=data.graphics[i].upgradable,
+                    ))
                     is_found = True
 
             if not is_found:
@@ -125,7 +129,10 @@ class BuildController(Controller):
                     model=data.graphics[i].model,
                 )
                 new_gpu = await graphics_service.create(new_gpu, auto_commit=True, auto_refresh=True)
-                build.graphics.append(new_gpu)
+                build.graphics_associations.append(BuildGraphicsAssociation(
+                    graphics=new_gpu,
+                    upgradable=data.graphics[i].upgradable,
+                ))
 
     async def _deduplicate_processors(self, build: Build, data: BuildCreate, processor_service: ProcessorService):
         # Find existing processors by name
@@ -139,7 +146,10 @@ class BuildController(Controller):
             is_found = False
             for processor in found_processors:
                 if processor.model == data.processors[i].model:
-                    build.processors.append(processor)
+                    build.processor_associations.append(BuildProcessorAssociation(
+                        processor=processor,
+                        upgradable=data.processors[i].upgradable,
+                    ))
                     is_found = True
 
             if not is_found:
@@ -147,7 +157,10 @@ class BuildController(Controller):
                     model=data.processors[i].model,
                 )
                 new_processor = await processor_service.create(new_processor, auto_commit=True, auto_refresh=True)
-                build.processors.append(new_processor)
+                build.processor_associations.append(BuildProcessorAssociation(
+                    processor=new_processor,
+                    upgradable=data.processors[i].upgradable,
+                ))
 
     @delete("/{build_id: uuid}")
     async def delete_build(self, build_id: UUID, build_service: BuildService) -> None:
@@ -169,11 +182,21 @@ class BuildController(Controller):
             "webcam",
             "microphone",
             "notes",
-            "processors",
-            "graphics",
             "price",
             "priced_at",
         ])
+
+        for cpu in build.processor_associations:
+            new_build.processor_associations.append(BuildProcessorAssociation(
+                processor=cpu.processor,
+                upgradable=cpu.upgradable,
+            ))
+
+        for gpu in build.graphics_associations:
+            new_build.graphics_associations.append(BuildGraphicsAssociation(
+                graphics=gpu.graphics,
+                upgradable=gpu.upgradable,
+            ))
 
         for mem in build.memory:
             new_mem = MemoryModule()

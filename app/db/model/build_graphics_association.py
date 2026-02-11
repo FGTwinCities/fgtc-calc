@@ -11,4 +11,6 @@ class BuildGraphicsAssociation(UUIDBase):
     build_id = mapped_column(ForeignKey("build.id"))
     graphics_id = mapped_column(ForeignKey("graphics_processor.id"))
 
+    upgradable: Mapped[bool] = mapped_column(nullable=False, default=True)
+
     graphics: Mapped[GraphicsProcessor] = relationship(lazy="selectin")

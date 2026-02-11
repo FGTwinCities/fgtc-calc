@@ -1,4 +1,5 @@
 from advanced_alchemy.base import UUIDBase
+from pygments.lexer import default
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, relationship
 from sqlalchemy.testing.schema import mapped_column
@@ -11,5 +12,7 @@ class BuildProcessorAssociation(UUIDBase):
 
     build_id = mapped_column(ForeignKey("build.id"))
     processor_id = mapped_column(ForeignKey("processor.id"))
+
+    upgradable: Mapped[bool] = mapped_column(nullable=False, default=True)
 
     processor: Mapped[Processor] = relationship(lazy="selectin")

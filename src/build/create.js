@@ -185,7 +185,7 @@ export function fillFormFromDto(dto) {
     for (let i = 0; i < dto["processors"].length; i++) {
         let field = addTemplateListItem('processor-template', 'processor-list');
         field.find("input[name=processor-name]").val(dto["processors"][i]["model"]);
-        field.find("input[name=processor-upgradable]").val(dto["processors"][i]["upgradable"]);
+        field.find("input[name=processor-upgradable]").prop("checked", dto["processor_associations"][i]["upgradable"]);
     }
 
     // Fill memory information
@@ -217,7 +217,7 @@ export function fillFormFromDto(dto) {
     for (let i = 0; i < dto["graphics"].length; i++) {
         let field = addTemplateListItem('gpu-template', 'gpu-list');
         field.find("input[name=gpu-name]").val(dto["graphics"][i]["model"]);
-        field.find("input[name=gpu-upgradable]").val(dto["graphics"][i]["upgradable"]);
+        field.find("input[name=gpu-upgradable]").prop("checked", dto["graphics_associations"][i]["upgradable"]);
     }
 
     // Fill display information
