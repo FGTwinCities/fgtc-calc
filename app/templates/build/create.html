@@ -207,20 +207,24 @@
             <template id="battery-template">
                 <fieldset class="build-list-item">
                     <legend>Battery</legend>
-
-                    <label class="input">
+                    <label class="input mb-4">
+                        <span class="label">Battery Health</span>
+                        <input type="number" id="battery-percent">
+                        <span class="label">%</span>
+                    </label>
+                    <br>
+                    <label class="input mr-2">
                         <span class="label">Design Capacity</span>
                     <input type="number" name="battery-designcapacity" id="battery-designcapacity">
                         <span class="label">mAh</span>
                     </label>
-                    <br>
                     <label class="input">
                         <span class="label">Remaining Capacity</span>
                         <input type="number" name="battery-remainingcapacity" id="battery-remainingcapacity">
                         <span class="label">mAh</span>
                     </label>
                     <br>
-                    <button type="button" id="remove-button" class="btn">Remove</button>
+                    <button type="button" id="remove-button" class="btn mt-4">Remove</button>
                 </fieldset>
             </template>
             <div id="battery-list"></div>

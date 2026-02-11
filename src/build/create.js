@@ -17,12 +17,29 @@ function normalizeDataSizeMegabytes(quantity, unit) {
     }
 }
 
+function onBatteryPercentChange(event) {
+    let batteryFieldset = $(event.target).parentsUntil(".build-list-item").parent();
+    let value = Math.max(Math.min(event.target.value, 100.0), 0.0);
+    batteryFieldset.find("#battery-remainingcapacity").val(Math.floor(1000 * (value / 100.0)));
+    batteryFieldset.find("#battery-designcapacity").val(1000);
+}
+
+function onBatteryCapacityChange(event) {
+    let batteryFieldset = $(event.target).parentsUntil(".build-list-item").parent();
+    let design = batteryFieldset.find("#battery-designcapacity").val();
+    let remain = batteryFieldset.find("#battery-remainingcapacity").val();
+    batteryFieldset.find("#battery-percent").val((remain / design) * 100.0);
+}
+
 function addTemplateListItem(templateElementId, listElementId) {
     let template = $($("#"+templateElementId).html()).clone();
 
     template.find("#remove-button").click(() => template.remove());
     template.find("#processor-search").keyup(onProcessorSearchKeyup);
     template.find("#gpu-search").keyup(onGraphicsSearchKeyup);
+    template.find("#battery-percent").change(onBatteryPercentChange);
+    template.find("#battery-designcapacity").change(onBatteryCapacityChange);
+    template.find("#battery-remainingcapacity").change(onBatteryCapacityChange);
 
     let form = new FormData($("#create-form").get(0));
     template.find("#processor-upgradable").prop("checked", form.get("type") !== "laptop");
