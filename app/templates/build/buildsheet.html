@@ -83,6 +83,9 @@
                     <h1 class="text-xl font-bold">Processor{% if not (loop.first and loop.last) %} #{{ loop.index }}{% endif %}</h1>
                     <div class="text-right grow self-center">
                         <p class="text-l">{{ processor.model }}</p>
+                        {% if not build.processor_associations[loop.index0].upgradable %}
+                        <p><b>Not User Upgradable</b></p>
+                        {% endif %}
                     </div>
                 </div>
             {% endfor %}
@@ -114,17 +117,17 @@
                     {% endfor %}
                 </div>
             </div>
-            <div class="buildsheet-section flex flex-row">
-                <h1 class="text-xl font-bold">Graphics</h1>
-                <div class="text-right grow self-center">
-                    {% if not build.graphics %}
-                        <p><b>NONE</b> (Integrated only)</p>
-                    {% endif %}
-                    {% for gpu in build.graphics %}
-                        <p>{{ gpu.model }}</p>
-                    {% endfor %}
+            {% for graphics in build.graphics %}
+                <div class="buildsheet-section flex flex-row">
+                    <h1 class="text-xl font-bold">Graphics{% if not (loop.first and loop.last) %} #{{ loop.index }}{% endif %}</h1>
+                    <div class="text-right grow self-center">
+                        <p class="text-l">{{ graphics.model }}</p>
+                        {% if not build.graphics_associations[loop.index0].upgradable %}
+                        <p><b>Not User Upgradable</b></p>
+                        {% endif %}
+                    </div>
                 </div>
-            </div>
+            {% endfor %}
             {% if build.display %}
                 <div class="buildsheet-section flex flex-row">
                     <h1 class="text-xl font-bold">Display</h1>
