@@ -1,3 +1,10 @@
+# fgtc-calc
+An application to dynamically price used PC builds using live market conditions at [Free Geek Twin Cities](https://www.freegeektwincities.org/).
+
+Python backend built using [Litestar](https://litestar.dev/), [SQLAlchemy](https://www.sqlalchemy.org/), [Alembic](https://alembic.sqlalchemy.org/en/latest/)
+
+Web frontend built using [Vite](https://vite.dev/), [TailwindCSS](https://tailwindcss.com/), [DaisyUI](https://daisyui.com/)
+
 ## Development Setup
 1) Install the Python package manager `uv` (see [uv Installation Docs](https://docs.astral.sh/uv/getting-started/installation/))
 2) Create a `.env` file with eBay API credentials (see [Obtaining eBay API Credentials](#obtaining-ebay-api-credentials) and [Creating the .env file](#creating-the-env-file))
@@ -14,6 +21,9 @@
 1) Clone or upload this repository to a working directory on the server
 2) Create the environment file with API credentials (see [Creating the .env file](#creating-the-env-file))
 3) Run `docker compose up --build -d` to bring the application and all dependencies online
+
+The application can be updated by updating the repository on the server (by updating through git or by uploading a new version)
+and re-running `docker compose up --build -d`
 
 ## Obtaining eBay API Credentials
 1) Register with an eBay Developer account at [developer.ebay.com](https://developer.ebay.com/signin?tab=register)
