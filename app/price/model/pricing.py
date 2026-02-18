@@ -31,12 +31,12 @@ class PricingModel:
         price = 0
 
         for processor in build.processors:
-            if processor.price:
+            if processor.price and processor.priced_at:
                 price += processor.price
                 debug.append(WithPrice(item=processor, price=processor.price))
 
         for gpu in build.graphics:
-            if gpu.price:
+            if gpu.price and gpu.priced_at:
                 price += gpu.price
                 debug.append(WithPrice(item=gpu, price=gpu.price))
 

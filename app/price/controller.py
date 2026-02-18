@@ -1,4 +1,5 @@
 import datetime
+import math
 from uuid import UUID
 from zoneinfo import ZoneInfo
 
@@ -26,6 +27,8 @@ async def _update_processor_price(processor: Processor, pricing_model_service: P
     try:
         estimator = EbayPriceEstimator()
         price = await estimator.estimate_processor(processor)
+        if math.isinf(price) or math.isnan(price):
+            raise RuntimeError("Invalid price")
     except Exception:
         model = await pricing_model_service.get_model()
         price = model.processor_model.compute(processor)
