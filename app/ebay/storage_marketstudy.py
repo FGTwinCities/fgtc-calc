@@ -53,10 +53,13 @@ async def fetch_disk_marketdata_query(conn: EbayConnection, query: str, limit: i
         if item.get("price", {}).get("currency") != "USD":
             continue
 
-        disk_price = float(item.get("price", {}).get("value"))
-        disk_price /= aspects.get("disk_count", 1)
+        try:
+            disk_price = float(item.get("price", {}).get("value"))
+            disk_price /= aspects.get("disk_count", 1)
 
-        if disk_price / aspects.get("capacity") > MAX_STORAGE_PRICE_PER_MB:
+            if disk_price / aspects.get("capacity") > MAX_STORAGE_PRICE_PER_MB:
+                continue
+        except ZeroDivisionError:
             continue
 
         yield {

@@ -16,7 +16,7 @@ from app.lib.datetime import now
 from app.lib.deps import provide_services
 from app.price.model.pricing import PricingModel
 
-MODEL_VALID_LIFESPAN = datetime.timedelta(days=7)
+MODEL_VALID_LIFESPAN = datetime.timedelta(days=14)
 
 class PricingModelService(SQLAlchemyAsyncRepositoryService[m.StoredPricingModel]):
 

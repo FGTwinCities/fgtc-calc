@@ -69,10 +69,13 @@ async def fetch_memory_marketdata_query(conn: EbayConnection, query: str, limit:
 		if item.get("price", {}).get("currency") != "USD":
 			continue
 
-		module_price = float(item.get("price", {}).get("value"))
-		module_price /= aspects.get("module_count", 1)
+		try:
+			module_price = float(item.get("price", {}).get("value"))
+			module_price /= aspects.get("module_count", 1)
 
-		if module_price / aspects.get("module_capacity") > MAX_MEMORY_PRICE_PER_MB:
+			if module_price / aspects.get("module_capacity") > MAX_MEMORY_PRICE_PER_MB:
+				continue
+		except ZeroDivisionError:
 			continue
 
 		yield {
