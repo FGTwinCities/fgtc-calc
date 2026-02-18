@@ -12,7 +12,7 @@ services:
       VITE_DEV_MODE: "false"
       DATABASE_URL: "postgresql+asyncpg://app:app@database:5432/app"
       REDIS_URL: "redis://redis:6379/0"
-    restart: unless-stopped
+    restart: always
     env_file: .env
     depends_on:
       database:
@@ -34,7 +34,7 @@ services:
       - "15432:5432"
     volumes:
       - db-data:/var/lib/postgresql
-    restart: unless-stopped
+    restart: always
     healthcheck:
       test:
         - CMD
@@ -51,7 +51,7 @@ services:
       - ''
       - infra
     hostname: cache
-    restart: unless-stopped
+    restart: always
     ports:
       - "6379:6379"
     environment:
@@ -82,6 +82,7 @@ services:
       - VPN_TYPE=openvpn
       - UPDATER_PERIOD=24h
     env_file: .env
+    restart: always
 
 volumes:
   db-data: {}
