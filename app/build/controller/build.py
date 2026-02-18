@@ -27,6 +27,9 @@ from app.passmark.passmark_scraper import attempt_cpu_parse, attempt_gpu_parse
 
 
 class BuildController(Controller):
+    """
+    Main controller class for creating, updating and managing builds
+    """
     path = "build"
 
     dependencies = {
@@ -38,6 +41,7 @@ class BuildController(Controller):
 
     @get("/create")
     async def create_build_page(self) -> Template:
+        """ Render the create build form page """
         return Template("build/create.html")
 
 
@@ -55,6 +59,15 @@ class BuildController(Controller):
 
     @patch("/{build_id: uuid}")
     async def update_build(self, build_id: UUID, build_service: BuildService, processor_service: ProcessorService, graphics_service: GraphicsProcessorService, data: BuildCreate) -> Build:
+        """
+        Update an existing build.
+        :param build_id: ID of build to update
+        :param build_service: builds database service [injected]
+        :param processor_service: processor database service [injected]
+        :param graphics_service: graphics database service [injected]
+        :param data:
+        :return:
+        """
         build = await build_service.get(build_id)
 
         build.processors = []
@@ -69,6 +82,10 @@ class BuildController(Controller):
 
     @post("/")
     async def create_build(self, build_service: BuildService, processor_service: ProcessorService, graphics_service: GraphicsProcessorService, data: BuildCreate) -> Build:
+        """
+        Create new build.
+        Converts the *Create DTO objects to the database model, commits to database and returns the result.
+        """
         build = Build()
 
         await self._deduplicate_processors(build, data, processor_service)
@@ -79,6 +96,7 @@ class BuildController(Controller):
         return build
 
     def _convert_create_dto_to_model(self, build: Build, data: BuildCreate):
+        """ Copies attributes from the BuildCreate DTO object to the Build database model object, as well as handling subobject creation """
         build.memory = []
         for mem in data.memory:
             module = MemoryModule()
@@ -109,6 +127,12 @@ class BuildController(Controller):
 
     async def _deduplicate_graphics_processors(self, build: Build, data: BuildCreate,
                                                graphics_service: GraphicsProcessorService):
+        """
+        Copy GPU attributes from data DTO to build, while searching database for existing GPUs by model name.
+        :param build: database object to copy data to
+        :param data: DTO schema to copy data from
+        :param graphics_service: GPU database service [injected]
+        """
         # Find existing GPUs by name
         for i in range(0, len(data.graphics)):
             data.graphics[i].model = attempt_gpu_parse(data.graphics[i].model)
@@ -135,6 +159,12 @@ class BuildController(Controller):
                 ))
 
     async def _deduplicate_processors(self, build: Build, data: BuildCreate, processor_service: ProcessorService):
+        """
+        Copy processor attributes from data to build, while searching the database for existing processors by model name.
+        :param build: database object to copy data to
+        :param data: Creation DTO schema to copy attributes from
+        :param processor_service: CPU database service [injected]
+        """
         # Find existing processors by name
         for i in range(0, len(data.processors)):
             data.processors[i].model = attempt_cpu_parse(data.processors[i].model)
@@ -168,6 +198,12 @@ class BuildController(Controller):
 
     @get("/{build_id: uuid}/duplicate")
     async def duplicate_build(self, build_id: UUID, build_service: BuildService) -> Build:
+        """
+        Duplicate an existing build by copying its attributes to a new build object
+        :param build_id: ID of build to duplicate
+        :param build_service: builds databse service [injected]
+        :return: new build object
+        """
         build = await build_service.get(build_id)
         new_build = Build()
 
@@ -224,6 +260,12 @@ class BuildController(Controller):
 
     @get("/{build_id: uuid}/sheet")
     async def generate_buildsheet(self, build_id: UUID, build_service: BuildService) -> Template:
+        """
+        Render a printable buildsheet template for a given build.
+        :param build_id: build to render buldsheet for
+        :param build_service: builds database service [injected]
+        :return: rendered template
+        """
         build = await build_service.get(build_id)
 
         total_memory = 0
@@ -236,6 +278,7 @@ class BuildController(Controller):
             total_designcapacity += battery.design_capacity
             total_remainingcapacity += battery.remaining_capacity
 
+        # See app/templates/build/buildsheet.html
         return Template("build/buildsheet.html", context=
         {
             "build": build,

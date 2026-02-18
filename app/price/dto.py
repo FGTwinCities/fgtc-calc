@@ -3,6 +3,10 @@ from typing import Optional, Any, Generic, TypeVar
 
 from app.db.model.build import Build
 
+"""
+Data Transfer object schemas used to return pricing information to the frontend.
+"""
+
 T = TypeVar("T")
 
 @dataclass

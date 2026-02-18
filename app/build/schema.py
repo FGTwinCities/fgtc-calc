@@ -4,6 +4,11 @@ from app.db.enum import BuildType, WirelessNetworkingStandard, MemoryType, Stora
     StorageDiskForm
 from app.db.model.display import Resolution
 
+"""
+Data Transfer Objects (DTOs) for creating and updating builds, processors and GPUs.
+These objects match the schema sent by the frontend.
+"""
+
 
 @dataclass
 class BuildCreateProcessor:

@@ -18,6 +18,11 @@ MAX_SEARCH_ITEMS = 100
 
 
 async def update_processor_specs(processor: Processor, rebind: bool = False):
+    """
+    Searches Passmark (cpubenchmark.net) for a given processor by name, and adds specifications to the CPU object if found.
+    :param processor: CPU to search for
+    :param rebind: set to True to force searching by model instead of using cached Passmark ID
+    """
     scraper = PassmarkScraper()
 
     if not processor.passmark_id or rebind:
@@ -59,6 +64,9 @@ async def update_processor_specs(processor: Processor, rebind: bool = False):
 
 
 class ProcessorController(Controller):
+    """
+    Route controller class for CRUD operations on CPU objects
+    """
     path = "build/processor"
 
     dependencies = {

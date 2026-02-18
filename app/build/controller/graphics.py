@@ -16,6 +16,11 @@ MAX_SEARCH_ITEMS = 100
 
 
 async def update_graphics_specs(gpu: GraphicsProcessor, rebind: bool = False):
+    """
+    Search for GPU on Passmark (videocardbenchmark.net), and pull the GPU specs if found
+    :param gpu: GPU to search with
+    :param rebind: set to True to always search by model instead of using cached passmark GPU id
+    """
     scraper = PassmarkScraper()
 
     if not gpu.passmark_id or rebind:
@@ -33,6 +38,9 @@ async def update_graphics_specs(gpu: GraphicsProcessor, rebind: bool = False):
 
 
 class GraphicsController(Controller):
+    """
+    Route controller for CRUD operations on graphics processors
+    """
     path = "build/graphics"
 
     dependencies = {
@@ -63,6 +71,13 @@ class GraphicsController(Controller):
 
     @get("/search")
     async def search_gpu(self, q: str, graphics_service: GraphicsProcessorService, limit: int = 50) -> Sequence[GraphicsProcessor]:
+        """
+        Search for existing GPUs by model name
+        :param q: query string
+        :param graphics_service: GPU database service [injected]
+        :param limit: result quantity limit
+        :return: list of found GPUs
+        """
         return await graphics_service.list(
             GraphicsProcessor.model.icontains(q),
             OrderBy("model"),

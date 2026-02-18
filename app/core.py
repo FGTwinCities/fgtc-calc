@@ -89,6 +89,10 @@ jinja_environment = Environment(
 
 
 class ApplicationCore(InitPluginProtocol, CLIPluginProtocol):
+    """
+    Litestar application plugin that handles the core setup and configuration for the application
+    """
+
     def on_cli_init(self, cli: Group) -> None:
         @cli.command()
         def generate_pricing_model():

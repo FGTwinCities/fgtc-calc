@@ -24,6 +24,7 @@ PRICE_VALID_TIMESPAN = datetime.timedelta(days=7)
 
 
 async def _update_processor_price(processor: Processor, pricing_model_service: PricingModelService) -> None:
+    """Update the stored price of a CPU. Attempts to use eBay to estimate price, then tries pricing by Passmark score."""
     try:
         estimator = EbayPriceEstimator()
         price = await estimator.estimate_processor(processor)
@@ -38,6 +39,7 @@ async def _update_processor_price(processor: Processor, pricing_model_service: P
 
 
 async def _update_graphics_price(gpu: GraphicsProcessor, pricing_model_service: PricingModelService) -> None:
+    """Update the stored price of a GPU. Attempts to use eBay to estimate price, then tries pricing by Passmark score."""
     try:
         estimator = EbayPriceEstimator()
         price = await estimator.estimate_graphics(gpu)
@@ -51,6 +53,9 @@ async def _update_graphics_price(gpu: GraphicsProcessor, pricing_model_service: 
 
 
 class PriceController(Controller):
+    """
+    Route controller class for pricing functionality.
+    """
     path = "price"
 
     dependencies = {
@@ -65,6 +70,14 @@ class PriceController(Controller):
 
     @get("/{build_id: uuid}")
     async def calculate_build_price(self, build_id: UUID, build_service: BuildService, processor_service: ProcessorService, pricing_model_service: PricingModelService) -> BuildPrice:
+        """
+        Calculates and saves a pricing estimate for an entire build
+        :param build_id: ID of build to generate price for
+        :param build_service: builds database service [injected]
+        :param processor_service: CPU database service [injected]
+        :param pricing_model_service: pricing data service [injected]
+        :return: Data Transfer object containing debug information for steps taken during pricing
+        """
         model = await pricing_model_service.get_model()
         build = await build_service.get(build_id)
 
