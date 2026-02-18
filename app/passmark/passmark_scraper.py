@@ -40,6 +40,7 @@ def attempt_cpu_parse(query: str) -> str:
         query = f"Intel Core {m.group(1)}-{m.group(2)}{(m.group(3) or "").upper()}"
 
     query = re.sub(r'\s{2,}', ' ', query)
+    query = query.strip()
     return query
 
 
@@ -66,6 +67,7 @@ def attempt_gpu_parse(query: str) -> str:
         query = f"GeForce {m.group(1).upper()}"
 
     query = re.sub(r'\s{2,}', ' ', query)
+    query = query.strip()
     return query
 
 
