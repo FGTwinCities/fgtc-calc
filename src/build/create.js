@@ -207,7 +207,7 @@ export function fillFormFromDto(dto) {
         let megabytes = dto["storage"][i]["size"];
         field.find("input[name=storage-disk-size]").val(megabytes);
         field.find("select[name=storage-disk-size-unit]").val("mb"); //TODO: Pick and convert units
-        field.find("input[name=storage-disk-type][value=" + dto["storage"][i]["type"] + "]").prop("checked", true);
+        field.find("select[name=storage-disk-type]").val(dto["storage"][i]["type"]);
         field.find("select[name=storage-disk-form]").val(dto["storage"][i]["form"]);
         field.find("select[name=storage-disk-interface]").val(dto["storage"][i]["interface"]);
         field.find("input[name=storage-disk-upgradable]").prop("checked", dto["storage"][i]["upgradable"]);
