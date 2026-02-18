@@ -147,6 +147,7 @@ class BuildController(Controller):
                         upgradable=data.graphics[i].upgradable,
                     ))
                     is_found = True
+                    break
 
             if not is_found:
                 new_gpu = GraphicsProcessor(
@@ -181,6 +182,7 @@ class BuildController(Controller):
                         upgradable=data.processors[i].upgradable,
                     ))
                     is_found = True
+                    break
 
             if not is_found:
                 new_processor = Processor(
