@@ -15,7 +15,7 @@ class Resolution:
 @dataclass
 class Display(UUIDBase):
     __tablename__ = "display"
-    build_id = mapped_column(ForeignKey("build.id"), nullable=True)
+    build_id = mapped_column(ForeignKey("build.id", ondelete="CASCADE"), nullable=False)
 
     size: Mapped[float] = mapped_column(nullable=False)
     resolution: Mapped[Resolution] = composite(mapped_column("resolution_x"), mapped_column("resolution_y"))

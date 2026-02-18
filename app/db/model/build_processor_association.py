@@ -10,8 +10,8 @@ from app.db.model.processor import Processor
 class BuildProcessorAssociation(UUIDBase):
     __tablename__ = "processor_build_associations"
 
-    build_id = mapped_column(ForeignKey("build.id"))
-    processor_id = mapped_column(ForeignKey("processor.id"))
+    build_id = mapped_column(ForeignKey("build.id", ondelete="CASCADE"), nullable=False)
+    processor_id = mapped_column(ForeignKey("processor.id", ondelete="CASCADE"), nullable=False)
 
     upgradable: Mapped[bool] = mapped_column(nullable=False, default=True)
 

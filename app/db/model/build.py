@@ -35,6 +35,7 @@ class Build(UUIDAuditBase, PriceMixin):
     processor_associations: Mapped[list[BuildProcessorAssociation]] = relationship(
         "BuildProcessorAssociation",
         lazy="selectin",
+        cascade="all, delete, delete-orphan",
     )
     processors: AssociationProxy[list[Processor]] = association_proxy(
         "processor_associations", "processor",
@@ -44,6 +45,7 @@ class Build(UUIDAuditBase, PriceMixin):
     graphics_associations: Mapped[list[BuildGraphicsAssociation]] = relationship(
         "BuildGraphicsAssociation",
         lazy="selectin",
+        cascade="all, delete, delete-orphan",
     )
     graphics: AssociationProxy[list[GraphicsProcessor]] = association_proxy(
         "graphics_associations", "graphics",
@@ -53,11 +55,13 @@ class Build(UUIDAuditBase, PriceMixin):
     memory: Mapped[list[MemoryModule]] = relationship(
         "MemoryModule",
         lazy="selectin",
+        cascade="all, delete, delete-orphan",
     )
 
     storage: Mapped[list[StorageDisk]] = relationship(
         "StorageDisk",
         lazy="selectin",
+        cascade="all, delete, delete-orphan",
     )
 
     #TODO: Figure out some way to make this not a list!
@@ -65,9 +69,11 @@ class Build(UUIDAuditBase, PriceMixin):
     display: Mapped[list[Display]] = relationship(
         "Display",
         lazy="selectin",
+        cascade="all, delete, delete-orphan",
     )
 
     batteries: Mapped[list[Battery]] = relationship(
         "Battery",
         lazy="selectin",
+        cascade="all, delete, delete-orphan",
     )
