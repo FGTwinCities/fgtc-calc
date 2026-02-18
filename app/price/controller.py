@@ -41,6 +41,8 @@ async def _update_graphics_price(gpu: GraphicsProcessor, pricing_model_service: 
     try:
         estimator = EbayPriceEstimator()
         price = await estimator.estimate_graphics(gpu)
+        if math.isinf(price) or math.isnan(price):
+            raise RuntimeError("Invalid price")
     except Exception:
         model = await pricing_model_service.get_model()
         price = model.graphics_model.compute(gpu)
