@@ -279,6 +279,7 @@ class BuildController(Controller):
         for battery in build.batteries:
             total_designcapacity += battery.design_capacity
             total_remainingcapacity += battery.remaining_capacity
+        total_designcapacity = max(1, total_designcapacity)
 
         # See app/templates/build/buildsheet.html
         return Template("build/buildsheet.html", context=
