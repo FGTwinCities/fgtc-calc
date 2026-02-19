@@ -27,8 +27,15 @@ and re-running `docker compose up --build -d`
 
 ## Obtaining eBay API Credentials
 1) Register with an eBay Developer account at [developer.ebay.com](https://developer.ebay.com/signin?tab=register)
-- Note: Developer accounts may be manually reviewed, and it may take some time before the account becomes active.
-2) 
+2) Under your user account in the upper right, go to **Application Keysets**
+3) Enter a name for the application
+4) Under **Production**, Click **Create a keyset**, and fill out the contact info if prompted
+5) Click the link to apply for a compliance exemption
+6) Check **Exempted from Marketplace Account Deletion** and select **I do not persist eBay data**, then **Submit**
+7) Go back to **Application Keysets** and copy the **App ID**, **Dev ID**, and **Cert ID** from that page. Use these for `EBAY_APP_ID`, `EBAY_DEV_ID`, and `EBAY_SECRET` respectively
+8) Under **App ID**, click **User Tokens**
+9) Under **Get a Token from eBay via Your Application**, click **Add eBay Redirect URL** and confirm address and contact info
+10) Next to **Your branded eBay Production Sign In (OAuth)**, click **See all**, and copy everything ***__EXCLUDING the `See less` at the end__***. Use this for `EBAY_REDIRECT`
 
 ## Creating the .env file
 At the project root, create a file called `.env` with your eBay API credentials like shown:
