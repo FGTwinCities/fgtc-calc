@@ -242,14 +242,10 @@ export function fillFormFromDto(dto) {
     $("input[name=display-touch]").prop("checked",  display_touchscreen);
 
     // Fill battery information
-    let batteryList = $("#battery-list");
-    batteryList.find("fieldset").remove();
-    let batteryTemplate = $($("#battery-template").html());
     for (let i = 0; i < dto["batteries"].length; i++) {
-        let field = batteryTemplate.clone();
+        let field = addTemplateListItem('battery-template', 'battery-list');
         field.find("input[name=battery-designcapacity]").val(dto["batteries"][i]["design_capacity"]);
         field.find("input[name=battery-remainingcapacity]").val(dto["batteries"][i]["remaining_capacity"]);
-        batteryList.append(field);
     }
 
     $("input[name=webcam]").prop("checked", dto["webcam"]);
