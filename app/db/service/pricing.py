@@ -3,7 +3,9 @@ import datetime
 from advanced_alchemy.extensions.litestar.providers import create_service_provider
 from advanced_alchemy.repository import SQLAlchemyAsyncRepository
 from advanced_alchemy.service import SQLAlchemyAsyncRepositoryService
-from litestar.exceptions import ValidationException
+from click import ClickException
+from litestar.exceptions import ValidationException, ClientException
+from litestar_saq.decorators import monitored_job
 from saq.types import Context
 
 from app.db import model as m
@@ -49,15 +51,21 @@ class PricingModelService(SQLAlchemyAsyncRepositoryService[m.StoredPricingModel]
         )
 
         if len(models) <= 0:
-            raise ValidationException("No pricing model is available")
+            raise PricingModelUnavailableException
 
         stored_model = max(models, key=lambda m: m.created_at)
 
         return PricingModel.from_stored(stored_model)
 
 
+class PricingModelUnavailableException(ClientException):
+    def __init__(self):
+        super().__init__("No pricing model is available")
+
+
 provide_pricing_model_service = create_service_provider(PricingModelService)
 
+@monitored_job(interval=10.0)
 async def generate_pricing_model_job(_: Context) -> None:
     async with provide_services(provide_pricing_model_service) as (pricing_model_service,):
         await pricing_model_service.generate_model()

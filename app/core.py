@@ -1,5 +1,4 @@
 import os
-from pathlib import Path
 
 import anyio
 from advanced_alchemy.config import AsyncSessionConfig, AlembicAsyncConfig
@@ -14,20 +13,17 @@ from litestar.di import Provide
 from litestar.logging import LoggingConfig
 from litestar.plugins.base import InitPluginProtocol, CLIPluginProtocol
 from litestar.template.config import TemplateConfig
-from litestar_saq import startup_logger, shutdown_logger, timing_before_process, timing_after_process
-from litestar_saq.base import CronJob
-from litestar_saq.config import SAQConfig, QueueConfig
-from litestar_saq.plugin import SAQPlugin
 from litestar_vite import VitePlugin, PathConfig
 from litestar_vite.config import ViteConfig
 
 from app.build.controller.build import BuildController
 from app.build.controller.graphics import GraphicsController
 from app.build.controller.processor import ProcessorController
-from app.db.service.pricing import provide_pricing_model_service, generate_pricing_model_job
+from app.db.service.pricing import provide_pricing_model_service
 from app.lib.deps import provide_services
 from app.lib.util import getenv_bool
 from app.price.controller import PriceController
+from app.saq import saq_plugin
 from app.static_controller import StaticController
 
 alembic_config = AlembicAsyncConfig(
@@ -53,31 +49,6 @@ vite_config = ViteConfig(
         resource_dir="src",
         static_dir="assets",
     )
-)
-
-saq_config = SAQConfig(
-    web_enabled=getenv_bool("SAQ_WEB_ENABLED", False),
-    use_server_lifespan=getenv_bool("SAQ_USE_SERVER_LIFESPAN", True),
-    queue_configs=[
-        QueueConfig(
-            dsn=os.getenv("REDIS_URL", "redis://localhost:6379/0"),
-            name="default",
-            tasks=[
-                generate_pricing_model_job,
-            ],
-            scheduled_tasks=[
-                CronJob(
-                    function=generate_pricing_model_job,
-                    cron="0 0 * * MON", #Midnight, every monday
-                    timeout=3600,
-                ),
-            ],
-            startup=[startup_logger],
-            shutdown=[shutdown_logger],
-            before_process=[timing_before_process],
-            after_process=[timing_after_process],
-        )
-    ]
 )
 
 jinja_environment = Environment(
@@ -109,7 +80,7 @@ class ApplicationCore(InitPluginProtocol, CLIPluginProtocol):
                 SQLAlchemyInitPlugin(config=sqlalchemy_config),
                 SQLAlchemySerializationPlugin(),
                 VitePlugin(config=vite_config),
-                SAQPlugin(config=saq_config),
+                saq_plugin,
             ]
         )
 
