@@ -12,6 +12,7 @@ services:
       VITE_DEV_MODE: "false"
       DATABASE_URL: "postgresql+asyncpg://app:app@database:5432/app"
       REDIS_URL: "redis://redis:6379/0"
+      SAQ_USE_SERVER_LIFESPAN: "false"
     env_file: .env
     ports:
       - "80:8585"
@@ -64,6 +65,27 @@ services:
         - ping
     volumes:
       - redis-data:/data
+
+  worker:
+    profiles:
+      - ''
+    build:
+      context: ./
+    command: uv run litestar workers run
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      DATABASE_URL: "postgresql+asyncpg://app:app@database:5432/app"
+      REDIS_URL: "redis://redis:6379/0"
+      SAQ_USE_SERVER_LIFESPAN: "false"
+    env_file: .env
+    restart: always
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
 volumes:
   db-data: {}

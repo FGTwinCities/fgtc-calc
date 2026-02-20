@@ -643,7 +643,7 @@ requires-dist = [
     { name = "ipykernel", specifier = ">=7.1.0" },
     { name = "jinja-markdown2", specifier = ">=0.4.0" },
     { name = "litestar", extras = ["standard"], specifier = ">=2.18.0" },
-    { name = "litestar-saq", specifier = ">=0.6.4" },
+    { name = "litestar-saq", specifier = "==0.6.4" },
     { name = "litestar-vite", specifier = ">=0.15.0" },
     { name = "matplotlib", specifier = ">=3.10.8" },
     { name = "numpy", specifier = ">=2.4.1" },
