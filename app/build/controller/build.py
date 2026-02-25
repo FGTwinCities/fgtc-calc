@@ -117,6 +117,10 @@ class BuildController(Controller):
 
         build.batteries = []
         for batt in data.batteries:
+            # Remove any batteries with 0 design capacity as they are invalid
+            if batt.design_capacity <= 0:
+                continue
+
             battery = Battery()
             attrcopy(batt, battery)
             build.batteries.append(battery)
