@@ -25,6 +25,7 @@ from app.lib.util import getenv_bool
 from app.price.controller import PriceController
 from app.saq import saq_plugin
 from app.static_controller import StaticController
+from app.status.controller import StatusController
 
 alembic_config = AlembicAsyncConfig(
     script_config="alembic.ini",
@@ -87,6 +88,7 @@ class ApplicationCore(InitPluginProtocol, CLIPluginProtocol):
         app_config.route_handlers.extend(
             [
                 StaticController,
+                StatusController,
                 BuildController,
                 ProcessorController,
                 GraphicsController,

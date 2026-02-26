@@ -6,6 +6,7 @@ from advanced_alchemy.service import SQLAlchemyAsyncRepositoryService
 from click import ClickException
 from litestar.exceptions import ValidationException, ClientException
 from litestar_saq.decorators import monitored_job
+from saq.job import Status
 from saq.types import Context
 
 from app.db import model as m
@@ -56,6 +57,16 @@ class PricingModelService(SQLAlchemyAsyncRepositoryService[m.StoredPricingModel]
         stored_model = max(models, key=lambda m: m.created_at)
 
         return PricingModel.from_stored(stored_model)
+
+    async def is_model_generating(self):
+        from app.saq import saq_plugin
+        queue = saq_plugin.get_queue("default")
+        jobs = await queue.jobs(['generate_pricing_model_job', 'cron:generate_pricing_model_job'])
+        for job in jobs:
+            if job is not None and job.status == Status.ACTIVE:
+                return True
+
+        return False
 
 
 class PricingModelUnavailableException(ClientException):
