@@ -132,15 +132,20 @@ export function convertFormToDto() {
     // Collect display information
     dto["display"] = null;
     if (dto["type"] === "laptop" || dto["type"] === "other") {
-        let display = {};
-        display["size"] = parseFloat(formData.get("display-size"));
-        display["resolution"] = {
-            "x": parseInt(formData.get("display-resolution-horizontal")),
-            "y": parseInt(formData.get("display-resolution-vertical")),
-        };
-        display["refresh_rate"] = parseInt(formData.get("display-refreshrate"));
-        display["touchscreen"] = Boolean(formData.get("display-touch"));
-        dto["display"] = display;
+        if (formData.get("display-size") !== "" ||
+                formData.get("display-resolution-horizontal") !== "" ||
+                formData.get("display-resolution-vertical") !== "" ||
+                formData.get("display-refreshrate") !== "") {
+            let display = {};
+            display["size"] = parseFloat(formData.get("display-size"));
+            display["resolution"] = {
+                "x": parseInt(formData.get("display-resolution-horizontal")),
+                "y": parseInt(formData.get("display-resolution-vertical")),
+            };
+            display["refresh_rate"] = parseInt(formData.get("display-refreshrate"));
+            display["touchscreen"] = Boolean(formData.get("display-touch"));
+            dto["display"] = display;
+        }
     }
 
     // Collect battery information
@@ -297,7 +302,7 @@ function validateForm() {
     validateFormList(form.getAll("gpu-name"), "Graphics Card Model is required");
 
     let type = form.get("type")
-    if (type === "laptop" || type === "other") {
+    if (type === "laptop") {
         validateFormItem("display-size", "Display Size is required", errors);
         validateFormItem("display-resolution-horizontal", "Display Resolution is required", errors);
         validateFormItem("display-resolution-vertical", "Display Resolution is required", errors);
