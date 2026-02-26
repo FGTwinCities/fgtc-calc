@@ -23,9 +23,11 @@ from app.price.dto import BuildPrice, WithPrice, Price
 PRICE_VALID_TIMESPAN = datetime.timedelta(days=7)
 
 
-async def _update_processor_price(processor: Processor, pricing_model_service: PricingModelService) -> None:
+async def _update_processor_price(processor: Processor, pricing_model_service: PricingModelService, force_score: bool = False) -> None:
     """Update the stored price of a CPU. Attempts to use eBay to estimate price, then tries pricing by Passmark score."""
     try:
+        if force_score:
+            raise Exception
         estimator = EbayPriceEstimator()
         price = await estimator.estimate_processor(processor)
         if math.isinf(price) or math.isnan(price):
@@ -38,9 +40,11 @@ async def _update_processor_price(processor: Processor, pricing_model_service: P
     processor.priced_at = now()
 
 
-async def _update_graphics_price(gpu: GraphicsProcessor, pricing_model_service: PricingModelService) -> None:
+async def _update_graphics_price(gpu: GraphicsProcessor, pricing_model_service: PricingModelService, force_score: bool = False) -> None:
     """Update the stored price of a GPU. Attempts to use eBay to estimate price, then tries pricing by Passmark score."""
     try:
+        if force_score:
+            raise Exception
         estimator = EbayPriceEstimator()
         price = await estimator.estimate_graphics(gpu)
         if math.isinf(price) or math.isnan(price):
@@ -137,20 +141,20 @@ class PriceController(Controller):
 
 
     @get("/processor/{processor_id: uuid}")
-    async def update_processor_price(self, processor_id: UUID, processor_service: ProcessorService, pricing_model_service: PricingModelService) -> Processor:
+    async def update_processor_price(self, processor_id: UUID, processor_service: ProcessorService, pricing_model_service: PricingModelService, force_score: bool = False) -> Processor:
         processor = await processor_service.get(processor_id)
 
-        await _update_processor_price(processor, pricing_model_service)
+        await _update_processor_price(processor, pricing_model_service, force_score)
 
         await processor_service.update(processor, auto_commit=True, auto_refresh=True)
         return processor
 
 
     @get("/graphics/{gpu_id: uuid}")
-    async def update_gpu_price(self, gpu_id: UUID, graphics_service: GraphicsProcessorService, pricing_model_service: PricingModelService) -> GraphicsProcessor:
+    async def update_gpu_price(self, gpu_id: UUID, graphics_service: GraphicsProcessorService, pricing_model_service: PricingModelService, force_score: bool = False) -> GraphicsProcessor:
         gpu = await graphics_service.get(gpu_id)
 
-        await _update_graphics_price(gpu, pricing_model_service)
+        await _update_graphics_price(gpu, pricing_model_service, force_score)
 
         await graphics_service.update(gpu, auto_commit=True, auto_refresh=True)
         return gpu
