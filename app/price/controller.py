@@ -184,7 +184,7 @@ class PriceController(Controller):
         await graphics_service.update(gpu, auto_commit=True, auto_refresh=True)
         return gpu
 
-    @get("/generate_model")
+    @get("/model/generate")
     async def generate_pricing_model(self) -> dict:
         await self._generate_pricing_model()
         return {"message": "Pricing model generation queued"}
@@ -195,3 +195,16 @@ class PriceController(Controller):
             key="generate_pricing_model_job",
             timeout=3600,
         ))
+
+    @get("/model/abort")
+    async def abort_pricing_model_generation(self) -> dict:
+        await self._abort_pricing_model_generation()
+        return {"message": "Pricing model generation aborted"}
+
+    async def _abort_pricing_model_generation(self) -> None:
+        queue = saq_plugin.get_queue("default")
+        await queue.abort(Job(
+            "generate_pricing_model_job",
+            key="generate_pricing_model_job",
+            queue=queue,
+        ), "abort")
