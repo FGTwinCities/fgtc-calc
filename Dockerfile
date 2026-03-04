@@ -27,7 +27,7 @@ COPY --parents pyproject.toml uv.lock package.json package-lock.json /app/
 
 RUN npm install
 
-RUN uv sync --frozen --no-editable --no-install-project
+RUN uv sync --locked --no-editable --no-install-project
 
 COPY --parents app/ src/ assets/ templates/ vite.config.ts README.md /app/
 

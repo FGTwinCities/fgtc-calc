@@ -6,6 +6,8 @@ from zoneinfo import ZoneInfo
 from litestar import get, post
 from litestar.controller import Controller
 from litestar.di import Provide
+from litestar.exceptions import ValidationException, ClientException
+from litestar_saq.base import Job
 
 from app.build.controller.graphics import update_graphics_specs
 from app.build.controller.processor import update_processor_specs
@@ -14,11 +16,12 @@ from app.db.repository import MemoryModuleRepository, provide_memory_repo, provi
     StorageDiskRepository, DisplayRepository, provide_display_repo, BatteryRepository, provide_battery_repo
 from app.db.service.build import provide_build_service, BuildService
 from app.db.service.graphics import provide_graphics_service, GraphicsProcessorService
-from app.db.service.pricing import PricingModelService
+from app.db.service.pricing import PricingModelService, generate_pricing_model_job, PricingModelUnavailableException
 from app.db.service.processor import provide_processor_service, ProcessorService
 from app.ebay.price_estimator import EbayPriceEstimator
 from app.lib.datetime import now
 from app.price.dto import BuildPrice, WithPrice, Price
+from app.saq import saq_plugin
 
 PRICE_VALID_TIMESPAN = datetime.timedelta(days=7)
 
@@ -82,7 +85,12 @@ class PriceController(Controller):
         :param pricing_model_service: pricing data service [injected]
         :return: Data Transfer object containing debug information for steps taken during pricing
         """
-        model = await pricing_model_service.get_model()
+        try:
+            model = await pricing_model_service.get_model()
+        except PricingModelUnavailableException:
+            await self._generate_pricing_model()
+            raise ClientException("No pricing model is available, please wait for pricing model generation.")
+
         build = await build_service.get(build_id)
 
         # If prices/specs for associated processors or GPUs are not present or too old, update those first
@@ -180,7 +188,27 @@ class PriceController(Controller):
         await graphics_service.update(gpu, auto_commit=True, auto_refresh=True)
         return gpu
 
-    @get("/generate_model")
-    async def generate_pricing_model(self, pricing_model_service: PricingModelService) -> dict:
-        await pricing_model_service.generate_model()
-        return {"message": "Pricing model generated"}
+    @get("/model/generate")
+    async def generate_pricing_model(self) -> dict:
+        await self._generate_pricing_model()
+        return {"message": "Pricing model generation queued"}
+
+    async def _generate_pricing_model(self) -> None:
+        await saq_plugin.get_queue("default").enqueue(Job(
+            "generate_pricing_model_job",
+            key="generate_pricing_model_job",
+            timeout=3600,
+        ))
+
+    @get("/model/abort")
+    async def abort_pricing_model_generation(self) -> dict:
+        await self._abort_pricing_model_generation()
+        return {"message": "Pricing model generation aborted"}
+
+    async def _abort_pricing_model_generation(self) -> None:
+        queue = saq_plugin.get_queue("default")
+        await queue.abort(Job(
+            "generate_pricing_model_job",
+            key="generate_pricing_model_job",
+            queue=queue,
+        ), "abort")
