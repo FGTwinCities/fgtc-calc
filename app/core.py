@@ -24,6 +24,7 @@ from litestar_vite.config import ViteConfig
 from app.build.controller.build import BuildController
 from app.build.controller.graphics import GraphicsController
 from app.build.controller.macbuild import MacBuildController
+from app.build.controller.modernbuild import ModernBuildController
 from app.build.controller.processor import ProcessorController
 from app.db.service.pricing import provide_pricing_model_service, generate_pricing_model_job
 from app.lib.deps import provide_services
@@ -118,6 +119,7 @@ class ApplicationCore(InitPluginProtocol, CLIPluginProtocol):
             [
                 StaticController,
                 BuildController,
+                ModernBuildController,
                 MacBuildController,
                 ProcessorController,
                 GraphicsController,

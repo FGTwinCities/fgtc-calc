@@ -12,5 +12,5 @@ class MacBuild(BuildBase):
     id: Mapped[UUID] = mapped_column(ForeignKey("build.id"), primary_key=True, sort_order=-100)
 
     __mapper_args__ = {
-        "polymorphic_identity": "macbuild",
+        "polymorphic_identity": "mac",
     }

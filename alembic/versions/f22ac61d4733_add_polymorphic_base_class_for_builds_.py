@@ -33,7 +33,7 @@ def upgrade() -> None:
     op.add_column('build', sa.Column('class_type', sa.String(), nullable=True))
 
     op.execute("INSERT INTO modernbuild (id, manufacturer, model, operating_system) SELECT id, manufacturer, model, operating_system FROM build")
-    op.execute("UPDATE build SET class_type = 'modernbuild'")
+    op.execute("UPDATE build SET class_type = 'modern'")
 
     op.alter_column('build', 'class_type', nullable=False)
 

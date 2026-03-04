@@ -129,7 +129,9 @@ async function fetchRecentBuildsPage() {
         }
 
         entry.find("a").prop("href", function(i, val) {
-            return val.replace(/%ID%/g, build.id);
+            val = val.replace(/%ID%/g, build.id);
+            val = val.replace(/%BUILDCLASS%/g, build.class_type)
+            return val;
         });
 
         entry.find("#entry-set-price-button").click(() => onClickSetPrice(build.id));

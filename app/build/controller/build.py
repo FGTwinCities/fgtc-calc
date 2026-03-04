@@ -7,7 +7,7 @@ from advanced_alchemy.filters import LimitOffset, OrderBy
 from litestar import get, post, delete, patch
 from litestar.controller import Controller
 from litestar.di import Provide
-from litestar.response import Template
+from litestar.response import Template, Redirect
 
 from app.build.controller.common import _deduplicate_processors, _deduplicate_graphics_processors, \
     _convert_create_dto_to_model
@@ -38,12 +38,6 @@ class BuildController(Controller):
     }
 
 
-    @get("/create")
-    async def create_build_page(self) -> Template:
-        """ Render the create build form page """
-        return Template("build/create.html")
-
-
     @get("/")
     async def get_builds(self, build_service: BuildService, offset: int = 0, page_size: int = 25) -> Sequence[Build]:
         return await build_service.list(
@@ -55,44 +49,6 @@ class BuildController(Controller):
     @get("/{build_id: uuid}")
     async def get_build(self, build_id: UUID, build_service: BuildService) -> Build:
         return await build_service.get(build_id)
-
-    @patch("/{build_id: uuid}")
-    async def update_build(self, build_id: UUID, build_service: BuildService, processor_service: ProcessorService, graphics_service: GraphicsProcessorService, data: ModernBuildCreate) -> Build:
-        """
-        Update an existing build.
-        :param build_id: ID of build to update
-        :param build_service: builds database service [injected]
-        :param processor_service: processor database service [injected]
-        :param graphics_service: graphics database service [injected]
-        :param data:
-        :return:
-        """
-        build = await build_service.get(build_id)
-
-        build.processors = []
-        await _deduplicate_processors(build, data, processor_service)
-
-        build.graphics = []
-        await _deduplicate_graphics_processors(build, data, graphics_service)
-        _convert_create_dto_to_model(build, data)
-
-        build = await build_service.update(build, auto_commit=True, auto_refresh=True)
-        return build
-
-    @post("/")
-    async def create_build(self, build_service: BuildService, processor_service: ProcessorService, graphics_service: GraphicsProcessorService, data: ModernBuildCreate) -> Build:
-        """
-        Create new build.
-        Converts the *Create DTO objects to the database model, commits to database and returns the result.
-        """
-        build = Build()
-
-        await _deduplicate_processors(build, data, processor_service)
-        await _deduplicate_graphics_processors(build, data, graphics_service)
-        _convert_create_dto_to_model(build, data)
-
-        build = await build_service.create(build, auto_commit=True, auto_refresh=True)
-        return build
 
     @delete("/{build_id: uuid}")
     async def delete_build(self, build_id: UUID, build_service: BuildService) -> None:
@@ -191,3 +147,7 @@ class BuildController(Controller):
             "total_remainingcapacity": total_remainingcapacity,
             "current_datetime": datetime.datetime.now(tz=ZoneInfo("UTC"))
         })
+
+    @get("/create")
+    async def legacy_redirect_create_page(self) -> Redirect:
+        return Redirect("/build/modern/create")

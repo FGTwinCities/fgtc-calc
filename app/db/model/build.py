@@ -16,5 +16,5 @@ class Build(BuildBase):
     operating_system: Mapped[str | None] = mapped_column(nullable=True, default=None)
 
     __mapper_args__ = {
-        "polymorphic_identity": "modernbuild",
+        "polymorphic_identity": "modern",
     }
