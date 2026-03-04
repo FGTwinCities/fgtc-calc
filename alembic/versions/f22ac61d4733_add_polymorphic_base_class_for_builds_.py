@@ -26,16 +26,20 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(['id'], ['build.id'], name=op.f('fk_modernbuild_id_build')),
         sa.PrimaryKeyConstraint('id', name=op.f('pk_modernbuild')),
         sa.Column('manufacturer', sa.String(), nullable=True),
+        sa.Column('model', sa.String(), nullable=True),
+        sa.Column('operating_system', sa.String(), nullable=True),
     )
 
     op.add_column('build', sa.Column('class_type', sa.String(), nullable=True))
 
-    op.execute("INSERT INTO modernbuild (id, manufacturer) SELECT id, manufacturer FROM build")
+    op.execute("INSERT INTO modernbuild (id, manufacturer, model, operating_system) SELECT id, manufacturer, model, operating_system FROM build")
     op.execute("UPDATE build SET class_type = 'modernbuild'")
 
     op.alter_column('build', 'class_type', nullable=False)
 
     op.drop_column('build', 'manufacturer')
+    op.drop_column('build', 'model')
+    op.drop_column('build', 'operating_system')
 
     op.create_table('macbuild',
         sa.Column('id', advanced_alchemy.types.guid.GUID(length=16), nullable=False),
@@ -47,8 +51,12 @@ def upgrade() -> None:
 def downgrade() -> None:
     """Downgrade schema."""
     op.add_column('build', sa.Column('manufacturer', sa.VARCHAR(), autoincrement=False, nullable=True))
+    op.add_column('build', sa.Column('model', sa.VARCHAR(), autoincrement=False, nullable=True))
+    op.add_column('build', sa.Column('operating_system', sa.VARCHAR(), autoincrement=False, nullable=True))
 
     op.execute("UPDATE build SET manufacturer = (SELECT manufacturer FROM modernbuild WHERE build.id = modernbuild.id)")
+    op.execute("UPDATE build SET model = (SELECT model FROM modernbuild WHERE build.id = modernbuild.id)")
+    op.execute("UPDATE build SET operating_system = (SELECT operating_system FROM modernbuild WHERE build.id = modernbuild.id)")
 
     op.drop_column('build', 'class_type')
     op.drop_table('modernbuild')

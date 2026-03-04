@@ -53,9 +53,6 @@ class BuildCreateDisplay:
 class BuildCreate:
     type: BuildType = field()
 
-    model: str | None = field()
-    operating_system: str | None = field()
-
     wired_networking: int | None = field()
     wireless_networking: WirelessNetworkingStandard | None = field()
     bluetooth: bool = field(default=False)
@@ -77,6 +74,8 @@ class BuildCreate:
 @dataclass
 class ModernBuildCreate(BuildCreate):
     manufacturer: str | None = field(default=None)
+    model: str | None = field(default=None)
+    operating_system: str | None = field(default=None)
 
 
 @dataclass

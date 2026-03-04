@@ -12,6 +12,8 @@ class Build(BuildBase):
     id: Mapped[UUID] = mapped_column(ForeignKey("build.id"), primary_key=True, sort_order=-100)
 
     manufacturer: Mapped[str | None] = mapped_column(nullable=True, default=None)
+    model: Mapped[str | None] = mapped_column(nullable=True, default=None)
+    operating_system: Mapped[str | None] = mapped_column(nullable=True, default=None)
 
     __mapper_args__ = {
         "polymorphic_identity": "modernbuild",
