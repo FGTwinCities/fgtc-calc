@@ -53,7 +53,6 @@ class BuildCreateDisplay:
 class BuildCreate:
     type: BuildType = field()
 
-    manufacturer: str | None = field()
     model: str | None = field()
     operating_system: str | None = field()
 
@@ -73,3 +72,13 @@ class BuildCreate:
     display: BuildCreateDisplay | None = field(default=None)
 
     notes: str | None = field(default=None)
+
+
+@dataclass
+class ModernBuildCreate(BuildCreate):
+    manufacturer: str | None = field(default=None)
+
+
+@dataclass
+class MacBuildCreate(BuildCreate):
+    pass

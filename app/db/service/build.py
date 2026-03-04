@@ -5,10 +5,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db import model as m
 
 
-class BuildService(SQLAlchemyAsyncRepositoryService[m.Build]):
+class BuildService(SQLAlchemyAsyncRepositoryService[m.BuildBase]):
 
-    class Repository(SQLAlchemyAsyncRepository[m.Build]):
-        model_type = m.Build
+    class Repository(SQLAlchemyAsyncRepository[m.BuildBase]):
+        model_type = m.BuildBase
 
     repository_type = Repository
 

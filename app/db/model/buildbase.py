@@ -1,19 +1,16 @@
-from dataclasses import dataclass
-
 from advanced_alchemy.base import UUIDAuditBase
-from sqlalchemy import String
 from sqlalchemy.ext.associationproxy import association_proxy, AssociationProxy
 from sqlalchemy.orm import Mapped, relationship, mapped_column
 
 from app.db.enum import BuildType, WirelessNetworkingStandard
 from app.db.model.battery import Battery
+from app.db.model.build_graphics_association import BuildGraphicsAssociation
+from app.db.model.build_processor_association import BuildProcessorAssociation
 from app.db.model.display import Display
 from app.db.model.graphics import GraphicsProcessor
-from app.db.model.build_graphics_association import BuildGraphicsAssociation
 from app.db.model.memory import MemoryModule
 from app.db.model.mixins.price import PriceMixin
 from app.db.model.processor import Processor
-from app.db.model.build_processor_association import BuildProcessorAssociation
 from app.db.model.storage import StorageDisk
 
 
@@ -82,4 +79,5 @@ class BuildBase(UUIDAuditBase, PriceMixin):
     __mapper_args__ = {
         "polymorphic_identity": "build",
         "polymorphic_on": "class_type",
+        "with_polymorphic": "*",
     }
