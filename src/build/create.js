@@ -328,7 +328,7 @@ async function onCreateFormSubmit() {
 
     let dto = convertFormToDto();
 
-    var url = "/build";
+    var url = $("#create-form").attr("action");
     let settings = {
         method: "POST",
         data: JSON.stringify(dto),
@@ -338,7 +338,7 @@ async function onCreateFormSubmit() {
     const urlParams = new URLSearchParams(window.location.search);
     let editId = urlParams.get('edit');
     if (editId) {
-        url = `/build/${editId}`;
+        url = `${url}/${editId}`;
         settings.method = "PATCH";
     }
 

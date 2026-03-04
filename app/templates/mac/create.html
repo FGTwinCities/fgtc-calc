@@ -1,0 +1,276 @@
+{% extends "base.html" %}
+
+{% block title %}Create Build{% endblock %}
+
+{% block extra_head %}
+{{ vite('src/build/create.js') }}
+{{ vite('src/build/search.js') }}
+{% endblock %}
+
+{% macro input_datasize(name) -%}
+    <label class="input">
+        <span class="label">Size</span>
+        <input type="number" name="{{ name }}" id="{{ name }}">
+        <select name="{{ name }}-unit" id="{{ name }}-unit" class="label">
+            <option value="mb">MB</option>
+            <option value="gb" selected>GB</option>
+            <option value="tb">TB</option>
+        </select>
+    </label>
+{%- endmacro %}
+
+{% block content %}
+<div>
+    <form action="/build/mac" onsubmit="return false;" id="create-form">
+        <fieldset class="build-section flex flex-col gap-4">
+            <legend>Computer Type</legend>
+            <div class="filter">
+                <input type="radio" name="type" value="desktop" id="type-desktop" class="btn checked:bg-primary" aria-label="Desktop">
+                <input type="radio" name="type" value="laptop" id="type-laptop" class="btn checked:bg-primary" aria-label="Laptop">
+                <input type="radio" name="type" value="other" id="type-other" class="btn checked:bg-primary" aria-label="Other">
+                <input type="radio" name="type" value="" aria-label="×" class="btn btn-square filter-reset">
+            </div>
+        </fieldset>
+        <fieldset id="fieldset-info" class="build-section">
+            <legend>Basic Info</legend>
+            <label class="floating-label">
+                <span class="label">Model</span>
+                <input type="text" name="model" id="model" placeholder="Model" class="input">
+            </label>
+            <label class="floating-label">
+                <span class="label">Operating System</span>
+                <input type="text" name="operating-system" id="operating-system" placeholder="Operating System" class="input" list="operating-system-list" autocomplete="off">
+                <datalist id="operating-system-list">
+                </datalist>
+            </label>
+        </fieldset>
+        <fieldset id="fieldset-processor" class="build-section">
+            <legend>Processors</legend>
+            <template id="processor-template">
+                <fieldset class="build-list-item">
+                    <legend>Processor</legend>
+                    <label class="input">
+                        <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <g
+                              stroke-linejoin="round"
+                              stroke-linecap="round"
+                              stroke-width="2.5"
+                              fill="none"
+                              stroke="currentColor"
+                            >
+                              <circle cx="11" cy="11" r="8"></circle>
+                              <path d="m21 21-4.3-4.3"></path>
+                            </g>
+                        </svg>
+                        <input type="search" class="processor-name" name="processor-name" id="processor-search" list="processor-results" autocomplete="off">
+                    </label>
+                    <button type="button" id="remove-button" class="btn">Remove</button>
+                    <br>
+                    <input type="checkbox" name="processor-upgradable" id="processor-upgradable" class="checkbox checkbox-primary" checked>
+                    <label for="processor-upgradable">Upgradable</label>
+                </fieldset>
+            </template>
+            <datalist id="processor-results"></datalist>
+            <div id="processor-list"></div>
+            <button type="button" id="add-processor-button" class="btn">Add Processor</button>
+        </fieldset>
+        <fieldset id="fieldset-memory" class="build-section">
+            <legend>Memory</legend>
+            <input type="radio" name="memory-type" value="3" id="memory-type-ddr3" class="radio radio-primary">
+            <label for="memory-type-ddr3">DDR3</label>
+            <input type="radio" name="memory-type" value="4" id="memory-type-ddr4" class="radio radio-primary">
+            <label for="memory-type-ddr4">DDR4</label>
+            <input type="radio" name="memory-type" value="5" id="memory-type-ddr5" class="radio radio-primary">
+            <label for="memory-type-ddr5">DDR5</label>
+            <br>
+            <input type="checkbox" name="memory-upgradable" id="memory-upgradable" class="checkbox checkbox-primary" checked>
+            <label for="memory-upgradable">Upgradable</label>
+            <input type="checkbox" name="memory-ecc" id="memory-ecc" class="checkbox checkbox-primary">
+            <label for="memory-ecc">Error Correcting</label>
+            <template id="memory-template">
+                <fieldset class="build-list-item">
+                    <legend>Memory Module</legend>
+                    {{ input_datasize('memory-size') }}
+                    <br>
+                    <label class="input">
+                        <span class="label">Speed</span>
+                        <input type="number" name="memory-speed" id="memory-speed">
+                        <span class="label">MT/s</span>
+                    </label>
+                    <br>
+                    <button type="button" id="remove-button" class="btn">Remove</button>
+                </fieldset>
+            </template>
+            <div id="memory-list"></div>
+            <button type="button" id="add-memory-button" class="btn">Add Module</button>
+        </fieldset>
+        <fieldset id="fieldset-storage" class="build-section">
+            <legend>Storage</legend>
+            <template id="storage-template">
+                <fieldset class="build-list-item">
+                    <legend>Disk</legend>
+                    <select name="storage-disk-form" id="storage-disk-form" class="select">
+                        <option value="2.5">2.5"</option>
+                        <option value="3.5">3.5"</option>
+                        <option value="m2" selected>m.2</option>
+                        <option value="pcie">PCIe</option>
+                        <option value="soldered">Soldered</option>
+                    </select>
+                    <select name="storage-disk-interface" id="storage-disk-interface" class="select">
+                        <option value="ide">IDE</option>
+                        <option value="sata">SATA</option>
+                        <option value="nvme" selected>NVMe</option>
+                        <option value="emmc">eMMC</option>
+                    </select>
+                    <select name="storage-disk-type" id="storage-disk-type" class="select">
+                        <option value="hdd">HDD</option>
+                        <option value="ssd" selected>SSD</option>
+                    </select>
+                    <br>
+                    {{ input_datasize('storage-disk-size') }}
+                    <br>
+                    <input type="checkbox" name="storage-disk-upgradable" id="storage-disk-upgradable" class="checkbox checkbox-primary" checked>
+                    <label for="storage-disk-upgradable">Upgradable</label>
+                    <br>
+                    <button type="button" id="remove-button" class="btn">Remove</button>
+                </fieldset>
+            </template>
+            <div id="storage-list"></div>
+            <button type="button" id="add-storage-button" class="btn">Add Storage Device</button>
+        </fieldset>
+        <fieldset id="fieldset-gpu" class="build-section">
+            <legend>Graphics Cards</legend>
+            <template id="gpu-template">
+                <fieldset class="build-list-item">
+                    <legend>Graphics Card</legend>
+                    <label class="input">
+                        <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <g
+                              stroke-linejoin="round"
+                              stroke-linecap="round"
+                              stroke-width="2.5"
+                              fill="none"
+                              stroke="currentColor"
+                            >
+                              <circle cx="11" cy="11" r="8"></circle>
+                              <path d="m21 21-4.3-4.3"></path>
+                            </g>
+                        </svg>
+                        <input type="search" name="gpu-name" id="gpu-search" autocomplete="off" list="graphics-results">
+                    </label>
+                    <button type="button" id="remove-button" class="btn">Remove</button>
+                    <br>
+                    <input type="checkbox" name="gpu-upgradable" id="gpu-upgradable" class="checkbox checkbox-primary" checked>
+                    <label for="gpu-upgradable">Upgradable</label>
+                </fieldset>
+            </template>
+            <datalist id="graphics-results"></datalist>
+            <div id="gpu-list"></div>
+            <button type="button" id="add-gpu-button" class="btn">Add Graphics Card</button>
+        </fieldset>
+        <fieldset id="fieldset-display" class="build-section">
+            <legend>Display</legend>
+            <label class="input">
+                <span class="label">Diagonal Size</span>
+                <input type="number" name="display-size" id="display-size">
+                <span class="label">Inch</span>
+            </label>
+            <br>
+            <label class="input">
+                <span class="label">Resolution</span>
+                <input type="number" name="display-resolution-horizontal" id="display-resolution-horizontal">
+                <span class="label">X</span>
+                <input type="number" name="display-resolution-vertical" id="display-resolution-vertical">
+            </label>
+            <br>
+            <label class="input">
+                <span class="label">Refresh Rate</span>
+                <input type="number" name="display-refreshrate" id="display-refreshrate">
+                <span class="label">Hz</span>
+            </label>
+            <br>
+            <input type="checkbox" name="display-touch" id="display-touch" class="checkbox">
+            <label for="display-touch">Touchscreen</label>
+        </fieldset>
+        <fieldset id="fieldset-battery" class="build-section">
+            <legend>Batteries</legend>
+            <template id="battery-template">
+                <fieldset class="build-list-item">
+                    <legend>Battery</legend>
+                    <label class="input mb-4">
+                        <span class="label">Battery Health</span>
+                        <input type="number" id="battery-percent">
+                        <span class="label">%</span>
+                    </label>
+                    <br>
+                    <label class="input mr-2">
+                        <span class="label">Design Capacity</span>
+                    <input type="number" name="battery-designcapacity" id="battery-designcapacity">
+                        <span class="label">mAh</span>
+                    </label>
+                    <label class="input">
+                        <span class="label">Remaining Capacity</span>
+                        <input type="number" name="battery-remainingcapacity" id="battery-remainingcapacity">
+                        <span class="label">mAh</span>
+                    </label>
+                    <br>
+                    <button type="button" id="remove-button" class="btn mt-4">Remove</button>
+                </fieldset>
+            </template>
+            <div id="battery-list"></div>
+            <button type="button" id="add-battery-button" class="btn">Add Battery</button>
+        </fieldset>
+        <fieldset id="fieldset-webcam" class="build-section flex flex-row gap-4">
+            <legend>Webcam & Microphone</legend>
+            <label class="label">
+                <input type="checkbox" class="toggle toggle-primary" name="webcam" checked>
+                <span>Webcam</span>
+            </label>
+            <label class="label">
+                <input type="checkbox" class="toggle toggle-primary" name="microphone" checked>
+                <span>Microphone</span>
+            </label>
+        </fieldset>
+        <fieldset id="fieldset-networking" class="build-section flex flex-col gap-4">
+            <legend>Networking</legend>
+            <div>
+                <b class="mr-2">Wired:</b>
+                <input type="radio" name="networking-wired" id="networking-wired-none" value="none" class="radio radio-primary" checked>
+                <label for="networking-wired-none">None</label>
+                <input type="radio" name="networking-wired" id="networking-wired-fast" value="100" class="radio radio-primary">
+                <label for="networking-wired-fast">10/100</label>
+                <input type="radio" name="networking-wired" id="networking-wired-gigabit" value="1000" class="radio radio-primary">
+                <label for="networking-wired-gigabit">Gigabit</label>
+                <input type="radio" name="networking-wired" id="networking-wired-2gig" value="2500" class="radio radio-primary">
+                <label for="networking-wired-2gig">2.5GbE</label>
+                <input type="radio" name="networking-wired" id="networking-wired-10gig" value="10000" class="radio radio-primary">
+                <label for="networking-wired-10gig">10GbE</label>
+            </div>
+            <div>
+                <b class="mr-2">Wireless:</b>
+                <input type="radio" name="networking-wireless" id="networking-wireless-none" value="none" class="radio radio-primary" checked>
+                <label for="networking-wireless-none">None</label>
+                <input type="radio" name="networking-wireless" id="networking-wireless-bg" value="bg" class="radio radio-primary">
+                <label for="networking-wireless-bg">WiFi 3 or older</label>
+                <input type="radio" name="networking-wireless" id="networking-wireless-n" value="n" class="radio radio-primary">
+                <label for="networking-wireless-n">WiFi 4 (n)</label>
+                <input type="radio" name="networking-wireless" id="networking-wireless-ac" value="ac" class="radio radio-primary">
+                <label for="networking-wireless-ac">WiFi 5 (ac)</label>
+                <input type="radio" name="networking-wireless" id="networking-wireless-ax" value="ax" class="radio radio-primary">
+                <label for="networking-wireless-ax">WiFi 6 (ax)</label>
+                <input type="radio" name="networking-wireless" id="networking-wireless-be" value="be" class="radio radio-primary">
+                <label for="networking-wireless-be">WiFi 7 (be)</label>
+            </div>
+            <div>
+                <b class="mr-2">Bluetooth:</b>
+                <input type="checkbox" name="bluetooth" class="toggle toggle-primary" />
+            </div>
+        </fieldset>
+        <fieldset id="fieldset-notes" class="build-section">
+            <legend>Notes</legend>
+            <textarea name="notes" class="textarea w-full min-h-64"></textarea>
+        </fieldset>
+        <button type="button" id="submit-button" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+{% endblock %}
