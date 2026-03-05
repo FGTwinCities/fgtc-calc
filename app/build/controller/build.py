@@ -4,14 +4,12 @@ from uuid import UUID
 from zoneinfo import ZoneInfo
 
 from advanced_alchemy.filters import LimitOffset, OrderBy
-from litestar import get, post, delete, patch
+from litestar import get, delete
 from litestar.controller import Controller
 from litestar.di import Provide
 from litestar.response import Template, Redirect
 
-from app.build.controller.common import _deduplicate_processors, _deduplicate_graphics_processors, \
-    _convert_create_dto_to_model
-from app.build.schema import ModernBuildCreate
+from app.build.schema import BuildRetrieve
 from app.db.model import BuildProcessorAssociation, BuildGraphicsAssociation
 from app.db.model.battery import Battery
 from app.db.model.build import Build
@@ -19,8 +17,8 @@ from app.db.model.display import Display
 from app.db.model.memory import MemoryModule
 from app.db.model.storage import StorageDisk
 from app.db.service.build import provide_build_service, BuildService
-from app.db.service.graphics import provide_graphics_service, GraphicsProcessorService
-from app.db.service.processor import provide_processor_service, ProcessorService
+from app.db.service.graphics import provide_graphics_service
+from app.db.service.processor import provide_processor_service
 from app.lib.attrs import attrcopy, attrcopy_allowlist
 from app.lib.math import mb2gb
 
@@ -37,18 +35,18 @@ class BuildController(Controller):
         "graphics_service": Provide(provide_graphics_service),
     }
 
-
     @get("/")
-    async def get_builds(self, build_service: BuildService, offset: int = 0, page_size: int = 25) -> Sequence[Build]:
-        return await build_service.list(
+    async def get_builds(self, build_service: BuildService, offset: int = 0, page_size: int = 25) -> Sequence[BuildRetrieve]:
+        builds = await build_service.list(
             LimitOffset(offset=offset, limit=page_size),
             OrderBy(Build.created_at, "desc"),
         )
 
+        return [build_service.retrieve_schema(b) for b in builds]
 
     @get("/{build_id: uuid}")
-    async def get_build(self, build_id: UUID, build_service: BuildService) -> Build:
-        return await build_service.get(build_id)
+    async def get_build(self, build_id: UUID, build_service: BuildService) -> BuildRetrieve:
+        return build_service.retrieve_schema(await build_service.get(build_id))
 
     @delete("/{build_id: uuid}")
     async def delete_build(self, build_id: UUID, build_service: BuildService) -> None:

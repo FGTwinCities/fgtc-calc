@@ -1,4 +1,7 @@
-from dataclasses import dataclass, field
+import datetime
+from uuid import UUID
+
+import msgspec
 
 from app.db.enum import BuildType, WirelessNetworkingStandard, MemoryType, StorageDiskType, StorageDiskInterface, \
     StorageDiskForm
@@ -10,74 +13,99 @@ These objects match the schema sent by the frontend.
 """
 
 
-@dataclass
-class BuildCreateProcessor:
-    model: str = field()
-    id: str | None = field(default=None)
-    upgradable: bool = field(default=True)
+class BuildCreateProcessor(msgspec.Struct):
+    model: str
+    id: UUID | None = None
+    upgradable: bool = True
 
 
-@dataclass
-class BuildCreateMemoryModule:
-    type: MemoryType = field()
-    clock: int = field()
-    size: int = field()
-    upgradable: bool = field(default=True)
-    ecc: bool = field(default=False)
+class BuildCreateMemoryModule(msgspec.Struct):
+    type: MemoryType
+    clock: int
+    size: int
+    upgradable: bool = True
+    ecc: bool = False
 
 
-@dataclass
-class BuildCreateStorageDisk:
-    type: StorageDiskType = field()
-    form: StorageDiskForm = field()
-    interface: StorageDiskInterface = field()
-    size: int = field()
-    upgradable: bool = field(default=True)
+class BuildCreateStorageDisk(msgspec.Struct):
+    type: StorageDiskType
+    form: StorageDiskForm
+    interface: StorageDiskInterface
+    size: int
+    upgradable: bool = True
 
 
-@dataclass
-class BuildCreateBattery:
-    design_capacity: int = field()
-    remaining_capacity: int = field()
+class BuildCreateBattery(msgspec.Struct):
+    design_capacity: int
+    remaining_capacity: int
 
 
-@dataclass
-class BuildCreateDisplay:
-    size: float = field()
-    refresh_rate: int = field()
-    resolution: Resolution = field()
-    touchscreen: bool = field(default=False)
+class BuildCreateDisplay(msgspec.Struct):
+    size: float
+    refresh_rate: int
+    resolution: Resolution
+    touchscreen: bool = False
 
 
-@dataclass
-class BuildCreate:
-    type: BuildType = field()
+class BuildCreate(msgspec.Struct):
+    type: BuildType
 
-    wired_networking: int | None = field()
-    wireless_networking: WirelessNetworkingStandard | None = field()
-    bluetooth: bool = field(default=False)
-    webcam: bool = field(default=False)
-    microphone: bool = field(default=False)
+    wired_networking: int | None = None
+    wireless_networking: WirelessNetworkingStandard | None = None
+    bluetooth: bool = False
+    webcam: bool = False
+    microphone: bool = False
 
-    processors: list[BuildCreateProcessor] = field(default_factory=list)
-    graphics: list[BuildCreateProcessor] = field(default_factory=list)
+    processors: list[BuildCreateProcessor] = []
+    graphics: list[BuildCreateProcessor] = []
 
-    memory: list[BuildCreateMemoryModule] = field(default_factory=list)
-    storage: list[BuildCreateStorageDisk] = field(default_factory=list)
+    memory: list[BuildCreateMemoryModule] = []
+    storage: list[BuildCreateStorageDisk] = []
 
-    batteries: list[BuildCreateBattery] = field(default_factory=list)
-    display: BuildCreateDisplay | None = field(default=None)
+    batteries: list[BuildCreateBattery] = []
+    display: BuildCreateDisplay | None = None
 
-    notes: str | None = field(default=None)
+    notes: str | None = None
 
 
-@dataclass
 class ModernBuildCreate(BuildCreate):
-    manufacturer: str | None = field(default=None)
-    model: str | None = field(default=None)
-    operating_system: str | None = field(default=None)
+    manufacturer: str | None = None
+    model: str | None = None
+    operating_system: str | None = None
 
 
-@dataclass
 class MacBuildCreate(BuildCreate):
     pass
+
+
+class BuildRetrieve(msgspec.Struct):
+    id: UUID
+    class_type: str
+    created_at: datetime.datetime
+    updated_at: datetime.datetime
+    price: float | None
+    priced_at: datetime.datetime | None
+    type: BuildType
+
+    wired_networking: int | None
+    wireless_networking: WirelessNetworkingStandard  | None
+    bluetooth: bool
+    webcam: bool
+    microphone: bool
+
+    processors: list[BuildCreateProcessor]
+    graphics: list[BuildCreateProcessor]
+
+    memory: list[BuildCreateMemoryModule]
+    storage: list[BuildCreateStorageDisk]
+
+    batteries: list[BuildCreateBattery]
+    display: BuildCreateDisplay | None
+
+    notes: str | None
+
+
+class ModernBuildRetrieve(BuildRetrieve):
+    manufacturer: str | None
+    model: str | None
+    operating_system: str | None

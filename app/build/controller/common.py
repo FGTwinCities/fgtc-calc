@@ -1,9 +1,8 @@
-from app.build.schema import BuildCreate
+from app.build.schema import BuildCreate, ModernBuildCreate, MacBuildCreate
 from app.db.model import BuildBase, Processor, BuildProcessorAssociation, GraphicsProcessor, \
-    BuildGraphicsAssociation, MemoryModule, StorageDisk, Display, Battery
+    BuildGraphicsAssociation, MemoryModule, StorageDisk, Display, Battery, Build, MacBuild
 from app.db.service.graphics import GraphicsProcessorService
 from app.db.service.processor import ProcessorService
-from app.lib.attrs import attrcopy
 from app.passmark.passmark_scraper import attempt_cpu_parse, attempt_gpu_parse
 
 
@@ -80,23 +79,50 @@ async def _deduplicate_graphics_processors(build: BuildBase, data: BuildCreate,
 
 def _convert_create_dto_to_model(build: BuildBase, data: BuildCreate):
     """ Copies attributes from the BuildCreate DTO object to the Build database model object, as well as handling subobject creation """
+    build.type = data.type
+    build.wired_networking = data.wired_networking
+    build.wireless_networking = data.wireless_networking
+    build.bluetooth = data.bluetooth
+    build.webcam = data.webcam
+    build.microphone = data.microphone
+    build.notes = data.notes
+
+    if isinstance(build, Build) and isinstance(data, ModernBuildCreate):
+        build.manufacturer = data.manufacturer
+        build.model = data.model
+        build.operating_system = data.operating_system
+
+    if isinstance(build, MacBuild) and isinstance(data, MacBuildCreate):
+        pass #TODO
+
     build.memory = []
     for mem in data.memory:
-        module = MemoryModule()
-        attrcopy(mem, module)
-        build.memory.append(module)
+        build.memory.append(MemoryModule(
+            type=mem.type,
+            upgradable=mem.upgradable,
+            ecc=mem.ecc,
+            clock=mem.clock,
+            size=mem.size,
+        ))
 
     build.storage = []
-    for store in data.storage:
-        disk = StorageDisk()
-        attrcopy(store, disk)
-        build.storage.append(disk)
+    for disk in data.storage:
+        build.storage.append(StorageDisk(
+            type=disk.type,
+            upgradable=disk.upgradable,
+            form=disk.form,
+            interface=disk.interface,
+            size=disk.size,
+        ))
 
     build.display = []
     if data.display:
-        display = Display()
-        attrcopy(data.display, display)
-        build.display.append(display)
+        build.display.append(Display(
+            size=data.display.size,
+            resolution=data.display.resolution,
+            refresh_rate=data.display.refresh_rate,
+            touchscreen=data.display.touchscreen,
+        ))
 
     build.batteries = []
     for batt in data.batteries:
@@ -104,10 +130,7 @@ def _convert_create_dto_to_model(build: BuildBase, data: BuildCreate):
         if batt.design_capacity <= 0:
             continue
 
-        battery = Battery()
-        attrcopy(batt, battery)
-        build.batteries.append(battery)
-
-    # Copy all attributes except the once done manually above between the creation object and the model object
-    attr_blocklist = ["processors", "graphics", "memory", "storage", "display", "batteries"]
-    attrcopy(data, build, attr_blocklist)
+        build.batteries.append(Battery(
+            design_capacity=batt.design_capacity,
+            remaining_capacity=batt.remaining_capacity,
+        ))
