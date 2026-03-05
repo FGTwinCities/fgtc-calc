@@ -27,7 +27,7 @@ class ModernBuildController(Controller):
     @get("/create")
     async def create_build_page(self) -> Template:
         """ Render the create build form page """
-        return Template("build/create.html")
+        return Template("build/modern.html")
 
     @get("/")
     async def get_modern_builds(self, build_service: BuildService, offset: int = 0, page_size: int = 25) -> Sequence[ModernBuildRetrieve]:

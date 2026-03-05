@@ -1,0 +1,29 @@
+{% extends "build/create.html" %}
+
+{% block title %}Create Mac Build{% endblock %}
+
+{% block computer_type %}
+    {{ super() }}
+    <div class="filter">
+        <input type="radio" name="mac_type" build-type="laptop" value="macbook" class="btn checked:bg-primary" aria-label="Macbook">
+        <input type="radio" name="mac_type" build-type="laptop" value="macbook_air" class="btn checked:bg-primary" aria-label="Macbook Air">
+        <input type="radio" name="mac_type" build-type="laptop" value="macbook_pro" class="btn checked:bg-primary" aria-label="Macbook Pro">
+        <input type="radio" name="mac_type" build-type="laptop" value="macbook_neo" class="btn checked:bg-primary" aria-label="Macbook Neo">
+        <input type="radio" name="mac_type" build-type="aio" value="imac" class="btn checked:bg-primary" aria-label="iMac">
+        <input type="radio" name="mac_type" build-type="aio" value="imac_pro" class="btn checked:bg-primary" aria-label="iMac Pro">
+        <input type="radio" name="mac_type" build-type="desktop" value="mac_pro" class="btn checked:bg-primary" aria-label="Mac Pro">
+        <input type="radio" name="mac_type" build-type="desktop" value="mac_mini" class="btn checked:bg-primary" aria-label="Mac Mini">
+        <input type="radio" name="mac_type" build-type="desktop" value="mac_studio" class="btn checked:bg-primary" aria-label="Mac Studio">
+        <input type="radio" name="mac_type" build-type="other" value="other" class="btn checked:bg-primary" aria-label="Other">
+        <input type="radio" name="mac_type" value="" aria-label="×" class="btn btn-square filter-reset">
+    </div>
+{% endblock %}
+
+{% block basic_info %}
+    <label class="input">
+        <span class="label">Mac OS Version</span>
+        <input type="number" name="macos_version_major" />
+        <span class="label">.</span>
+        <input type="number" name="macos_version_minor" />
+    </label>
+{% endblock %}

@@ -26,7 +26,7 @@ class MacBuildController(Controller):
 
     @get("/create")
     async def create_build_page(self) -> Template:
-        return Template("mac/create.html")
+        return Template("build/mac.html")
 
     @get("/")
     async def get_mac_builds(self, build_service: BuildService, offset: int = 0, page_size: int = 25) -> Sequence[MacBuildRetrieve]:

@@ -24,35 +24,20 @@
     <form action="/build/modern" onsubmit="return false;" id="create-form">
         <fieldset class="build-section flex flex-col gap-4">
             <legend>Computer Type</legend>
-            <div class="filter">
-                <input type="radio" name="type" value="desktop" id="type-desktop" class="btn checked:bg-primary" aria-label="Desktop">
-                <input type="radio" name="type" value="laptop" id="type-laptop" class="btn checked:bg-primary" aria-label="Laptop">
-                <input type="radio" name="type" value="other" id="type-other" class="btn checked:bg-primary" aria-label="Other">
-                <input type="radio" name="type" value="" aria-label="×" class="btn btn-square filter-reset">
-            </div>
+            {% block computer_type %}
+                <div class="filter">
+                    <input type="radio" name="type" value="desktop" id="type-desktop" class="btn checked:bg-primary" aria-label="Desktop">
+                    <input type="radio" name="type" value="laptop" id="type-laptop" class="btn checked:bg-primary" aria-label="Laptop">
+                    <input type="radio" name="type" value="aio" id="type-aio" class="btn checked:bg-primary" aria-label="All-In-One">
+                    <input type="radio" name="type" value="other" id="type-other" class="btn checked:bg-primary" aria-label="Other">
+                    <input type="radio" name="type" value="" aria-label="×" class="btn btn-square filter-reset">
+                </div>
+            {% endblock %}
         </fieldset>
         <fieldset id="fieldset-info" class="build-section">
             <legend>Basic Info</legend>
-            <label class="floating-label">
-                <span class="label">Manufacturer</span>
-                <input type="text" name="manufacturer" id="manufacturer" placeholder="Manufacturer" class="input">
-            </label>
-            <label class="floating-label">
-                <span class="label">Model</span>
-                <input type="text" name="model" id="model" placeholder="Model" class="input">
-            </label>
-            <label class="floating-label">
-                <span class="label">Operating System</span>
-                <input type="text" name="operating-system" id="operating-system" placeholder="Operating System" class="input" list="operating-system-list" autocomplete="off">
-                <datalist id="operating-system-list">
-                    <option value="Windows 10 Home" />
-                    <option value="Windows 10 Pro" />
-                    <option value="Windows 11 Home" />
-                    <option value="Windows 11 Pro" />
-                    <option value="Linux Mint 22.3" />
-                    <option value="Linux Mint 22.4" />
-                </datalist>
-            </label>
+            {% block basic_info %}
+            {% endblock %}
         </fieldset>
         <fieldset id="fieldset-processor" class="build-section">
             <legend>Processors</legend>
