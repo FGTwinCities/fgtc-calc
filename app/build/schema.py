@@ -109,3 +109,7 @@ class ModernBuildRetrieve(BuildRetrieve):
     manufacturer: str | None
     model: str | None
     operating_system: str | None
+
+
+class MacBuildRetrieve(BuildRetrieve):
+    pass

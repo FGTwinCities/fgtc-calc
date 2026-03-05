@@ -53,7 +53,7 @@ class BuildController(Controller):
         await build_service.delete(build_id, auto_commit=True)
 
     @get("/{build_id: uuid}/duplicate")
-    async def duplicate_build(self, build_id: UUID, build_service: BuildService) -> Build:
+    async def duplicate_build(self, build_id: UUID, build_service: BuildService) -> BuildRetrieve:
         """
         Duplicate an existing build by copying its attributes to a new build object
         :param build_id: ID of build to duplicate
@@ -112,7 +112,7 @@ class BuildController(Controller):
             new_build.display.append(new_disp)
 
         await build_service.create(new_build, auto_commit=True, auto_refresh=True)
-        return new_build
+        return build_service.to_schema(new_build, schema_type=BuildRetrieve)
 
 
     @get("/{build_id: uuid}/sheet")

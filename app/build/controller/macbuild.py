@@ -6,9 +6,9 @@ from litestar import Controller, get, post, patch
 from litestar.di import Provide
 from litestar.response import Template
 
-from app.build.controller.build import _deduplicate_processors, _deduplicate_graphics_processors
-from app.build.controller.common import _convert_create_dto_to_model
-from app.build.schema import MacBuildCreate
+from app.build.controller.common import _convert_create_dto_to_model, _deduplicate_processors, \
+    _deduplicate_graphics_processors
+from app.build.schema import MacBuildCreate, MacBuildRetrieve
 from app.db.model import MacBuild
 from app.db.service.build import provide_build_service, BuildService
 from app.db.service.graphics import provide_graphics_service, GraphicsProcessorService
@@ -29,15 +29,21 @@ class MacBuildController(Controller):
         return Template("mac/create.html")
 
     @get("/")
-    async def get_mac_builds(self, build_service: BuildService, offset: int = 0, page_size: int = 25) -> Sequence[MacBuild]:
-        return await build_service.list(
+    async def get_mac_builds(self, build_service: BuildService, offset: int = 0, page_size: int = 25) -> Sequence[MacBuildRetrieve]:
+        builds = await build_service.list(
             LimitOffset(offset=offset, limit=page_size),
             OrderBy(MacBuild.created_at, "desc"),
             MacBuild.class_type.contains("macbuild"),
         )
 
+        return [build_service.to_schema(b, schema_type=MacBuildRetrieve) for b in builds]
+
+    @get("/{build_id: uuid}")
+    async def get_mac_build(self, build_id: UUID, build_service: BuildService) -> MacBuildRetrieve:
+        return build_service.to_schema(await build_service.get(build_id), schema_type=MacBuildRetrieve)
+
     @post("/")
-    async def create_mac_build(self, build_service: BuildService, processor_service: ProcessorService, graphics_service: GraphicsProcessorService, data: MacBuildCreate) -> MacBuild:
+    async def create_mac_build(self, build_service: BuildService, processor_service: ProcessorService, graphics_service: GraphicsProcessorService, data: MacBuildCreate) -> MacBuildRetrieve:
         build = MacBuild()
 
         await _deduplicate_processors(build, data, processor_service)
@@ -45,11 +51,11 @@ class MacBuildController(Controller):
         _convert_create_dto_to_model(build, data)
 
         await build_service.create(build, auto_commit=True, auto_refresh=True)
-        return build
+        return build_service.to_schema(build, schema_type=MacBuildRetrieve)
 
 
     @patch("/{build_id: uuid}")
-    async def update_mac_build(self, build_id: UUID, build_service: BuildService, processor_service: ProcessorService, graphics_service: GraphicsProcessorService, data: MacBuildCreate) -> MacBuild:
+    async def update_mac_build(self, build_id: UUID, build_service: BuildService, processor_service: ProcessorService, graphics_service: GraphicsProcessorService, data: MacBuildCreate) -> MacBuildRetrieve:
         build = await build_service.get(build_id)
         assert isinstance(build, MacBuild)
 
@@ -61,4 +67,4 @@ class MacBuildController(Controller):
         _convert_create_dto_to_model(build, data)
 
         build = await build_service.update(build, auto_commit=True, auto_refresh=True)
-        return build
+        return build_service.to_schema(build, schema_type=MacBuildRetrieve)
