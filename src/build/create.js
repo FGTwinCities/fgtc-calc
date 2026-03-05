@@ -190,7 +190,7 @@ export function fillFormFromDto(dto) {
     for (let i = 0; i < dto["processors"].length; i++) {
         let field = addTemplateListItem('processor-template', 'processor-list');
         field.find("input[name=processor-name]").val(dto["processors"][i]["model"]);
-        field.find("input[name=processor-upgradable]").prop("checked", dto["processor_associations"][i]["upgradable"]);
+        field.find("input[name=processor-upgradable]").prop("checked", dto["processors"][i]["upgradable"]);
     }
 
     // Fill memory information
@@ -222,29 +222,17 @@ export function fillFormFromDto(dto) {
     for (let i = 0; i < dto["graphics"].length; i++) {
         let field = addTemplateListItem('gpu-template', 'gpu-list');
         field.find("input[name=gpu-name]").val(dto["graphics"][i]["model"]);
-        field.find("input[name=gpu-upgradable]").prop("checked", dto["graphics_associations"][i]["upgradable"]);
+        field.find("input[name=gpu-upgradable]").prop("checked", dto["graphics"][i]["upgradable"]);
     }
 
     // Fill display information
-    var display_size = NaN;
-    var display_resolution_x = NaN;
-    var display_resolution_y = NaN;
-    var display_refreshrate = NaN;
-    var display_touchscreen = false;
-
-    if (dto["display"].length > 0) {
-        display_size = dto["display"][0]["size"];
-        display_resolution_x = dto["display"][0]["resolution"]["x"];
-        display_resolution_y = dto["display"][0]["resolution"]["y"];
-        display_refreshrate = dto["display"][0]["refresh_rate"];
-        display_touchscreen = dto["display"][0]["touchscreen"];
+    if (dto["display"] !== null) {
+        $("input[name=display-size]").val(dto["display"]["size"]);
+        $("input[name=display-resolution-horizontal]").val(dto["display"]["resolution"]["x"]);
+        $("input[name=display-resolution-vertical]").val(dto["display"]["resolution"]["y"]);
+        $("input[name=display-refreshrate]").val(dto["display"]["refresh_rate"]);
+        $("input[name=display-touch]").prop("checked",  dto["display"]["touchscreen"]);
     }
-
-    $("input[name=display-size]").val(display_size);
-    $("input[name=display-resolution-horizontal]").val(display_resolution_x);
-    $("input[name=display-resolution-vertical]").val(display_resolution_y);
-    $("input[name=display-refreshrate]").val(display_refreshrate);
-    $("input[name=display-touch]").prop("checked",  display_touchscreen);
 
     // Fill battery information
     for (let i = 0; i < dto["batteries"].length; i++) {

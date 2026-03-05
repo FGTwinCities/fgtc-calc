@@ -99,6 +99,9 @@ class BuildService(SQLAlchemyAsyncRepositoryService[m.BuildBase]):
                   *,
                   schema_type: "Optional[type[ModelDTOT]]" = None) -> "Union[ModelOrRowMappingT, OffsetPagination[ModelOrRowMappingT], ModelDTOT, OffsetPagination[ModelDTOT]]":
 
+        if data is None:
+            return None
+
         if issubclass(schema_type, BuildCreateProcessor):
             if isinstance(data, m.BuildProcessorAssociation):
                 return BuildCreateProcessor(
@@ -142,7 +145,7 @@ class BuildService(SQLAlchemyAsyncRepositoryService[m.BuildBase]):
                 memory=[self.to_schema(x, schema_type=BuildCreateMemoryModule) for x in data.memory],
                 storage=[self.to_schema(x, schema_type=BuildCreateStorageDisk) for x in data.storage],
                 batteries=[self.to_schema(x, schema_type=BuildCreateBattery) for x in data.batteries],
-                display=self.to_schema(data.display, schema_type=BuildCreateDisplay),
+                display=self.to_schema(next(iter(data.display), None), schema_type=BuildCreateDisplay),
                 notes=data.notes,
 
                 manufacturer=data.manufacturer,
@@ -169,7 +172,7 @@ class BuildService(SQLAlchemyAsyncRepositoryService[m.BuildBase]):
                 memory=[self.to_schema(x, schema_type=BuildCreateMemoryModule) for x in data.memory],
                 storage=[self.to_schema(x, schema_type=BuildCreateStorageDisk) for x in data.storage],
                 batteries=[self.to_schema(x, schema_type=BuildCreateBattery) for x in data.batteries],
-                display=self.to_schema(data.display, schema_type=BuildCreateDisplay),
+                display=self.to_schema(next(iter(data.display), None), schema_type=BuildCreateDisplay),
                 notes=data.notes,
             )
 
