@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.build.schema import BuildRetrieve, ModernBuildRetrieve, BuildCreateProcessor, BuildCreateMemoryModule, \
     BuildCreateStorageDisk, BuildCreateBattery, BuildCreateDisplay
 from app.db import model as m
+from app.lib.attrs import attrcopy_allowlist
 
 
 class BuildService(SQLAlchemyAsyncRepositoryService[m.BuildBase]):
@@ -15,6 +16,72 @@ class BuildService(SQLAlchemyAsyncRepositoryService[m.BuildBase]):
         model_type = m.BuildBase
 
     repository_type = Repository
+
+    async def duplicate(self, build: m.BuildBase, auto_commit: bool = True, auto_refresh: bool = True):
+        new_build = type(build)()
+
+        attrcopy_allowlist(build, new_build, [
+            "class_type",
+            "type",
+            "manufacturer",
+            "model",
+            "operating_system",
+            "wired_networking",
+            "wireless_networking",
+            "bluetooth",
+            "webcam",
+            "microphone",
+            "notes",
+            "price",
+            "priced_at",
+        ])
+
+        for cpu in build.processor_associations:
+            new_build.processor_associations.append(m.BuildProcessorAssociation(
+                processor=cpu.processor,
+                upgradable=cpu.upgradable,
+            ))
+
+        for gpu in build.graphics_associations:
+            new_build.graphics_associations.append(m.BuildGraphicsAssociation(
+                graphics=gpu.graphics,
+                upgradable=gpu.upgradable,
+            ))
+
+        for mem in build.memory:
+            new_build.memory.append(m.MemoryModule(
+                type=mem.type,
+                upgradable=mem.upgradable,
+                ecc=mem.ecc,
+                clock=mem.clock,
+                size=mem.size,
+            ))
+
+        for disk in build.storage:
+            new_build.storage.append(m.StorageDisk(
+                type=disk.type,
+                upgradable=disk.upgradable,
+                form=disk.form,
+                interface=disk.interface,
+                size=disk.size,
+            ))
+
+        for disp in build.display:
+            new_build.display.append(m.Display(
+                size=disp.size,
+                resolution=disp.resolution,
+                refresh_rate=disp.refresh_rate,
+                touchscreen=disp.touchscreen,
+            ))
+
+        for batt in build.batteries:
+            new_build.batteries.append(m.Battery(
+                design_capacity=batt.design_capacity,
+                remaining_capacity=batt.remaining_capacity,
+            ))
+
+        await self.create(new_build, auto_commit=auto_commit, auto_refresh=auto_refresh)
+        return new_build
 
     def retrieve_schema(self, build: m.BuildBase) -> BuildRetrieve:
         schema = BuildRetrieve

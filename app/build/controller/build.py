@@ -61,57 +61,7 @@ class BuildController(Controller):
         :return: new build object
         """
         build = await build_service.get(build_id)
-        new_build = Build()
-
-        attrcopy_allowlist(build, new_build, [
-            "class_type",
-            "type",
-            "manufacturer",
-            "model",
-            "operating_system",
-            "wired_networking",
-            "wireless_networking",
-            "bluetooth",
-            "webcam",
-            "microphone",
-            "notes",
-            "price",
-            "priced_at",
-        ])
-
-        for cpu in build.processor_associations:
-            new_build.processor_associations.append(BuildProcessorAssociation(
-                processor=cpu.processor,
-                upgradable=cpu.upgradable,
-            ))
-
-        for gpu in build.graphics_associations:
-            new_build.graphics_associations.append(BuildGraphicsAssociation(
-                graphics=gpu.graphics,
-                upgradable=gpu.upgradable,
-            ))
-
-        for mem in build.memory:
-            new_mem = MemoryModule()
-            attrcopy(mem, new_mem, ["build_id"])
-            new_build.memory.append(new_mem)
-
-        for disk in build.storage:
-            new_disk = StorageDisk()
-            attrcopy(disk, new_disk, ["build_id"])
-            new_build.storage.append(new_disk)
-
-        for batt in build.batteries:
-            new_batt = Battery()
-            attrcopy(batt, new_batt, ["build_id"])
-            new_build.batteries.append(new_batt)
-
-        for disp in build.display:
-            new_disp = Display()
-            attrcopy(disp, new_disp, ["build_id"])
-            new_build.display.append(new_disp)
-
-        await build_service.create(new_build, auto_commit=True, auto_refresh=True)
+        new_build = await build_service.duplicate(build)
         return build_service.to_schema(new_build, schema_type=BuildRetrieve)
 
 
