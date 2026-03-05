@@ -56,6 +56,7 @@ export function convertFormToDto() {
 
     // Collect values that can be pulled directly from the form into the build object
     dto["type"] = formData.get("type") == "" ? null : formData.get("type");
+    dto["mac_type"] = formData.get("mac_type") == "" ? null : formData.get("mac_type");
     dto["manufacturer"] = formData.get("manufacturer") == "" ? null : formData.get("manufacturer");
     dto["model"] = formData.get("model") == "" ? null : formData.get("model");
     dto["operating_system"] = formData.get("operating-system") == "" ? null : formData.get("operating-system");
@@ -184,6 +185,10 @@ export function convertFormToDto() {
 export function fillFormFromDto(dto) {
     $("input[name=type][value=" + dto["type"] + "]").prop("checked", true);
     updateVisibleFields();
+
+    if (Object.hasOwn(dto, "mac_type")) {
+        $("input[name=mac_type][value=" + dto["mac_type"] + "]").prop("checked", true);
+    }
 
     $("input[name=manufacturer]").val(dto["manufacturer"]);
     $("input[name=model]").val(dto["model"]);
@@ -357,16 +362,17 @@ function updateVisibleFields() {
     let isAny = !(form.get("type") === "" || form.get("type") === null);
     let isDesktop = form.get("type") === "desktop";
     let isLaptop = form.get("type") === "laptop";
-    let isComputer = isDesktop || isLaptop;
+    let isAio = form.get("type") === "aio";
+    let isComputer = isDesktop || isLaptop || isAio;
 
     $("#fieldset-info").prop('hidden', !isAny)
     $("#fieldset-processor").prop('hidden', !(isComputer || isOther));
     $("#fieldset-memory").prop('hidden', !(isComputer || isOther));
     $("#fieldset-storage").prop('hidden', !(isComputer || isOther));
     $("#fieldset-gpu").prop('hidden', !(isComputer || isOther));
-    $("#fieldset-display").prop('hidden', !(isLaptop || isOther));
+    $("#fieldset-display").prop('hidden', !(isLaptop || isAio || isOther));
     $("#fieldset-battery").prop('hidden', !(isLaptop || isOther));
-    $("#fieldset-webcam").prop('hidden', !(isLaptop || isOther))
+    $("#fieldset-webcam").prop('hidden', !(isLaptop || isAio || isOther));
     $("#fieldset-networking").prop('hidden', !(isComputer || isOther));
     $("#fieldset-notes").prop('hidden', !isAny);
 
@@ -374,11 +380,25 @@ function updateVisibleFields() {
     $("#memory-upgradable").prop("checked", !isLaptop);
     $("#gpu-upgradable").prop("checked", !isLaptop);
 
+    // Mac type filter buttons
+    $("input[name=mac_type][build-type=laptop]").prop('hidden', !(!isAny || isLaptop || isOther));
+    $("input[name=mac_type][build-type=desktop]").prop('hidden', !(!isAny || isDesktop || isOther));
+    $("input[name=mac_type][build-type=aio]").prop('hidden', !(!isAny || isAio || isOther));
+
+}
+
+function updateMacSelectedBuildType() {
+    let build_type = $("input[name=mac_type]:checked").attr("build-type");
+    if (build_type !== "") {
+        $("input[name=type][value=" + build_type + "]").prop("checked", true);
+        updateVisibleFields();
+    }
 }
 
 window.addEventListener("load", async function() {
     // Bind events for page
     $("input[name=type]").change(updateVisibleFields);
+    $("input[name=mac_type]").change(updateMacSelectedBuildType);
     $("#add-processor-button").click(() => addTemplateListItem('processor-template', 'processor-list'));
     $("#add-memory-button").click(() => addTemplateListItem('memory-template', 'memory-list'));
     $("#add-storage-button").click(() => addTemplateListItem('storage-template', 'storage-list'));

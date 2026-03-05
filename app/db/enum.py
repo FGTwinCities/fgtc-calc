@@ -96,3 +96,39 @@ class BuildType(Enum):
     SERVER = "server"
     TABLET = "tablet"
     OTHER = "other"
+
+
+class MacType(Enum):
+    OTHER = "other"
+    MACBOOK = "macbook"
+    MACBOOK_AIR = "macbook_air"
+    MACBOOK_PRO = "macbook_pro"
+    MACBOOK_NEO = "macbook_neo"
+    IMAC = "imac"
+    IMAC_PRO = "imac_pro"
+    MAC_PRO = "mac_pro"
+    MAC_MINI = "mac_mini"
+    MAC_STUDIO = "mac_studio"
+
+    def __str__(self) -> str:
+        match self:
+            case MacType.MACBOOK:
+                return "Macbook"
+            case MacType.MACBOOK_AIR:
+                return "Macbook Air"
+            case MacType.MACBOOK_PRO:
+                return "Macbook Pro"
+            case MacType.MACBOOK_NEO:
+                return "Macbook Neo"
+            case MacType.IMAC:
+                return "iMac"
+            case MacType.IMAC_PRO:
+                return "iMac"
+            case MacType.MAC_PRO:
+                return "Mac Pro"
+            case MacType.MAC_MINI:
+                return "Mac Mini"
+            case MacType.MAC_STUDIO:
+                return "Mac Studio"
+            case _:
+                return str(self.value)

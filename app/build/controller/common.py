@@ -89,14 +89,12 @@ def _convert_create_dto_to_model(build: BuildBase, data: BuildCreate):
 
     if isinstance(build, MacBuild) and isinstance(data, MacBuildCreate):
         build.macos_version = data.macos_version
+        build.mac_type = data.mac_type
 
     if isinstance(build, Build) and isinstance(data, ModernBuildCreate):
         build.manufacturer = data.manufacturer
         build.model = data.model
         build.operating_system = data.operating_system
-
-    if isinstance(build, MacBuild) and isinstance(data, MacBuildCreate):
-        pass #TODO
 
     build.memory = []
     for mem in data.memory:

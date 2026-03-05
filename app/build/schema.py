@@ -4,7 +4,7 @@ from uuid import UUID
 import msgspec
 
 from app.db.enum import BuildType, WirelessNetworkingStandard, MemoryType, StorageDiskType, StorageDiskInterface, \
-    StorageDiskForm
+    StorageDiskForm, MacType
 from app.db.model.display import Resolution
 from app.db.model.macbuild import Version
 
@@ -76,6 +76,7 @@ class ModernBuildCreate(BuildCreate):
 
 
 class MacBuildCreate(BuildCreate):
+    mac_type: MacType = MacType.OTHER
     macos_version: Version = None
 
 
@@ -113,4 +114,5 @@ class ModernBuildRetrieve(BuildRetrieve):
 
 
 class MacBuildRetrieve(BuildRetrieve):
+    mac_type: MacType
     macos_version: Version

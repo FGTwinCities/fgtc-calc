@@ -34,6 +34,7 @@ class BuildService(SQLAlchemyAsyncRepositoryService[m.BuildBase]):
             "notes",
             "price",
             "priced_at",
+            "mac_type",
             "macos_version",
         ])
 
@@ -176,6 +177,7 @@ class BuildService(SQLAlchemyAsyncRepositoryService[m.BuildBase]):
                 display=self.to_schema(next(iter(data.display), None), schema_type=BuildCreateDisplay),
                 notes=data.notes,
 
+                mac_type=data.mac_type,
                 macos_version=data.macos_version,
             )
 
