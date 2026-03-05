@@ -6,6 +6,7 @@ import msgspec
 from app.db.enum import BuildType, WirelessNetworkingStandard, MemoryType, StorageDiskType, StorageDiskInterface, \
     StorageDiskForm
 from app.db.model.display import Resolution
+from app.db.model.macbuild import Version
 
 """
 Data Transfer Objects (DTOs) for creating and updating builds, processors and GPUs.
@@ -75,7 +76,7 @@ class ModernBuildCreate(BuildCreate):
 
 
 class MacBuildCreate(BuildCreate):
-    pass
+    macos_version: Version = None
 
 
 class BuildRetrieve(msgspec.Struct):
@@ -112,4 +113,4 @@ class ModernBuildRetrieve(BuildRetrieve):
 
 
 class MacBuildRetrieve(BuildRetrieve):
-    pass
+    macos_version: Version

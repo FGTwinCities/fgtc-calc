@@ -33,15 +33,11 @@
         </fieldset>
         <fieldset id="fieldset-info" class="build-section">
             <legend>Basic Info</legend>
-            <label class="floating-label">
-                <span class="label">Model</span>
-                <input type="text" name="model" id="model" placeholder="Model" class="input">
-            </label>
-            <label class="floating-label">
-                <span class="label">Operating System</span>
-                <input type="text" name="operating-system" id="operating-system" placeholder="Operating System" class="input" list="operating-system-list" autocomplete="off">
-                <datalist id="operating-system-list">
-                </datalist>
+            <label class="input">
+                <span class="label">Mac OS Version</span>
+                <input type="number" name="macos_version_major" />
+                <span class="label">.</span>
+                <input type="number" name="macos_version_minor" />
             </label>
         </fieldset>
         <fieldset id="fieldset-processor" class="build-section">

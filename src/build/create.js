@@ -61,6 +61,10 @@ export function convertFormToDto() {
     dto["operating_system"] = formData.get("operating-system") == "" ? null : formData.get("operating-system");
     dto["notes"] = formData.get("notes") == "" ? null : formData.get("notes");
 
+    dto["macos_version"] = {}
+    dto["macos_version"]["major"] = formData.get("macos_version_major");
+    dto["macos_version"]["minor"] = formData.get("macos_version_minor");
+
     // Collect processors
     dto["processors"] = [];
     let processorNames = formData.getAll("processor-name");
@@ -185,6 +189,11 @@ export function fillFormFromDto(dto) {
     $("input[name=model]").val(dto["model"]);
     $("input[name=operating-system]").val(dto["operating_system"]);
     $("textarea[name=notes]").val(dto["notes"]);
+
+    if (Object.hasOwn(dto, "macos_version")) {
+        $("input[name=macos_version_major").val(dto["macos_version"]["major"]);
+        $("input[name=macos_version_minor").val(dto["macos_version"]["minor"]);
+    }
 
     // Fill processor information
     for (let i = 0; i < dto["processors"].length; i++) {

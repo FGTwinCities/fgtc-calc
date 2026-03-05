@@ -87,6 +87,9 @@ def _convert_create_dto_to_model(build: BuildBase, data: BuildCreate):
     build.microphone = data.microphone
     build.notes = data.notes
 
+    if isinstance(build, MacBuild) and isinstance(data, MacBuildCreate):
+        build.macos_version = data.macos_version
+
     if isinstance(build, Build) and isinstance(data, ModernBuildCreate):
         build.manufacturer = data.manufacturer
         build.model = data.model

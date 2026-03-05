@@ -5,7 +5,7 @@ from advanced_alchemy.service import SQLAlchemyAsyncRepositoryService
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.build.schema import BuildRetrieve, ModernBuildRetrieve, BuildCreateProcessor, BuildCreateMemoryModule, \
-    BuildCreateStorageDisk, BuildCreateBattery, BuildCreateDisplay
+    BuildCreateStorageDisk, BuildCreateBattery, BuildCreateDisplay, MacBuildRetrieve
 from app.db import model as m
 from app.lib.attrs import attrcopy_allowlist
 
@@ -34,6 +34,7 @@ class BuildService(SQLAlchemyAsyncRepositoryService[m.BuildBase]):
             "notes",
             "price",
             "priced_at",
+            "macos_version",
         ])
 
         for cpu in build.processor_associations:
@@ -88,7 +89,7 @@ class BuildService(SQLAlchemyAsyncRepositoryService[m.BuildBase]):
         if isinstance(build, m.Build):
             schema = ModernBuildRetrieve
         elif isinstance(build, m.MacBuild):
-            schema = BuildRetrieve
+            schema = MacBuildRetrieve
 
         return self.to_schema(build, schema_type=schema)
 
@@ -151,6 +152,31 @@ class BuildService(SQLAlchemyAsyncRepositoryService[m.BuildBase]):
                 manufacturer=data.manufacturer,
                 model=data.model,
                 operating_system=data.operating_system,
+            )
+
+        if issubclass(schema_type, MacBuildRetrieve):
+            return MacBuildRetrieve(
+                id=data.id,
+                class_type=data.class_type,
+                created_at=data.created_at,
+                updated_at=data.updated_at,
+                price=data.price,
+                priced_at=data.priced_at,
+                type=data.type,
+                wired_networking=data.wired_networking,
+                wireless_networking=data.wireless_networking,
+                bluetooth=data.bluetooth,
+                webcam=data.webcam,
+                microphone=data.microphone,
+                processors=[self.to_schema(x, schema_type=BuildCreateProcessor) for x in data.processor_associations],
+                graphics=[self.to_schema(x, schema_type=BuildCreateProcessor) for x in data.graphics_associations],
+                memory=[self.to_schema(x, schema_type=BuildCreateMemoryModule) for x in data.memory],
+                storage=[self.to_schema(x, schema_type=BuildCreateStorageDisk) for x in data.storage],
+                batteries=[self.to_schema(x, schema_type=BuildCreateBattery) for x in data.batteries],
+                display=self.to_schema(next(iter(data.display), None), schema_type=BuildCreateDisplay),
+                notes=data.notes,
+
+                macos_version=data.macos_version,
             )
 
         if issubclass(schema_type, BuildRetrieve):
