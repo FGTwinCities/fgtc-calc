@@ -17,6 +17,7 @@ class MacBuild(BuildBase):
 
     id: Mapped[UUID] = mapped_column(ForeignKey("build.id"), primary_key=True, sort_order=-100)
 
+    year: Mapped[int] = mapped_column()
     mac_type: Mapped[MacType] = mapped_column(default=MacType.OTHER)
     macos_version: Mapped[Version] = composite(
         mapped_column("macos_version_major"),

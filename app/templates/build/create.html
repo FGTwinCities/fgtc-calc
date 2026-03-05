@@ -21,7 +21,7 @@
 
 {% block content %}
 <div>
-    <form action="/build/modern" onsubmit="return false;" id="create-form">
+    <form action="{% block form_action %}{% endblock %}" onsubmit="return false;" id="create-form">
         <fieldset class="build-section flex flex-col gap-4">
             <legend>Computer Type</legend>
             {% block computer_type %}
@@ -34,7 +34,7 @@
                 </div>
             {% endblock %}
         </fieldset>
-        <fieldset id="fieldset-info" class="build-section">
+        <fieldset id="fieldset-info" class="build-section flex flex-col gap-4">
             <legend>Basic Info</legend>
             {% block basic_info %}
             {% endblock %}

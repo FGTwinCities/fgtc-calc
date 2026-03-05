@@ -62,6 +62,8 @@ export function convertFormToDto() {
     dto["operating_system"] = formData.get("operating-system") == "" ? null : formData.get("operating-system");
     dto["notes"] = formData.get("notes") == "" ? null : formData.get("notes");
 
+    dto["year"] = formData.get("year");
+
     dto["macos_version"] = {}
     dto["macos_version"]["major"] = formData.get("macos_version_major");
     dto["macos_version"]["minor"] = formData.get("macos_version_minor");
@@ -186,19 +188,21 @@ export function fillFormFromDto(dto) {
     $("input[name=type][value=" + dto["type"] + "]").prop("checked", true);
     updateVisibleFields();
 
+    if (Object.hasOwn(dto, "year")) {
+        $("input[name=year]").val(dto["year"]);
+    }
+
     if (Object.hasOwn(dto, "mac_type")) {
         $("input[name=mac_type][value=" + dto["mac_type"] + "]").prop("checked", true);
+
+        $("input[name=macos_version_major").val(dto["macos_version"]["major"]);
+        $("input[name=macos_version_minor").val(dto["macos_version"]["minor"]);
     }
 
     $("input[name=manufacturer]").val(dto["manufacturer"]);
     $("input[name=model]").val(dto["model"]);
     $("input[name=operating-system]").val(dto["operating_system"]);
     $("textarea[name=notes]").val(dto["notes"]);
-
-    if (Object.hasOwn(dto, "macos_version")) {
-        $("input[name=macos_version_major").val(dto["macos_version"]["major"]);
-        $("input[name=macos_version_minor").val(dto["macos_version"]["minor"]);
-    }
 
     // Fill processor information
     for (let i = 0; i < dto["processors"].length; i++) {

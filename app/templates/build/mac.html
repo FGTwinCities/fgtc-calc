@@ -1,6 +1,7 @@
 {% extends "build/create.html" %}
 
 {% block title %}Create Mac Build{% endblock %}
+{% block form_action %}/build/mac{% endblock %}
 
 {% block computer_type %}
     {{ super() }}
@@ -20,6 +21,10 @@
 {% endblock %}
 
 {% block basic_info %}
+    <label class="input">
+        <span class="label">Model Year</span>
+        <input type="number" name="year" />
+    </label>
     <label class="input">
         <span class="label">Mac OS Version</span>
         <input type="number" name="macos_version_major" />
