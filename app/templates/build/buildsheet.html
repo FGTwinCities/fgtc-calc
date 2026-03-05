@@ -57,27 +57,40 @@
                 <p>2537 25th Ave S</p>
                 <p>Minneapolis, MN 55406</p>
                 <p>612-223-5967</p>
-                <p>fgtc.us</p>
+                <p>freegeektwincities.org</p>
             </div>
         </div>
         <div>
             <h1 class="text-4xl font-bold mb-8">Price: {{ format_price(build.price) }}</h1>
         </div>
         <div class="buildsheet-section-list">
-            <div class="buildsheet-section">
-                <h1 class="text-xl font-bold">Manufacturer & Model #:</h1>
-                <p class="text-l">{{ build.manufacturer }} {{ build.model }}</p>
-            </div>
-            <div class="buildsheet-section flex flex-row">
-                <h1 class="text-xl font-bold">Operating System</h1>
-                <div class="text-right grow self-center">
-                    {% if build.operating_system %}
-                        <p>{{ build.operating_system }}</p>
-                    {% else %}
-                        <p><b>NONE</b></p>
-                    {% endif %}
+            {% if build.class_type == "modern" %}
+                <div class="buildsheet-section">
+                    <h1 class="text-xl font-bold">Manufacturer & Model #:</h1>
+                    <p class="text-l">{{ build.manufacturer }} {{ build.model }}</p>
                 </div>
-            </div>
+                <div class="buildsheet-section flex flex-row">
+                    <h1 class="text-xl font-bold">Operating System</h1>
+                    <div class="text-right grow self-center">
+                        {% if build.operating_system %}
+                            <p>{{ build.operating_system }}</p>
+                        {% else %}
+                            <p><b>NONE</b></p>
+                        {% endif %}
+                    </div>
+                </div>
+            {% elif build.class_type == "mac" %}
+                <div class="buildsheet-section flex flex-row">
+                    <h1 class="text-xl font-bold">Model:</h1>
+                    <p class="text-xl font-bold text-right grow self-center">{{ build.year }} {{ build.mac_type }}</p>
+                </div>
+                <div class="buildsheet-section flex flex-row">
+                    <h1 class="text-xl font-bold">Operating System:</h1>
+                    <div class="text-right grow self-center">
+                        <p class="text-xl font-bold">macOS {{ build.macos_version.major }}.{{ build.macos_version.minor }}</p>
+                    </div>
+                </div>
+            {% endif %}
             {% for processor in build.processors %}
                 <div class="buildsheet-section flex flex-row">
                     <h1 class="text-xl font-bold">Processor{% if not (loop.first and loop.last) %} #{{ loop.index }}{% endif %}</h1>
