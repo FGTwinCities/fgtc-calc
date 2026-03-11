@@ -14,7 +14,7 @@ services:
       REDIS_URL: "redis://redis:6379/0"
     env_file: .env
     ports:
-      - "80:8585"
+      - "${APP_PORT:-8000}:8585"
     restart: always
     depends_on:
       database:
