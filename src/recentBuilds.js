@@ -91,6 +91,19 @@ async function onClickDeleteBuild(build_id) {
     removeLoadingTask("delete-build_" + build_id);
 }
 
+function formatMacType(type) {
+    if (type === "macbook") { return "Macbook"; }
+    if (type === "macbook_air") { return "Macbook Air"; }
+    if (type === "macbook_pro") { return "Macbook Pro"; }
+    if (type === "macbook_neo") { return "Macbook Neo"; }
+    if (type === "imac") { return "iMac"; }
+    if (type === "imac_pro") { return "iMac Pro"; }
+    if (type === "mac_pro") { return "Mac Pro"; }
+    if (type === "mac_mini") { return "Mac Mini"; }
+    if (type === "mac_studio") { return "Mac Studio"; }
+    return type;
+}
+
 async function fetchRecentBuildsPage() {
     $("#recent-builds-list").children().remove();
 
@@ -106,7 +119,12 @@ async function fetchRecentBuildsPage() {
 
         entry.attr("build-id", build.id);
 
-        entry.find("#entry-title").text(`${build.manufacturer} ${build.model}`);
+        if (build.class_type == "modern") {
+            entry.find("#entry-title").text(`${build.manufacturer} ${build.model}`);
+        } else if (build.class_type == "mac") {
+            entry.find("#entry-title").text(`${build.year} ${formatMacType(build.mac_type)}`);
+        }
+
         let created_at = Date.parse(build.created_at);
         entry.find("#entry-subtitle").text(`Created ${timeSince(created_at)} ago`);
 
