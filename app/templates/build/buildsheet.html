@@ -39,10 +39,8 @@
 {% endmacro %}
 
 {% macro format_port(count, name) %}
-    {% if count > 1 %}
-        <span class="ml-2">{{ count }}x <b>{{ name }}</b>
-    {% elif build.ports.hdmi > 0 %}
-        <span class="ml-2"><b>{{ name }}</b>
+    {% if count > 0 %}
+        <span class="ml-2">{% if count > 1 %}{{ count }}x {% endif %}<b>{{ name }}</b>
     {% endif %}
 {% endmacro %}
 
