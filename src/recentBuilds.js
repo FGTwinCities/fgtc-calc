@@ -91,6 +91,12 @@ async function onClickDeleteBuild(build_id) {
     removeLoadingTask("delete-build_" + build_id);
 }
 
+async function onFilterChanged() {
+    addLoadingTask("refresh");
+    await fetchRecentBuildsPage();
+    removeLoadingTask("refresh");
+}
+
 function formatMacType(type) {
     if (type === "macbook") { return "Macbook"; }
     if (type === "macbook_air") { return "Macbook Air"; }
@@ -107,7 +113,19 @@ function formatMacType(type) {
 async function fetchRecentBuildsPage() {
     $("#recent-builds-list").children().remove();
 
-    let builds = await $.ajax("/build");
+    let modern = $("input[name=recents-modern]").prop("checked");
+    let mac = $("input[name=recents-mac]").prop("checked");
+
+    var url = "/build";
+    if (!modern && mac) {
+        url = "/build/mac"
+    } else if (modern && !mac) {
+        url = "/build/modern"
+    } else if (!modern && !mac) {
+        return;
+    }
+
+    let builds = await $.ajax(url);
 
     let entryList = $("#recent-builds-list");
     let entryTemplate = $($("#recent-build-entry-template").html());
@@ -169,6 +187,7 @@ async function fetchRecentBuildsPage() {
 }
 
 window.addEventListener("load", function() {
+    $("#recents-filter").find("input").on("change", onFilterChanged)
     try {
         addLoadingTask("fetch-recent-builds");
         fetchRecentBuildsPage();

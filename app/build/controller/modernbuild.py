@@ -34,7 +34,7 @@ class ModernBuildController(Controller):
         builds = await build_service.list(
             LimitOffset(offset=offset, limit=page_size),
             OrderBy(Build.created_at, "desc"),
-            Build.class_type.contains("modernbuild"),
+            Build.class_type.contains("modern"),
         )
 
         return [build_service.to_schema(b, schema_type=ModernBuildRetrieve) for b in builds]

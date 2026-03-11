@@ -33,7 +33,7 @@ class MacBuildController(Controller):
         builds = await build_service.list(
             LimitOffset(offset=offset, limit=page_size),
             OrderBy(MacBuild.created_at, "desc"),
-            MacBuild.class_type.contains("macbuild"),
+            MacBuild.class_type.contains("mac"),
         )
 
         return [build_service.to_schema(b, schema_type=MacBuildRetrieve) for b in builds]
