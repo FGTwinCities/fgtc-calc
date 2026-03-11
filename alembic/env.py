@@ -25,8 +25,8 @@ if config.config_file_name is not None:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 from app.db.model import *
-from advanced_alchemy.base import UUIDBase
-target_metadata = UUIDBase.metadata
+from advanced_alchemy.base import AdvancedDeclarativeBase
+target_metadata = AdvancedDeclarativeBase.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

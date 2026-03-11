@@ -179,6 +179,17 @@ export function convertFormToDto() {
     dto["bluetooth"] = Boolean(formData.get("bluetooth"));
     dto["browser_installed"] = Boolean(formData.get("browser_installed"));
 
+    dto["ports"] = {
+        "hdmi": formData.get("ports-hdmi"),
+        "dp": formData.get("ports-dp"),
+        "dvi": formData.get("ports-dvi"),
+        "vga": formData.get("ports-vga"),
+        "sd": formData.get("ports-sd"),
+        "usb": formData.get("ports-usb"),
+        "usb3": formData.get("ports-usb3"),
+        "usbc": formData.get("ports-usbc"),
+    };
+
     console.log("Converted build DTO:");
     console.log(JSON.stringify(dto));
 
@@ -268,6 +279,15 @@ export function fillFormFromDto(dto) {
     $("input[name=networking-wired][value=" + (dto["wired_networking"] == null ? "none" : dto["wired_networking"]) + "]").prop("checked", true);
     $("input[name=networking-wireless][value=" + (dto["wireless_networking"] == null ? "none" : dto["wireless_networking"]) + "]").prop("checked", true);
     $("input[name=bluetooth]").prop("checked", dto["bluetooth"]);
+
+    $("input[name=ports-hdmi]").val(dto["ports"]["hdmi"]);
+    $("input[name=ports-dp]").val(dto["ports"]["dp"]);
+    $("input[name=ports-dvi]").val(dto["ports"]["dvi"]);
+    $("input[name=ports-vga]").val(dto["ports"]["vga"]);
+    $("input[name=ports-sd]").val(dto["ports"]["sd"]);
+    $("input[name=ports-usb]").val(dto["ports"]["usb"]);
+    $("input[name=ports-usb3]").val(dto["ports"]["usb3"]);
+    $("input[name=ports-usbc]").val(dto["ports"]["usbc"]);
 }
 
 function validateFormItem(item, message, errors) {
@@ -381,6 +401,7 @@ function updateVisibleFields() {
     $("#fieldset-webcam").prop('hidden', !(isLaptop || isAio || isOther));
     $("#fieldset-networking").prop('hidden', !(isComputer || isOther));
     $("#fieldset-notes").prop('hidden', !isAny);
+    $("#fieldset-ports").prop('hidden', !isAny);
 
     $("#processor-upgradable").prop("checked", !isLaptop);
     $("#memory-upgradable").prop("checked", !isLaptop);

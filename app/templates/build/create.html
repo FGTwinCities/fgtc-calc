@@ -263,6 +263,41 @@
                 </div>
             {% endblock %}
         </fieldset>
+        <fieldset id="fieldset-ports" class="build-section flex flex-row gap-4">
+            <legend>Ports</legend>
+            <label class="input w-38">
+                <input type="number" name="ports-hdmi" value="0" />
+                <span class="font-bold">HDMI</span>
+            </label>
+            <label class="input w-38">
+                <input type="number" name="ports-dp" value="0" />
+                <span class="font-bold">DisplayPort</span>
+            </label>
+            <label class="input w-38">
+                <input type="number" name="ports-dvi" value="0" />
+                <span class="font-bold">DVI</span>
+            </label>
+            <label class="input w-38">
+                <input type="number" name="ports-vga" value="0" />
+                <span class="font-bold">VGA</span>
+            </label>
+            <label class="input w-38">
+                <input type="number" name="ports-sd" value="0" />
+                <span class="font-bold">SD Card</span>
+            </label>
+            <label class="input w-38">
+                <input type="number" name="ports-usb" value="0" />
+                <span class="font-bold">USB 2.0</span>
+            </label>
+            <label class="input w-38">
+                <input type="number" name="ports-usb3" value="0" />
+                <span class="font-bold">USB 3.0+</span>
+            </label>
+            <label class="input w-38">
+                <input type="number" name="ports-usbc" value="0" />
+                <span class="font-bold">USB C</span>
+            </label>
+        </fieldset>
         {% block before_notes %}
         {% endblock %}
         <fieldset id="fieldset-notes" class="build-section">

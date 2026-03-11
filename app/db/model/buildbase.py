@@ -10,6 +10,7 @@ from app.db.model.display import Display
 from app.db.model.graphics import GraphicsProcessor
 from app.db.model.memory import MemoryModule
 from app.db.model.mixins.price import PriceMixin
+from app.db.model.ports import Ports
 from app.db.model.processor import Processor
 from app.db.model.storage import StorageDisk
 
@@ -70,6 +71,12 @@ class BuildBase(UUIDAuditBase, PriceMixin):
 
     batteries: Mapped[list[Battery]] = relationship(
         "Battery",
+        lazy="selectin",
+        cascade="all, delete, delete-orphan",
+    )
+
+    ports: Mapped[Ports] = relationship(
+        "Ports",
         lazy="selectin",
         cascade="all, delete, delete-orphan",
     )

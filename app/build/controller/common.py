@@ -1,6 +1,7 @@
 from app.build.schema import BuildCreate, ModernBuildCreate, MacBuildCreate
 from app.db.model import BuildBase, Processor, BuildProcessorAssociation, GraphicsProcessor, \
     BuildGraphicsAssociation, MemoryModule, StorageDisk, Display, Battery, Build, MacBuild
+from app.db.model.ports import Ports
 from app.db.service.graphics import GraphicsProcessorService
 from app.db.service.processor import ProcessorService
 from app.passmark.passmark_scraper import attempt_cpu_parse, attempt_gpu_parse
@@ -137,3 +138,14 @@ def _convert_create_dto_to_model(build: BuildBase, data: BuildCreate):
             design_capacity=batt.design_capacity,
             remaining_capacity=batt.remaining_capacity,
         ))
+
+    build.ports = Ports(
+        hdmi=data.ports.hdmi,
+        dp=data.ports.dp,
+        dvi=data.ports.dvi,
+        vga=data.ports.vga,
+        sd=data.ports.sd,
+        usb=data.ports.usb,
+        usb3=data.ports.usb3,
+        usbc=data.ports.usbc,
+    )

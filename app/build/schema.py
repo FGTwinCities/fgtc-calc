@@ -48,6 +48,17 @@ class BuildCreateDisplay(msgspec.Struct):
     touchscreen: bool = False
 
 
+class BuildCreatePorts(msgspec.Struct):
+    hdmi: int = 0
+    dp: int = 0
+    dvi: int = 0
+    vga: int = 0
+    sd: int = 0
+    usb: int = 0
+    usb3: int = 0
+    usbc: int = 0
+
+
 class BuildCreate(msgspec.Struct):
     type: BuildType
 
@@ -66,6 +77,7 @@ class BuildCreate(msgspec.Struct):
     batteries: list[BuildCreateBattery] = []
     display: BuildCreateDisplay | None = None
 
+    ports: BuildCreatePorts = None
     notes: str | None = None
 
 
@@ -105,6 +117,8 @@ class BuildRetrieve(msgspec.Struct):
 
     batteries: list[BuildCreateBattery]
     display: BuildCreateDisplay | None
+
+    ports: BuildCreatePorts
 
     notes: str | None
 

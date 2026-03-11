@@ -5,8 +5,9 @@ from advanced_alchemy.service import SQLAlchemyAsyncRepositoryService
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.build.schema import BuildRetrieve, ModernBuildRetrieve, BuildCreateProcessor, BuildCreateMemoryModule, \
-    BuildCreateStorageDisk, BuildCreateBattery, BuildCreateDisplay, MacBuildRetrieve
+    BuildCreateStorageDisk, BuildCreateBattery, BuildCreateDisplay, MacBuildRetrieve, BuildCreatePorts
 from app.db import model as m
+from app.db.model.ports import Ports
 from app.lib.attrs import attrcopy_allowlist
 
 
@@ -84,6 +85,17 @@ class BuildService(SQLAlchemyAsyncRepositoryService[m.BuildBase]):
                 remaining_capacity=batt.remaining_capacity,
             ))
 
+        new_build.ports = Ports(
+            hdmi=build.ports.hdmi,
+            dp=build.ports.dp,
+            dvi=build.ports.dvi,
+            vga=build.ports.vga,
+            sd=build.ports.sd,
+            usb=build.ports.usb,
+            usb3=build.ports.usb3,
+            usbc=build.ports.usbc,
+        )
+
         await self.create(new_build, auto_commit=auto_commit, auto_refresh=auto_refresh)
         return new_build
 
@@ -150,6 +162,7 @@ class BuildService(SQLAlchemyAsyncRepositoryService[m.BuildBase]):
                 storage=[self.to_schema(x, schema_type=BuildCreateStorageDisk) for x in data.storage],
                 batteries=[self.to_schema(x, schema_type=BuildCreateBattery) for x in data.batteries],
                 display=self.to_schema(next(iter(data.display), None), schema_type=BuildCreateDisplay),
+                ports=self.to_schema(data.ports, schema_type=BuildCreatePorts),
                 notes=data.notes,
 
                 manufacturer=data.manufacturer,
@@ -177,6 +190,7 @@ class BuildService(SQLAlchemyAsyncRepositoryService[m.BuildBase]):
                 storage=[self.to_schema(x, schema_type=BuildCreateStorageDisk) for x in data.storage],
                 batteries=[self.to_schema(x, schema_type=BuildCreateBattery) for x in data.batteries],
                 display=self.to_schema(next(iter(data.display), None), schema_type=BuildCreateDisplay),
+                ports=self.to_schema(data.ports, schema_type=BuildCreatePorts),
                 notes=data.notes,
 
                 year=data.year,
@@ -205,6 +219,7 @@ class BuildService(SQLAlchemyAsyncRepositoryService[m.BuildBase]):
                 storage=[self.to_schema(x, schema_type=BuildCreateStorageDisk) for x in data.storage],
                 batteries=[self.to_schema(x, schema_type=BuildCreateBattery) for x in data.batteries],
                 display=self.to_schema(next(iter(data.display), None), schema_type=BuildCreateDisplay),
+                ports=self.to_schema(data.ports, schema_type=BuildCreatePorts),
                 notes=data.notes,
             )
 
