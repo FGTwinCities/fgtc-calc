@@ -38,6 +38,14 @@
     {% endif %}
 {% endmacro %}
 
+{% macro format_port(count, name) %}
+    {% if count > 1 %}
+        <span class="ml-2">{{ count }}x <b>{{ name }}</b>
+    {% elif build.ports.hdmi > 0 %}
+        <span class="ml-2"><b>{{ name }}</b>
+    {% endif %}
+{% endmacro %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -251,6 +259,30 @@
                     </div>
                 </div>
             {% endif %}
+            <div class="buildsheet-section flex flex-row">
+                <h1 class="font-bold">Monitor Connections</h1>
+                <div class="text-right grow self-center">
+                    {{ format_port(build.ports.hdmi, "HDMI") }}
+                    {{ format_port(build.ports.dp, "DisplayPort") }}
+                    {{ format_port(build.ports.dvi, "DVI") }}
+                    {{ format_port(build.ports.vga, "VGA") }}
+                    {{ format_port(build.ports.usbc, "USB-C") }}
+                    {% if (build.ports.hdmi <= 0) and (build.ports.dp <= 0) and (build.ports.dvi <= 0) and (build.ports.vga <= 0) and (build.ports.usbc <= 0) %}
+                        <span><b>NONE</b></span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="buildsheet-section flex flex-row">
+                <h1 class="font-bold">USB</h1>
+                <div class="text-right grow self-center">
+                    {{ format_port(build.ports.usb, "USB 2.0") }}
+                    {{ format_port(build.ports.usb3, "USB 3.0+") }}
+                    {{ format_port(build.ports.usbc, "USB-C") }}
+                    {% if (build.ports.usb <= 0) and (build.ports.usb3 <= 0) and (build.ports.usbc <= 0) %}
+                        <span><b>NONE</b></span>
+                    {% endif %}
+                </div>
+            </div>
             <div class="buildsheet-section">
                 <p class="text-xs"><b>Created:</b> {{ build.created_at.astimezone().strftime('%B %d, %Y at %I:%M %p') }}</p>
                 <p class="text-xs"><b>Printed:</b> {{ current_datetime.astimezone().strftime('%B %d, %Y at %I:%M %p') }}</p>
