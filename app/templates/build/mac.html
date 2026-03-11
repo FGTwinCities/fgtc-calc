@@ -32,3 +32,11 @@
         <input type="number" name="macos_version_minor" />
     </label>
 {% endblock %}
+
+{% block networking %}
+    {{ super() }}
+    <div>
+        <b class="mr-2">Firefox & Chrome Installed:</b>
+        <input type="checkbox" name="browser_installed" class="toggle toggle-primary" />
+    </div>
+{% endblock %}

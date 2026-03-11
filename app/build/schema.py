@@ -79,6 +79,7 @@ class MacBuildCreate(BuildCreate):
     year: int = None
     mac_type: MacType = MacType.OTHER
     macos_version: Version = None
+    browser_installed: bool | None = None
 
 
 class BuildRetrieve(msgspec.Struct):
@@ -118,3 +119,4 @@ class MacBuildRetrieve(BuildRetrieve):
     year: int
     mac_type: MacType
     macos_version: Version
+    browser_installed: bool | None

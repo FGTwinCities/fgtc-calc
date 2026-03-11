@@ -91,6 +91,7 @@ def _convert_create_dto_to_model(build: BuildBase, data: BuildCreate):
         build.year = data.year
         build.mac_type = data.mac_type
         build.macos_version = data.macos_version
+        build.browser_installed = data.browser_installed
 
     if isinstance(build, Build) and isinstance(data, ModernBuildCreate):
         build.manufacturer = data.manufacturer

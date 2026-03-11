@@ -177,6 +177,7 @@ export function convertFormToDto() {
     var wireless = formData.get("networking-wireless");
     dto["wireless_networking"] = wireless === "none" ? null : wireless;
     dto["bluetooth"] = Boolean(formData.get("bluetooth"));
+    dto["browser_installed"] = Boolean(formData.get("browser_installed"));
 
     console.log("Converted build DTO:");
     console.log(JSON.stringify(dto));
@@ -197,6 +198,7 @@ export function fillFormFromDto(dto) {
 
         $("input[name=macos_version_major").val(dto["macos_version"]["major"]);
         $("input[name=macos_version_minor").val(dto["macos_version"]["minor"]);
+        $("input[name=browser_installed]").prop("checked", dto["browser_installed"]);
     }
 
     $("input[name=manufacturer]").val(dto["manufacturer"]);

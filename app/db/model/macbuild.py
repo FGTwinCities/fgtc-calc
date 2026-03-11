@@ -23,6 +23,7 @@ class MacBuild(BuildBase):
         mapped_column("macos_version_major"),
         mapped_column("macos_version_minor"),
     )
+    browser_installed: Mapped[bool | None] = mapped_column(default=None, nullable=True)
 
     __mapper_args__ = {
         "polymorphic_identity": "mac",

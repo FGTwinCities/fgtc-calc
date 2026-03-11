@@ -37,6 +37,7 @@ class BuildService(SQLAlchemyAsyncRepositoryService[m.BuildBase]):
             "year",
             "mac_type",
             "macos_version",
+            "browser_installed",
         ])
 
         for cpu in build.processor_associations:
@@ -181,6 +182,7 @@ class BuildService(SQLAlchemyAsyncRepositoryService[m.BuildBase]):
                 year=data.year,
                 mac_type=data.mac_type,
                 macos_version=data.macos_version,
+                browser_installed=data.browser_installed,
             )
 
         if issubclass(schema_type, BuildRetrieve):
