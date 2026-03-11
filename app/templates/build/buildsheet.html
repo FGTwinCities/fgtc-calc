@@ -87,9 +87,21 @@
                 <div class="buildsheet-section flex flex-row">
                     <h1 class="text-xl font-bold">Operating System:</h1>
                     <div class="text-right grow self-center">
-                        <p class="text-xl font-bold">macOS {{ build.macos_version.major }}.{{ build.macos_version.minor }}</p>
+                        {% if macos_name %}
+                            <p class="text-xl font-bold">macOS {{ macos_name }} ({{ build.macos_version.major }}.{{ build.macos_version.minor }})</p>
+                        {% else %}
+                            <p class="text-xl font-bold">macOS {{ build.macos_version.major }}.{{ build.macos_version.minor }}</p>
+                        {% endif %}
                     </div>
                 </div>
+                {% if macos_release_year %}
+                    <div class="buildsheet-section flex flex-row">
+                        <h1 class="text-l font-bold">OS Release Date:</h1>
+                        <div class="text-right grow self-center">
+                            <p class="text-l font-bold">{{ macos_release_year }}</p>
+                        </div>
+                    </div>
+                {% endif %}
             {% endif %}
             {% for processor in build.processors %}
                 <div class="buildsheet-section flex flex-row">
@@ -217,7 +229,7 @@
                     <p><b>Efficiency Cores:</b> {{ cpu.efficient_core_count }} Cores, {{ cpu.efficient_thread_count }} Threads @ {{ cpu.efficient_clock / 1000 if cpu.efficient_clock else 'None' }} GHz Base{% if cpu.efficient_turbo_clock %}, {{ cpu.efficient_turbo_clock / 1000 }} GHz Turbo{% endif %}</p>
                     {% else %}
                     <p><b>Base Clock:</b> {{ cpu.performance_clock / 1000 if cpu.performance_clock else 'None' }} Ghz</p>
-                    {% if cpu.performance_turbo_clock %}<p><b>Turbo Clock:</b> {{ cpu.performance_turbo_clock / 1000 }}</p>{% endif %}
+                    {% if cpu.performance_turbo_clock %}<p><b>Turbo Clock:</b> {{ cpu.performance_turbo_clock / 1000 }} Ghz</p>{% endif %}
                     <p><b>Cores:</b> {{ cpu.performance_core_count }} <b>Threads:</b> {{ cpu.performance_thread_count }}</p>
                     {% endif %}
                     <p><b>Passmark Rating:</b> {{ cpu.multithread_score }} Multithreaded, {{ cpu.single_thread_score }} Single Threaded</p>

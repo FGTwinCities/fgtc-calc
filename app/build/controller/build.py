@@ -3,17 +3,20 @@ from typing import Sequence
 from uuid import UUID
 from zoneinfo import ZoneInfo
 
+import dateutil
 from advanced_alchemy.filters import LimitOffset, OrderBy
+from aiohttp import ClientSession
 from litestar import get, delete
 from litestar.controller import Controller
 from litestar.di import Provide
 from litestar.response import Template, Redirect
 
 from app.build.schema import BuildRetrieve
-from app.db.model import BuildProcessorAssociation, BuildGraphicsAssociation
+from app.db.model import BuildProcessorAssociation, BuildGraphicsAssociation, MacBuild
 from app.db.model.battery import Battery
 from app.db.model.build import Build
 from app.db.model.display import Display
+from app.db.model.macbuild import Version
 from app.db.model.memory import MemoryModule
 from app.db.model.storage import StorageDisk
 from app.db.service.build import provide_build_service, BuildService
@@ -21,6 +24,23 @@ from app.db.service.graphics import provide_graphics_service
 from app.db.service.processor import provide_processor_service
 from app.lib.attrs import attrcopy, attrcopy_allowlist
 from app.lib.math import mb2gb
+
+
+async def get_macos_version_info(version: Version) -> dict | None:
+    async with ClientSession() as session:
+        async with session.get("https://endoflife.date/api/v1/products/macos/") as response:
+            assert response.ok
+
+            version_str = f"{version.major}{f".{version.minor}" if version.major <= 10 else ""}"
+
+            data = await response.json()
+            releases = data["result"]["releases"]
+            for release in releases:
+                if release["name"] == version_str:
+                    return release
+
+            return None
+
 
 
 class BuildController(Controller):
@@ -86,15 +106,21 @@ class BuildController(Controller):
             total_remainingcapacity += battery.remaining_capacity
         total_designcapacity = max(1, total_designcapacity)
 
-        # See app/templates/build/buildsheet.html
-        return Template("build/buildsheet.html", context=
-        {
+        context = {
             "build": build,
             "total_memory": mb2gb(total_memory),
             "total_designcapacity": total_designcapacity,
             "total_remainingcapacity": total_remainingcapacity,
-            "current_datetime": datetime.datetime.now(tz=ZoneInfo("UTC"))
-        })
+            "current_datetime": datetime.datetime.now(tz=ZoneInfo("UTC")),
+        }
+
+        if isinstance(build, MacBuild):
+            macos_info = await get_macos_version_info(build.macos_version)
+            context["macos_name"] = macos_info["codename"]
+            context["macos_release_year"] = dateutil.parser.parse(macos_info["releaseDate"]).year
+
+        # See app/templates/build/buildsheet.html
+        return Template("build/buildsheet.html", context=context)
 
     @get("/create")
     async def legacy_redirect_create_page(self) -> Redirect:
