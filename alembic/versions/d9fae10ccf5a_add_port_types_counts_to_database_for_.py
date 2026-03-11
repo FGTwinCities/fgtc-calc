@@ -35,6 +35,8 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint('build_id', name=op.f('pk_ports'))
     )
 
+    op.execute("INSERT INTO ports (build_id) SELECT id FROM build")
+
 
 def downgrade() -> None:
     """Downgrade schema."""
