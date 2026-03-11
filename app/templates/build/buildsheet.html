@@ -176,12 +176,14 @@
                     {{ format_wireless(build.wireless_networking) }}
                 </div>
             </div>
-            <div class="buildsheet-section flex flex-row">
-                <h1 class="text-xl font-bold">Wired?</h1>
-                <div class="text-right grow self-center">
-                    {{ format_wired(build.wired_networking) }}
+            {% if build.class_type != "mac" or build.wired_networking is not none or build.type.value == "desktop" or build.type.value == "aio" %}
+                <div class="buildsheet-section flex flex-row">
+                    <h1 class="text-xl font-bold">Wired?</h1>
+                    <div class="text-right grow self-center">
+                        {{ format_wired(build.wired_networking) }}
+                    </div>
                 </div>
-            </div>
+            {% endif %}
             <div class="buildsheet-section flex flex-row">
                 <h1 class="text-xl font-bold">Bluetooth?</h1>
                 <div class="text-right grow self-center">

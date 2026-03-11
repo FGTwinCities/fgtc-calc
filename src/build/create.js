@@ -138,7 +138,7 @@ export function convertFormToDto() {
 
     // Collect display information
     dto["display"] = null;
-    if (dto["type"] === "laptop" || dto["type"] === "other") {
+    if (dto["type"] === "laptop" || dto["type"] == "aio" || dto["type"] === "other") {
         if (formData.get("display-size") !== "" ||
                 formData.get("display-resolution-horizontal") !== "" ||
                 formData.get("display-resolution-vertical") !== "" ||
