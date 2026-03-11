@@ -31,8 +31,6 @@ services:
       POSTGRES_DB: "app"
       POSTGRES_USER: "app"
       POSTGRES_PASSWORD: "app"
-    ports:
-      - "15432:5432"
     volumes:
       - db-data:/var/lib/postgresql
     restart: always
@@ -53,8 +51,6 @@ services:
       - infra
     hostname: cache
     restart: always
-    ports:
-      - "6379:6379"
     environment:
       ALLOW_EMPTY_PASSWORD: "yes"
     healthcheck:
