@@ -38,6 +38,10 @@ def attempt_cpu_parse(query: str) -> str:
     elif m := re.search(r'(i\d)[-_\s]*(\d+)(\w*)', query):
         # Intel Core i CPUs
         query = f"Intel Core {m.group(1)}-{m.group(2)}{(m.group(3) or "").upper()}"
+    elif m := re.search(r'm(\d+)[-_\s]*([mpu][arl][xot]r?a?)?', query):
+        # Apple Silicon M chips
+        corematch = re.search(r'(\d+)[-_\s]*co?r?e?', query)
+        query = f"Apple M{m.group(1)} {(m.group(2) or "").title()} {f"{corematch.group(1)} Core" or ""}"
 
     query = re.sub(r'\s{2,}', ' ', query)
     query = query.strip()
