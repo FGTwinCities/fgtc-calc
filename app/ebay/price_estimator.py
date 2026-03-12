@@ -77,7 +77,7 @@ class EbayPriceEstimator:
         # Format eBay query string
         query_str: str
         match mac.type:
-            case BuildType.LAPTOP:
+            case BuildType.LAPTOP | BuildType.ALL_IN_ONE:
                 query_str = f"{mac.year} {mac.mac_type} {mac.display[0].size:g} {processor} {memory_gb:.0f}GB {storage_gb:.0f}GB"
             case _:
                 query_str = f"{mac.year} {mac.mac_type} {processor} {memory_gb}GB {storage_gb}GB"
