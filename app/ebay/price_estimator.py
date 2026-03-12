@@ -57,7 +57,7 @@ class EbayPriceEstimator:
     async def estimate_mac_build(self, mac: MacBuild) -> float:
         # Get and convert the processor model to "Core i5" or "M3 Max" form
         assert len(mac.processors) >= 1
-        processor = mac.processors[0].model
+        processor = mac.processors[0].model.lower()
         if m := re.search(r'(i\d)[-_\s]*(\d+)(\w*)', processor):
             processor = f"Core {m.group(1)}"
         elif m := re.search(r'm(\d+)[-_\s]*([mpu][arl][xot]r?a?)?', processor):
@@ -83,7 +83,7 @@ class EbayPriceEstimator:
                 query_str = f"{mac.year} {mac.mac_type} {processor} {memory_gb}GB {storage_gb}GB"
 
         results = await self.connection.fetch_query_results(query_str, limit=100)
-        results = list(filter(lambda i: item_has_category(i, 111422), results))
+        results = list(filter(lambda i: item_has_category(i, 111422) or item_has_category(i, 111418), results))
 
         if len(results) < MINIMUM_RESULT_COUNT:
             raise InsufficientResultsException()
