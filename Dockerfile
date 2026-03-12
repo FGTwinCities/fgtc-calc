@@ -5,7 +5,7 @@
 # ===============================================
 FROM astral/uv:python3.13-alpine3.23 as base
 
-RUN apk add --no-cache tzdata npm
+RUN apk add --no-cache tzdata npm build-base
 
 
 # ===============================================
