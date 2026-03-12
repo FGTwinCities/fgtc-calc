@@ -89,6 +89,7 @@ class ModernBuildCreate(BuildCreate):
 
 class MacBuildCreate(BuildCreate):
     year: int = None
+    is_retro: bool = None
     mac_type: MacType = MacType.OTHER
     macos_version: Version = None
     browser_installed: bool | None = None
@@ -131,6 +132,7 @@ class ModernBuildRetrieve(BuildRetrieve):
 
 class MacBuildRetrieve(BuildRetrieve):
     year: int
+    is_retro: bool
     mac_type: MacType
     macos_version: Version
     browser_installed: bool | None

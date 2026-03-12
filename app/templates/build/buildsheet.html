@@ -55,7 +55,7 @@
 <body>
 <div class="grid grid-cols-2 m-6 gap-8">
     <div>
-        <div class="columns-2 mb-8">
+        <div class="columns-2 mb-6">
             <div>
                 <img src="/static/img/freegeeklogo.jpg" class="h-24">
             </div>
@@ -67,8 +67,14 @@
             </div>
         </div>
         <div>
-            <h1 class="text-4xl font-bold mb-8">Price: {{ format_price(build.price) }}</h1>
+            <h1 class="text-4xl font-bold mb-6">Price: {{ format_price(build.price) }}</h1>
         </div>
+        {% if build.is_retro %}
+            <div class="text-center mb-4">
+                <p class="text-3xl font-bold">RETRO MAC</p>
+                <p class="text-xl">Not suitable for internet use!</p>
+            </div>
+        {% endif %}
         <div class="buildsheet-section-list">
             {% if build.class_type == "modern" %}
                 <div class="buildsheet-section">
@@ -249,7 +255,7 @@
                     <p><b>Passmark Rating:</b> {{ gpu.score }} 3D, {{ gpu.score_g2d }} 2D</p>
                 </div>
             {% endfor %}
-            {% if build.class_type == "mac" and build.browser_installed is not none %}
+            {% if (build.class_type == "mac") and (build.browser_installed is not none) and (not build.is_retro) %}
                 <div class="buildsheet-section flex flex-row">
                     <h1 class="font-bold">Firefox & Chrome Installed?</h1>
                     <div class="text-right grow self-center">

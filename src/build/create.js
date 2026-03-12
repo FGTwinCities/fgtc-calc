@@ -57,6 +57,7 @@ export function convertFormToDto() {
     // Collect values that can be pulled directly from the form into the build object
     dto["type"] = formData.get("type") == "" ? null : formData.get("type");
     dto["mac_type"] = formData.get("mac_type") == "" ? null : formData.get("mac_type");
+    dto["is_retro"] = Boolean(formData.get("is_retro"));
     dto["manufacturer"] = formData.get("manufacturer") == "" ? null : formData.get("manufacturer");
     dto["model"] = formData.get("model") == "" ? null : formData.get("model");
     dto["operating_system"] = formData.get("operating-system") == "" ? null : formData.get("operating-system");
@@ -206,7 +207,7 @@ export function fillFormFromDto(dto) {
 
     if (Object.hasOwn(dto, "mac_type")) {
         $("input[name=mac_type][value=" + dto["mac_type"] + "]").prop("checked", true);
-
+        $("input[name=is_retro]").prop("checked", dto["is_retro"]);
         $("input[name=macos_version_major").val(dto["macos_version"]["major"]);
         $("input[name=macos_version_minor").val(dto["macos_version"]["minor"]);
         $("input[name=browser_installed]").prop("checked", dto["browser_installed"]);

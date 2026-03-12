@@ -90,6 +90,7 @@ def _convert_create_dto_to_model(build: BuildBase, data: BuildCreate):
 
     if isinstance(build, MacBuild) and isinstance(data, MacBuildCreate):
         build.year = data.year
+        build.is_retro = data.is_retro
         build.mac_type = data.mac_type
         build.macos_version = data.macos_version
         build.browser_installed = data.browser_installed
