@@ -82,7 +82,7 @@
                     <p class="text-l">{{ build.manufacturer }} {{ build.model }}</p>
                 </div>
                 <div class="buildsheet-section flex flex-row">
-                    <h1 class="text-xl font-bold">Operating System</h1>
+                    <h1 class="text-xl font-bold">OS</h1>
                     <div class="text-right grow self-center">
                         {% if build.operating_system %}
                             <p>{{ build.operating_system }}</p>
@@ -93,11 +93,11 @@
                 </div>
             {% elif build.class_type == "mac" %}
                 <div class="buildsheet-section flex flex-row">
-                    <h1 class="text-xl font-bold">Model:</h1>
+                    <h1 class="text-xl font-bold">Model</h1>
                     <p class="text-xl font-bold text-right grow self-center">{{ build.year }} {{ build.mac_type }}{% if build.type.value == "laptop" and build.display %} {{ "%g"|format(build.display[0].size) }}"{% endif %}</p>
                 </div>
                 <div class="buildsheet-section flex flex-row">
-                    <h1 class="text-xl font-bold">Operating System:</h1>
+                    <h1 class="text-xl font-bold">OS</h1>
                     <div class="text-right grow self-center">
                         {% if macos_name %}
                             <p class="text-xl font-bold">macOS {{ macos_name }} ({{ build.macos_version.major }}.{{ build.macos_version.minor }})</p>
@@ -108,7 +108,7 @@
                 </div>
                 {% if macos_release_year %}
                     <div class="buildsheet-section flex flex-row">
-                        <h1 class="text-l font-bold">OS Release Date:</h1>
+                        <h1 class="text-l font-bold">OS Release Year</h1>
                         <div class="text-right grow self-center">
                             <p class="text-l font-bold">{{ macos_release_year }}</p>
                         </div>
