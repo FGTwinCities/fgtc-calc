@@ -57,6 +57,7 @@ class BuildCreatePorts(msgspec.Struct):
     usb: int = 0
     usb3: int = 0
     usbc: int = 0
+    thunderbolt: int = 0
 
 
 class BuildCreate(msgspec.Struct):

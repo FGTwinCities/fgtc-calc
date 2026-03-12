@@ -149,4 +149,5 @@ def _convert_create_dto_to_model(build: BuildBase, data: BuildCreate):
         usb=data.ports.usb,
         usb3=data.ports.usb3,
         usbc=data.ports.usbc,
+        thunderbolt=data.ports.thunderbolt
     )

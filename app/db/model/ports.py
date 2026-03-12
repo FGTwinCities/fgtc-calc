@@ -18,3 +18,4 @@ class Ports(AdvancedDeclarativeBase):
     usb: Mapped[int] = mapped_column(default=0)
     usb3: Mapped[int] = mapped_column(default=0)
     usbc: Mapped[int] = mapped_column(default=0)
+    thunderbolt: Mapped[int] = mapped_column(default=0)

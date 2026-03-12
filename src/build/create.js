@@ -189,6 +189,7 @@ export function convertFormToDto() {
         "usb": formData.get("ports-usb"),
         "usb3": formData.get("ports-usb3"),
         "usbc": formData.get("ports-usbc"),
+        "thunderbolt": formData.get("ports-thunderbolt"),
     };
 
     console.log("Converted build DTO:");
@@ -289,6 +290,7 @@ export function fillFormFromDto(dto) {
     $("input[name=ports-usb]").val(dto["ports"]["usb"]);
     $("input[name=ports-usb3]").val(dto["ports"]["usb3"]);
     $("input[name=ports-usbc]").val(dto["ports"]["usbc"]);
+    $("input[name=ports-thunderbolt]").val(dto["ports"]["thunderbolt"]);
 }
 
 function validateFormItem(item, message, errors) {

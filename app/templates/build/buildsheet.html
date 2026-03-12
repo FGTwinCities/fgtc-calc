@@ -271,6 +271,7 @@
                     {{ format_port(build.ports.dvi, "DVI") }}
                     {{ format_port(build.ports.vga, "VGA") }}
                     {{ format_port(build.ports.usbc, "USB-C") }}
+                    {{ format_port(build.ports.thunderbolt, "Thunderbolt") }}
                     {% if (build.ports.hdmi <= 0) and (build.ports.dp <= 0) and (build.ports.dvi <= 0) and (build.ports.vga <= 0) and (build.ports.usbc <= 0) %}
                         <span><b>NONE</b></span>
                     {% endif %}
