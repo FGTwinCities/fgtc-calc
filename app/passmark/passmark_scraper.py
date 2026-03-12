@@ -76,12 +76,21 @@ def attempt_gpu_parse(query: str) -> str:
 
 
 def _parse_pe_core_details(tag: Tag) -> PassmarkCoreDetails:
-    return PassmarkCoreDetails(
-        cores=int(re.search(r'(\d+)(\s*[Cc]ores)', tag.text).group(1)),
-        threads=int(re.search(r'(\d+)(\s*[Tt]hreads)', tag.text).group(1)),
-        clock=float(re.search(r'(\d+\.?\d*)(\s*[GgHhZz]+\s*[Bb]ase)', tag.text).group(1)),
-        turbo_clock=float(re.search(r'(\d+\.?\d*)(\s*[GgHhZz]+\s*[Tt]urbo)', tag.text).group(1)),
-    )
+    details = PassmarkCoreDetails()
+
+    core_match = re.search(r'(\d+)(\s*[Cc]ores)', tag.text)
+    details.cores = int(core_match.group(1)) if core_match else None
+
+    thread_match = re.search(r'(\d+)(\s*[Tt]hreads)', tag.text)
+    details.threads = int(thread_match.group(1)) if thread_match else None
+
+    clock_match = re.search(r'(\d+\.?\d*)(\s*[GgHhZz]+\s*[Bb]ase)', tag.text)
+    details.clock = float(clock_match.group(1)) if clock_match else None
+
+    turbo_match = re.search(r'(\d+\.?\d*)(\s*[GgHhZz]+\s*[Tt]urbo)', tag.text)
+    details.turbo_clock = float(turbo_match.group(1)) if turbo_match else None
+
+    return details
 
 _rate_limiter = RateLimitMiddleware(3, 0.1)
 
@@ -220,9 +229,9 @@ class PassmarkScraper:
                     )
 
                     try:
-                        performance = soup.find(["p", "strong", "b"], string=re.compile(r'[Pp]erformance\s*[Cc]ores:')).parent
+                        performance = soup.find(["p", "strong", "b"], string=re.compile(r'[Pp][er][ri][fm][oa]r[my]a?n?c?e?\s*[Cc]ores:')).parent
                         result.performance_cores = _parse_pe_core_details(performance)
-                        efficient = soup.find(["p", "strong", "b"], string=re.compile(r'[Ee]fficient\s*[Cc]ores:')).parent
+                        efficient = soup.find(["p", "strong", "b"], string=re.compile(r'[EeSs][fe][fc][io][cn][id][ea][nr][ty]\s*[Cc]ores:')).parent
                         result.efficient_cores = _parse_pe_core_details(efficient)
                     except AttributeError:
                         pass
