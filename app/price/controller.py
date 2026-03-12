@@ -9,7 +9,7 @@ from litestar.di import Provide
 
 from app.build.controller.graphics import update_graphics_specs
 from app.build.controller.processor import update_processor_specs
-from app.db.model import Processor, GraphicsProcessor, MemoryModule, StorageDisk, Display, Battery, Build
+from app.db.model import Processor, GraphicsProcessor, MemoryModule, StorageDisk, Display, Battery, Build, MacBuild
 from app.db.repository import MemoryModuleRepository, provide_memory_repo, provide_storage_repo, \
     StorageDiskRepository, DisplayRepository, provide_display_repo, BatteryRepository, provide_battery_repo
 from app.db.service.build import provide_build_service, BuildService
@@ -18,12 +18,14 @@ from app.db.service.pricing import PricingModelService
 from app.db.service.processor import provide_processor_service, ProcessorService
 from app.ebay.price_estimator import EbayPriceEstimator
 from app.lib.datetime import now
-from app.price.dto import BuildPrice, WithPrice, Price
+from app.lib.math import round_down_exact
+from app.price.dto import BuildPrice, WithPrice, Price, PriceAdjustment
+from app.price.model.pricing import PricingModel
 
 PRICE_VALID_TIMESPAN = datetime.timedelta(days=7)
 
 
-async def _update_processor_price(processor: Processor, pricing_model_service: PricingModelService, force_score: bool = False) -> None:
+async def _update_processor_price(processor: Processor, model: PricingModel, force_score: bool = False) -> None:
     """Update the stored price of a CPU. Attempts to use eBay to estimate price, then tries pricing by Passmark score."""
     try:
         if force_score:
@@ -33,14 +35,13 @@ async def _update_processor_price(processor: Processor, pricing_model_service: P
         if math.isinf(price) or math.isnan(price):
             raise RuntimeError("Invalid price")
     except Exception:
-        model = await pricing_model_service.get_model()
         price = model.processor_model.compute(processor)
 
     processor.price = price
     processor.priced_at = now()
 
 
-async def _update_graphics_price(gpu: GraphicsProcessor, pricing_model_service: PricingModelService, force_score: bool = False) -> None:
+async def _update_graphics_price(gpu: GraphicsProcessor, model: PricingModel, force_score: bool = False) -> None:
     """Update the stored price of a GPU. Attempts to use eBay to estimate price, then tries pricing by Passmark score."""
     try:
         if force_score:
@@ -50,10 +51,51 @@ async def _update_graphics_price(gpu: GraphicsProcessor, pricing_model_service: 
         if math.isinf(price) or math.isnan(price):
             raise RuntimeError("Invalid price")
     except Exception:
-        model = await pricing_model_service.get_model()
         price = model.graphics_model.compute(gpu)
     gpu.price = price
     gpu.priced_at = now()
+
+
+async def _calculate_modern_build_price(build: Build, model: PricingModel) -> BuildPrice:
+    # If prices/specs for associated processors or GPUs are not present or too old, update those first
+    for processor in build.processors:
+        if not processor.passmark_id:
+            await update_processor_specs(processor)
+        if not processor.price or not processor.priced_at or now() > (processor.priced_at + PRICE_VALID_TIMESPAN):
+            await _update_processor_price(processor, model)
+
+    for gpu in build.graphics:
+        if not gpu.passmark_id:
+            await update_graphics_specs(gpu)
+        if not gpu.price or not gpu.priced_at or now() > (gpu.priced_at + PRICE_VALID_TIMESPAN):
+            await _update_graphics_price(gpu, model)
+
+    return await model.compute(build)
+
+
+async def _calculate_mac_build_price(mac: MacBuild, model: PricingModel) -> BuildPrice:
+    for processor in mac.processors:
+        if not processor.passmark_id:
+            await update_processor_specs(processor)
+
+    for gpu in mac.graphics:
+        if not gpu.passmark_id:
+            await update_graphics_specs(gpu)
+
+    debug = []
+    estimator = EbayPriceEstimator()
+    price = await estimator.estimate_mac_build(mac)
+    debug.append(Price(price))
+
+    adjusted = model.compute_adjustment(price)
+    debug.append(PriceAdjustment(price=adjusted - price, comment="Store Adjustment"))
+    price = adjusted
+
+    adjusted = round_down_exact(price, model.rounding)
+    debug.append(PriceAdjustment(price=adjusted - price, comment=f"Round down to nearest ${model.rounding}"))
+    price = adjusted
+
+    return BuildPrice(price, None, debug)
 
 
 class PriceController(Controller):
@@ -85,20 +127,12 @@ class PriceController(Controller):
         model = await pricing_model_service.get_model()
         build = await build_service.get(build_id)
 
-        # If prices/specs for associated processors or GPUs are not present or too old, update those first
-        for processor in build.processors:
-            if not processor.passmark_id:
-                await update_processor_specs(processor)
-            if not processor.price or not processor.priced_at or now() > (processor.priced_at + PRICE_VALID_TIMESPAN):
-                await _update_processor_price(processor, pricing_model_service)
-
-        for gpu in build.graphics:
-            if not gpu.passmark_id:
-                await update_graphics_specs(gpu)
-            if not gpu.price or not gpu.priced_at or now() > (gpu.priced_at + PRICE_VALID_TIMESPAN):
-                await _update_graphics_price(gpu, pricing_model_service)
-
-        price = await model.compute(build)
+        if isinstance(build, Build):
+            price = await _calculate_modern_build_price(build, model)
+        elif isinstance(build, MacBuild):
+            price = await _calculate_mac_build_price(build, model)
+        else:
+            raise NotImplemented
 
         build.price = price.price
         build.priced_at = datetime.datetime.now(tz=ZoneInfo("UTC"))
@@ -144,7 +178,7 @@ class PriceController(Controller):
     async def update_processor_price(self, processor_id: UUID, processor_service: ProcessorService, pricing_model_service: PricingModelService, force_score: bool = False) -> Processor:
         processor = await processor_service.get(processor_id)
 
-        await _update_processor_price(processor, pricing_model_service, force_score)
+        await _update_processor_price(processor, await pricing_model_service.get_model(), force_score)
 
         await processor_service.update(processor, auto_commit=True, auto_refresh=True)
         return processor
@@ -154,7 +188,7 @@ class PriceController(Controller):
     async def update_gpu_price(self, gpu_id: UUID, graphics_service: GraphicsProcessorService, pricing_model_service: PricingModelService, force_score: bool = False) -> GraphicsProcessor:
         gpu = await graphics_service.get(gpu_id)
 
-        await _update_graphics_price(gpu, pricing_model_service, force_score)
+        await _update_graphics_price(gpu, await pricing_model_service.get_model(), force_score)
 
         await graphics_service.update(gpu, auto_commit=True, auto_refresh=True)
         return gpu
