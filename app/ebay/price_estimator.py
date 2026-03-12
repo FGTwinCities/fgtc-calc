@@ -1,6 +1,8 @@
 import re
 
 import numpy as np
+from sklearn.ensemble import IsolationForest
+from sklearn.model_selection import train_test_split
 
 from app.db.enum import BuildType
 from app.db.model import Processor, GraphicsProcessor, MacBuild
@@ -10,6 +12,13 @@ from app.ebay.util import item_has_category
 from app.lib.math import mb2gb
 
 MINIMUM_RESULT_COUNT = 10
+
+def cull_outliers_1d(data):
+    data = data.reshape(-1, 1)
+    data_train, data_test = train_test_split(data, random_state=42)
+    clf = IsolationForest(max_samples=min(100, len(data_train)), random_state=0)
+    clf.fit(data_train)
+    return data[clf.predict(data) == 1]
 
 
 class EbayPriceEstimator:
@@ -25,7 +34,7 @@ class EbayPriceEstimator:
             raise InsufficientResultsException()
 
         prices = [float(r['price']['value']) for r in results]
-        #TODO: Better outlier culling
+        prices = cull_outliers_1d(np.array(prices))
         price = np.mean(prices)
 
         return round(price, 2)
@@ -40,7 +49,7 @@ class EbayPriceEstimator:
             raise InsufficientResultsException()
 
         prices = [float(r['price']['value']) for r in results]
-        #TODO: Better outlier culling
+        prices = cull_outliers_1d(np.array(prices))
         price = np.mean(prices)
 
         return round(price, 2)
@@ -79,8 +88,8 @@ class EbayPriceEstimator:
         if len(results) < MINIMUM_RESULT_COUNT:
             raise InsufficientResultsException()
 
-        #TODO: Better outlier culling
         prices = [float(r['price']['value']) for r in results]
+        prices = cull_outliers_1d(np.array(prices))
         price = np.mean(prices)
 
         return round(price, 2)
