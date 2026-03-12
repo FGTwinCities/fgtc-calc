@@ -107,8 +107,11 @@ async function fetchRecentBuildsPage() {
         entry.attr("build-id", build.id);
 
         entry.find("#entry-title").text(`${build.manufacturer} ${build.model}`);
+
+        entry.find("#entry-subtitle").text(build.id.substring(0, 8));
+
         let created_at = Date.parse(build.created_at);
-        entry.find("#entry-subtitle").text(`Created ${timeSince(created_at)} ago`);
+        entry.find("#entry-timestamp").text(`Created ${timeSince(created_at)} ago`);
 
         entry.find("#entry-price").text(`$${build.price}`);
 
