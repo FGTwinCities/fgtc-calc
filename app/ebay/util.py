@@ -1,6 +1,8 @@
 import re
 
 import numpy as np
+from sklearn.ensemble import IsolationForest
+from sklearn.model_selection import train_test_split
 
 from app.lib.math import gb2mb, tb2mb
 from app.lib.util import try_int
@@ -27,18 +29,6 @@ def parse_capacity(capacity_string: str) -> int | None:
     return round(value)
 
 
-def cull_outliers(x, outlierConstant):
-    a = np.array(x)
-    upper_quartile = np.percentile(a, 75)
-    lower_quartile = np.percentile(a, 25)
-    IQR = (upper_quartile - lower_quartile) * outlierConstant
-    quartileSet = (lower_quartile - IQR, upper_quartile + IQR)
-
-    result = a[np.where((a >= quartileSet[0]) & (a <= quartileSet[1]))]
-
-    return result.tolist()
-
-
 def item_has_category(item: dict, category_id: int) -> bool:
     if "category_id_path" in item:
         categories = map(lambda c: int(c), item['category_id_path'].split('|'))
@@ -51,3 +41,18 @@ def item_has_category(item: dict, category_id: int) -> bool:
 
     return False
 
+
+def cull_outliers_1d(data):
+    data = data.reshape(-1, 1)
+    data_train, data_test = train_test_split(data)
+    clf = IsolationForest(max_samples=min(100, len(data_train)))
+    clf.fit(data_train)
+    return data[clf.predict(data) == 1]
+
+def cull_outliers_2d(data, filter_data):
+    X_train, X_test = train_test_split(data)
+
+    clf = IsolationForest()
+    clf.fit(X_train)
+
+    return filter_data[clf.predict(data) == 1]

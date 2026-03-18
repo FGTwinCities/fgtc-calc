@@ -5,12 +5,14 @@ from typing import AsyncGenerator
 import numpy as np
 from aiostream import stream
 from scipy.optimize import curve_fit
+from sklearn.ensemble import IsolationForest
+from sklearn.model_selection import train_test_split
 
 from app.db.enum import MemoryType
 from app.db.model import MemoryModule
 from app.ebay.ebay_connection import EbayConnection
 from app.ebay.storage_marketstudy import item_has_category
-from app.ebay.util import parse_capacity
+from app.ebay.util import parse_capacity, cull_outliers_2d
 from app.price.model.memory import MemoryPricingModel, memory_model_func
 
 MAX_MEMORY_PRICE_PER_MB = 0.08
@@ -109,6 +111,14 @@ async def run_memory_marketstudy() -> MemoryPricingModel:
 	capacities = np.array(capacities)
 	speeds = np.array(speeds)
 	prices = np.array(prices)
+	data = np.column_stack((capacities, speeds, prices))
+
+	clf_data = np.column_stack((speeds, prices/capacities))
+	data = cull_outliers_2d(clf_data, data)
+
+	capacities = data[:, 0]
+	speeds = data[:, 1]
+	prices = data[:, 2]
 
 	popt, pcov = curve_fit(memory_model_func, (capacities, speeds), prices)
 
