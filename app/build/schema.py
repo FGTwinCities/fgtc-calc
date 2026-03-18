@@ -78,7 +78,7 @@ class BuildCreate(msgspec.Struct):
     batteries: list[BuildCreateBattery] = []
     display: BuildCreateDisplay | None = None
 
-    ports: BuildCreatePorts = None
+    ports: BuildCreatePorts | None = None
     notes: str | None = None
 
 

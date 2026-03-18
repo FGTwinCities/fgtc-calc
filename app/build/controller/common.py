@@ -140,14 +140,17 @@ def _convert_create_dto_to_model(build: BuildBase, data: BuildCreate):
             remaining_capacity=batt.remaining_capacity,
         ))
 
-    build.ports = Ports(
-        hdmi=data.ports.hdmi,
-        dp=data.ports.dp,
-        dvi=data.ports.dvi,
-        vga=data.ports.vga,
-        sd=data.ports.sd,
-        usb=data.ports.usb,
-        usb3=data.ports.usb3,
-        usbc=data.ports.usbc,
-        thunderbolt=data.ports.thunderbolt
-    )
+    if data.ports is None:
+        build.ports = Ports()
+    else:
+        build.ports = Ports(
+            hdmi=data.ports.hdmi,
+            dp=data.ports.dp,
+            dvi=data.ports.dvi,
+            vga=data.ports.vga,
+            sd=data.ports.sd,
+            usb=data.ports.usb,
+            usb3=data.ports.usb3,
+            usbc=data.ports.usbc,
+            thunderbolt=data.ports.thunderbolt
+        )
