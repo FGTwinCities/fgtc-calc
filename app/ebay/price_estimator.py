@@ -25,7 +25,8 @@ class EbayPriceEstimator:
             raise InsufficientResultsException()
 
         prices = [float(r['price']['value']) for r in results]
-        prices = cull_outliers_1d(np.array(prices))
+        prices = np.array(prices)
+        prices = cull_outliers_1d(prices, prices)
         price = np.mean(prices)
 
         return round(price, 2)
@@ -40,7 +41,8 @@ class EbayPriceEstimator:
             raise InsufficientResultsException()
 
         prices = [float(r['price']['value']) for r in results]
-        prices = cull_outliers_1d(np.array(prices))
+        np.array(prices)
+        prices = cull_outliers_1d(prices, prices)
         price = np.mean(prices)
 
         return round(price, 2)
@@ -80,7 +82,8 @@ class EbayPriceEstimator:
             raise InsufficientResultsException()
 
         prices = [float(r['price']['value']) for r in results]
-        prices = cull_outliers_1d(np.array(prices))
+        prices = np.array(prices)
+        prices = cull_outliers_1d(prices, prices)
         price = np.mean(prices)
 
         return round(price, 2)

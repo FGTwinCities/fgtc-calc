@@ -6,7 +6,7 @@ from aiostream import stream
 from scipy.optimize import curve_fit
 
 from app.ebay.ebay_connection import EbayConnection
-from app.ebay.util import parse_capacity, item_has_category
+from app.ebay.util import parse_capacity, item_has_category, cull_outliers_1d
 from app.lib.util import try_int
 from app.price.model.storage import StoragePricingModel, storage_model_func
 
@@ -81,6 +81,13 @@ async def disk_marketstudy(conn: EbayConnection, queries: list, limit: int, filt
     capacities = np.array(capacities)
     prices = np.array(prices)
 
+    data = np.column_stack((capacities, prices))
+    clf_data = prices / capacities
+    data = cull_outliers_1d(clf_data, data)
+
+    capacities = data[:, 0]
+    prices = data[:, 1]
+
     popt, pcov = curve_fit(storage_model_func, capacities, prices)
 
     return popt
@@ -111,12 +118,7 @@ async def run_storage_marketstudy() -> StoragePricingModel:
 
     model = StoragePricingModel()
     model.hdd_parameters = await disk_marketstudy(conn, ["4TB Hard Drive", "1TB Hard Drive", "512GB Hard Drive"], 25, filter_hard_dries)
-    model.sata_ssd_parameters = await disk_marketstudy(conn, ["1TB SATA SSD", "512GB SATA SSD", "128GB SATA SSD"], 25, filter_sata_ssd)
-    model.nvme_ssd_parameters = await disk_marketstudy(conn, ["1TB NVMe SSD", "512GB NVMe SSD", "128GB NVMe SSD"], 25, filter_nvme_ssd)
+    model.sata_ssd_parameters = await disk_marketstudy(conn, ["4TB SATA SSD", "2TB SATA SSD", "1TB SATA SSD", "512GB SATA SSD"], 25, filter_sata_ssd)
+    model.nvme_ssd_parameters = await disk_marketstudy(conn, ["4TB NVMe SSD", "2TB NVMe SSD", "1TB NVMe SSD", "512GB NVMe SSD"], 25, filter_nvme_ssd)
 
     return model
-
-
-if __name__ == "__main__":
-    model = asyncio.run(run_storage_marketstudy())
-    print("done")

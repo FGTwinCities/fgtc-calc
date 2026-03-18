@@ -42,12 +42,12 @@ def item_has_category(item: dict, category_id: int) -> bool:
     return False
 
 
-def cull_outliers_1d(data):
+def cull_outliers_1d(data, filter_data):
     data = data.reshape(-1, 1)
     data_train, data_test = train_test_split(data)
     clf = IsolationForest(max_samples=min(100, len(data_train)))
     clf.fit(data_train)
-    return data[clf.predict(data) == 1]
+    return filter_data[clf.predict(data) == 1]
 
 def cull_outliers_2d(data, filter_data):
     X_train, X_test = train_test_split(data)
