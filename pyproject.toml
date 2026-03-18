@@ -16,7 +16,7 @@ dependencies = [
     "ebay-rest>=1.1.3",
     "ipykernel>=7.1.0",
     "jinja-markdown2>=0.4.0",
-    "litestar-saq>=0.6.4",
+    "litestar-saq==0.6.4",
     "litestar-vite>=0.15.0",
     "litestar[standard]>=2.18.0",
     "matplotlib>=3.10.8",

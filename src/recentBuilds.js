@@ -143,8 +143,10 @@ async function fetchRecentBuildsPage() {
             entry.find("#entry-title").text(`${build.year} ${formatMacType(build.mac_type)}`);
         }
 
+        entry.find("#entry-subtitle").text(build.id.substring(0, 8));
+
         let created_at = Date.parse(build.created_at);
-        entry.find("#entry-subtitle").text(`Created ${timeSince(created_at)} ago`);
+        entry.find("#entry-timestamp").text(`Created ${timeSince(created_at)} ago`);
 
         entry.find("#entry-price").text(`$${build.price}`);
 
@@ -166,7 +168,7 @@ async function fetchRecentBuildsPage() {
 
         entry.find("a").prop("href", function(i, val) {
             val = val.replace(/%ID%/g, build.id);
-            val = val.replace(/%BUILDCLASS%/g, build.class_type)
+            val = val.replace(/%BUILDCLASS%/g, build.class_type);
             return val;
         });
 
