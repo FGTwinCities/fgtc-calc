@@ -7,6 +7,18 @@
 {% endblock %}
 
 {% block content %}
+<template id="pricing-breakdown-template">
+    <dialog id="pricing-breakdown" class="modal">
+        <div class="modal-box">
+            <h1>Pricing Result</h1>
+            <table id="table" class="table table-zebra">
+            </table>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
+</template>
 <div class="flex justify-center mt-24 mb-24 gap-8">
     <a class="btn btn-xl btn-primary" href="/build/modern/create">Create New Modern Build</a>
     <a class="btn btn-xl btn-primary" href="/build/mac/create">Create New Mac Build</a>

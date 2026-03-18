@@ -31,7 +31,8 @@ function timeSince(date) {
 async function onClickGeneratePrice(build_id) {
     try {
         addLoadingTask("generate-price_" + build_id);
-        await $.ajax(`/price/${build_id}`)
+        let pricingData = await $.ajax(`/price/${build_id}`);
+        showPricingBreakdown(pricingData);
     } catch(err) {
         console.log(err);
         alert("Failed to price build: " + err.responseText);
@@ -108,6 +109,22 @@ function formatMacType(type) {
     if (type === "mac_mini") { return "Mac Mini"; }
     if (type === "mac_studio") { return "Mac Studio"; }
     return type;
+}
+
+function showPricingBreakdown(data) {
+    let modal = $($("#pricing-breakdown-template").html()).clone();
+
+    let components = data["component_pricing"];
+    for (let i = 0; i < components.length; i++) {
+        if ('comment' in components[i]) {
+            modal.find("#table").append(`<tr><td>${components[i]['comment']}</td><td></td><td>${components[i]['price']}</td></tr>`);
+        } else if ('price' in components[i]) {
+            modal.find("#table").append(`<tr><td></td><td></td><td>${components[i]['price']}</td></tr>`);
+        }
+    }
+
+    $("body").append(modal);
+    modal.get(0).showModal();
 }
 
 async function fetchRecentBuildsPage() {
