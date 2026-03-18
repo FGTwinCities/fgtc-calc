@@ -6,7 +6,7 @@ from aiostream import stream
 from scipy.optimize import curve_fit
 
 from app.ebay.ebay_connection import EbayConnection
-from app.ebay.util import item_has_category
+from app.ebay.util import item_has_category, cull_outliers_1d
 from app.passmark.passmark_scraper import PassmarkScraper
 from app.price.model.graphics import GraphicsProcessorPricingModel, graphics_model_func
 
@@ -66,8 +66,12 @@ async def run_graphics_marketstudy() -> GraphicsProcessorPricingModel:
             prices.append(data.get("price"))
             scores.append(data.get("score"))
 
-    prices = np.array(prices)
-    scores = np.array(scores)
+    data = np.column_stack((scores, prices))
+    clf_data = data[:, 1] / data[:, 0]
+    data = cull_outliers_1d(clf_data, data)
+
+    scores = data[:, 0]
+    prices = data[:, 1]
 
     popt, pcov = curve_fit(graphics_model_func, scores, prices)
 
