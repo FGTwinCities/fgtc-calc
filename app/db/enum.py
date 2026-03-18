@@ -15,6 +15,7 @@ class MemoryType(Enum):
 class StorageDiskType(Enum):
     HDD = "hdd"
     SSD = "ssd"
+    HYBRID = "hybrid"
 
     def __str__(self) -> str:
         match self:
@@ -22,6 +23,8 @@ class StorageDiskType(Enum):
                 return "HDD"
             case StorageDiskType.SSD:
                 return "SSD"
+            case StorageDiskType.HYBRID:
+                return "Hybrid"
 
 
 class StorageDiskForm(Enum):

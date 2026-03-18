@@ -120,6 +120,7 @@
                     <select name="storage-disk-type" id="storage-disk-type" class="select">
                         <option value="hdd">HDD</option>
                         <option value="ssd" selected>SSD</option>
+                        <option value="hybrid">Hybrid</option>
                     </select>
                     <br>
                     {{ input_datasize('storage-disk-size') }}
@@ -296,6 +297,10 @@
             <label class="input w-38">
                 <input type="number" name="ports-usbc" value="0" />
                 <span class="font-bold">USB C</span>
+            </label>
+            <label class="input w-38">
+                <input type="number" name="ports-thunderbolt" value="0" />
+                <span class="font-bold">Thunderbolt</span>
             </label>
         </fieldset>
         {% block before_notes %}

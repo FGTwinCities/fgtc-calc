@@ -95,6 +95,7 @@ class BuildService(SQLAlchemyAsyncRepositoryService[m.BuildBase]):
             usb=build.ports.usb,
             usb3=build.ports.usb3,
             usbc=build.ports.usbc,
+            thunderbolt=build.ports.thunderbolt,
         )
 
         await self.create(new_build, auto_commit=auto_commit, auto_refresh=auto_refresh)
