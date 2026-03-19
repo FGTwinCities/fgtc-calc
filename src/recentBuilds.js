@@ -195,6 +195,32 @@ function showPricingBreakdown(data, buildId) {
     modal.get(0).showModal();
 }
 
+async function onClickPagePrev(event) {
+    let list = $("#recent-builds-list");
+    var page = parseInt(list.attr('page'));
+    page -= 1;
+
+    if (page < 0) {
+        return;
+    }
+
+    list.attr('page', page);
+    await fetchRecentBuildsPage();
+}
+
+async function onClickPageNext(event) {
+    let list = $("#recent-builds-list");
+    var page = parseInt(list.attr('page'));
+    page += 1;
+
+    if (page >= parseInt(list.attr('total-pages'))) {
+        return;
+    }
+
+    list.attr('page', page);
+    await fetchRecentBuildsPage();
+}
+
 async function fetchRecentBuildsPage() {
     $("#recent-builds-list").children().remove();
 
@@ -210,9 +236,18 @@ async function fetchRecentBuildsPage() {
         return;
     }
 
-    let builds = await $.ajax(url);
-
     let entryList = $("#recent-builds-list");
+
+    let page = entryList.attr('page');
+
+    let buildPagination = await $.ajax(url + `?page=${page}`);
+
+    entryList.attr('page', buildPagination['current_page']);
+    entryList.attr('total-pages', buildPagination['total_pages']);
+
+    $("#page-current").text(`Page ${buildPagination['current_page'] + 1} of ${buildPagination['total_pages']}`);
+
+    let builds = buildPagination['items'];
     let entryTemplate = $($("#recent-build-entry-template").html());
     for (let i = 0; i < builds.length; i++) {
         let build = builds[i];
@@ -274,7 +309,9 @@ async function fetchRecentBuildsPage() {
 }
 
 window.addEventListener("load", function() {
-    $("#recents-filter").find("input").on("change", onFilterChanged)
+    $("#recents-filter").find("input").on("change", onFilterChanged);
+    $("#page-prev").click(onClickPagePrev);
+    $("#page-next").click(onClickPageNext);
     try {
         addLoadingTask("fetch-recent-builds");
         fetchRecentBuildsPage();
