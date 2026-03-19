@@ -7,6 +7,44 @@
 {% endblock %}
 
 {% block content %}
+<template id="pricing-breakdown-template">
+    <dialog id="pricing-breakdown" class="modal">
+        <div class="modal-box">
+            <form method="dialog">
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+            </form>
+            <span class="text-3xl">Pricing Result</span>
+            <table id="table" class="table table-zebra mt-4">
+                    <thead>
+                        <tr>
+                            <td>Component</td>
+                            <td class="text-right">Price</td>
+                            <td class="text-right">Total</td>
+                        </tr>
+                    </thead>
+                    <tr></tr><tr></tr>
+                <template id="row-template">
+                    <tr>
+                        <td id="label"></td>
+                        <td id="price-delta" class="text-right"></td>
+                        <td id="price-total" class="text-right"></td>
+                    </tr>
+                </template>
+            </table>
+            <div class="mt-8 flex flex-row gap-4">
+                <label class="self-center text-3xl"><span>Total:</span></label>
+                <label class="input join-item text-2xl">
+                    <span class="label">$</span>
+                    <input id="pricing-breakdown-price" class="font-bold" type="number">
+                </label>
+                <button id="pricing-breakdown-setprice-btn" class="btn btn-primary join-item text-l">Set Price</button>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
+</template>
 <div class="flex justify-center mt-24 mb-24 gap-8">
     <a class="btn btn-xl btn-primary" href="/build/modern/create">Create New Modern Build</a>
     <a class="btn btn-xl btn-primary" href="/build/mac/create">Create New Mac Build</a>

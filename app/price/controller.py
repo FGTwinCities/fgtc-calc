@@ -88,7 +88,7 @@ async def _calculate_mac_build_price(mac: MacBuild, model: PricingModel) -> Buil
     debug = []
     estimator = EbayPriceEstimator()
     price = await estimator.estimate_mac_build(mac)
-    debug.append(Price(price))
+    debug.append(PriceAdjustment(price=price, comment=f"{mac.year} {mac.mac_type} eBay Estimate"))
 
     adjusted = model.compute_adjustment(price)
     debug.append(PriceAdjustment(price=adjusted - price, comment="Store Adjustment"))
