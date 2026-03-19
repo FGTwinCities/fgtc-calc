@@ -32,7 +32,7 @@ async function onClickGeneratePrice(build_id) {
     try {
         addLoadingTask("generate-price_" + build_id);
         let pricingData = await $.ajax(`/price/${build_id}`);
-        showPricingBreakdown(pricingData);
+        showPricingBreakdown(pricingData, build_id);
     } catch(err) {
         console.log(err);
         alert("Failed to price build: " + err.responseText);
@@ -43,9 +43,8 @@ async function onClickGeneratePrice(build_id) {
     removeLoadingTask("generate-price_" + build_id);
 }
 
-async function onClickSetPrice(build_id) {
+async function setBuildPrice(build_id, price) {
     addLoadingTask("set-price_" + build_id);
-    let price = parseFloat($(`.build-entry[build-id=${build_id}]`).find("#entry-set-price-field").val());
     let dto = {
         'price': price,
     }
@@ -59,6 +58,24 @@ async function onClickSetPrice(build_id) {
     await fetchRecentBuildsPage();
     $(`.build-entry[build-id=${build_id}]`).find("input[type=radio]").prop("checked", true);
     removeLoadingTask("set-price_" + build_id);
+}
+
+async function onClickSetPrice(build_id) {
+    let price = parseFloat($(`.build-entry[build-id=${build_id}]`).find("#entry-set-price-field").val());
+    await setBuildPrice(build_id, price);
+}
+
+async function onClickBreakdownSetPrice(event) {
+    let field = $(event.target);
+    let dialog = field.parents("dialog");
+    let buildId = dialog.attr("build-id");
+    let price = parseFloat(dialog.find("#pricing-breakdown-price").val());
+    await setBuildPrice(buildId, price);
+    dialog.get(0).close();
+
+    setTimeout(function () {
+        dialog.remove();
+    }, 1000);
 }
 
 function onClickPrintBuildsheet(build_id) {
@@ -111,17 +128,68 @@ function formatMacType(type) {
     return type;
 }
 
-function showPricingBreakdown(data) {
+function formatComponentLabel(component) {
+    if ('item' in component) {
+        let item = component['item'];
+        if ('model' in item) {
+            return `${item['model']}`;
+        } else if ('ecc' in item) {
+            return `${item['size'] / 1000.0}GB DDR${item['type']}-${item['clock']}`;
+        } else if ('form' in item) {
+            return `${item['size'] / 1000.0}GB ${item['form']} ${item['interface']} ${item['type']}`;
+        } else if ('resolution' in item) {
+            return `${item['size']}" ${item['resolution']['x']}x${item['resolution']['y']}@${item['refresh_rate']}Hz Display`;
+        } else if ('remaining_capacity' in item) {
+            let capacity = item['remaining_capacity'] / item['design_capacity'] * 100;
+            return `Battery (${capacity.toFixed(1)}% Capacity)`
+        } else {
+            return "Other build component";
+        }
+    } else if ('comment' in component) {
+        return component['comment'];
+    }
+    return "";
+}
+
+function formatPrice(price) {
+    return `$${price.toFixed(2)}`;
+}
+
+function formatPriceDelta(delta) {
+    if (delta > 0) {
+        return `+ ${formatPrice(delta)}`;
+    } else if (delta < 0) {
+        return `- ${formatPrice(Math.abs(delta))}`;
+    } else {
+        return formatPrice(delta);
+    }
+}
+
+function showPricingBreakdown(data, buildId) {
     let modal = $($("#pricing-breakdown-template").html()).clone();
 
+    modal.attr('build-id', buildId);
+
+    let rowTemplate = $(modal.find("#row-template").html());
     let components = data["component_pricing"];
+    var price = 0.0;
     for (let i = 0; i < components.length; i++) {
-        if ('comment' in components[i]) {
-            modal.find("#table").append(`<tr><td>${components[i]['comment']}</td><td></td><td>${components[i]['price']}</td></tr>`);
-        } else if ('price' in components[i]) {
-            modal.find("#table").append(`<tr><td></td><td></td><td>${components[i]['price']}</td></tr>`);
+        let row = rowTemplate.clone();
+        row.find("#label").text(formatComponentLabel(components[i]));
+
+        if ('price' in components[i]) {
+            let compPrice = components[i]['price'];
+            row.find("#price-delta").html(formatPriceDelta(compPrice));
+            price += compPrice;
         }
+
+        row.find("#price-total").html(formatPrice(price));
+
+        modal.find("#table").append(row);
     }
+
+    modal.find("#pricing-breakdown-price").val(data['price']);
+    modal.find("#pricing-breakdown-setprice-btn").click(onClickBreakdownSetPrice);
 
     $("body").append(modal);
     modal.get(0).showModal();

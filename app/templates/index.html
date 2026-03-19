@@ -10,9 +10,34 @@
 <template id="pricing-breakdown-template">
     <dialog id="pricing-breakdown" class="modal">
         <div class="modal-box">
+            <form method="dialog">
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+            </form>
             <h1>Pricing Result</h1>
             <table id="table" class="table table-zebra">
+                    <thead>
+                        <tr>
+                            <td>Component</td>
+                            <td>Price</td>
+                            <td>Total</td>
+                        </tr>
+                    </thead>
+                    <tr></tr>
+                <template id="row-template">
+                    <tr>
+                        <td id="label"></td>
+                        <td id="price-delta"></td>
+                        <td id="price-total"></td>
+                    </tr>
+                </template>
             </table>
+            <div class="join mt-6">
+                <label class="input join-item">
+                    <span class="label">$</span>
+                    <input id="pricing-breakdown-price" type="number">
+                </label>
+                <button id="pricing-breakdown-setprice-btn" class="btn btn-primary join-item rounded-r-full">Set Price</button>
+            </div>
         </div>
         <form method="dialog" class="modal-backdrop">
             <button>close</button>
