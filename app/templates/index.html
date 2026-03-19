@@ -13,30 +13,31 @@
             <form method="dialog">
                 <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
             </form>
-            <h1>Pricing Result</h1>
-            <table id="table" class="table table-zebra">
+            <span class="text-3xl">Pricing Result</span>
+            <table id="table" class="table table-zebra mt-4">
                     <thead>
                         <tr>
                             <td>Component</td>
-                            <td>Price</td>
-                            <td>Total</td>
+                            <td class="text-right">Price</td>
+                            <td class="text-right">Total</td>
                         </tr>
                     </thead>
                     <tr></tr>
                 <template id="row-template">
                     <tr>
                         <td id="label"></td>
-                        <td id="price-delta"></td>
-                        <td id="price-total"></td>
+                        <td id="price-delta" class="text-right"></td>
+                        <td id="price-total" class="text-right"></td>
                     </tr>
                 </template>
             </table>
-            <div class="join mt-6">
-                <label class="input join-item">
+            <div class="mt-8 flex flex-row gap-4">
+                <label class="self-center text-3xl"><span>Total:</span></label>
+                <label class="input join-item text-2xl">
                     <span class="label">$</span>
-                    <input id="pricing-breakdown-price" type="number">
+                    <input id="pricing-breakdown-price" class="font-bold" type="number">
                 </label>
-                <button id="pricing-breakdown-setprice-btn" class="btn btn-primary join-item rounded-r-full">Set Price</button>
+                <button id="pricing-breakdown-setprice-btn" class="btn btn-primary join-item text-l">Set Price</button>
             </div>
         </div>
         <form method="dialog" class="modal-backdrop">

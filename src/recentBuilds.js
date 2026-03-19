@@ -157,9 +157,9 @@ function formatPrice(price) {
 
 function formatPriceDelta(delta) {
     if (delta > 0) {
-        return `+ ${formatPrice(delta)}`;
+        return `<span class="text-success">+ ${formatPrice(delta)}</span>`;
     } else if (delta < 0) {
-        return `- ${formatPrice(Math.abs(delta))}`;
+        return `<span class="text-error">- ${formatPrice(Math.abs(delta))}</span>`;
     } else {
         return formatPrice(delta);
     }
