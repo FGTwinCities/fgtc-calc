@@ -1,4 +1,5 @@
 import datetime
+from math import ceil
 from typing import Sequence
 from uuid import UUID
 from zoneinfo import ZoneInfo
@@ -9,6 +10,7 @@ from aiohttp import ClientSession
 from litestar import get, delete
 from litestar.controller import Controller
 from litestar.di import Provide
+from litestar.pagination import AbstractAsyncClassicPaginator, T, ClassicPagination
 from litestar.response import Template, Redirect
 
 from app.build.schema import BuildRetrieve
@@ -42,6 +44,23 @@ async def get_macos_version_info(version: Version) -> dict | None:
             return None
 
 
+class BuildClassicPaginator(AbstractAsyncClassicPaginator[BuildRetrieve]):
+    build_service: BuildService
+
+    def __init__(self, build_service: BuildService) -> None:
+        self.build_service = build_service
+
+    async def get_total(self, page_size: int) -> int:
+        return ceil(await self.build_service.count() / page_size)
+
+    async def get_items(self, page_size: int, current_page: int) -> list[BuildRetrieve]:
+        builds = await self.build_service.list(
+            LimitOffset(offset=current_page * page_size, limit=page_size),
+            OrderBy(Build.created_at, "desc"),
+        )
+
+        return [self.build_service.retrieve_schema(b) for b in builds]
+
 
 class BuildController(Controller):
     """
@@ -56,13 +75,9 @@ class BuildController(Controller):
     }
 
     @get("/")
-    async def get_builds(self, build_service: BuildService, offset: int = 0, page_size: int = 25) -> Sequence[BuildRetrieve]:
-        builds = await build_service.list(
-            LimitOffset(offset=offset, limit=page_size),
-            OrderBy(Build.created_at, "desc"),
-        )
-
-        return [build_service.retrieve_schema(b) for b in builds]
+    async def get_builds(self, build_service: BuildService, page: int = 0, page_size: int = 25) -> ClassicPagination[BuildRetrieve]:
+        paginator = BuildClassicPaginator(build_service)
+        return await paginator(page_size=page_size, current_page=page)
 
     @get("/{build_id: uuid}")
     async def get_build(self, build_id: UUID, build_service: BuildService) -> BuildRetrieve:

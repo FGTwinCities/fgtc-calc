@@ -59,7 +59,12 @@
                 <input class="btn" type="checkbox" name="recents-mac" aria-label="Mac" checked/>
             </form>
         </div>
-        <div id="recent-builds-list"></div>
+        <div id="recent-builds-list" page="0" total-pages="0"></div>
+        <div class="join self-center m-2">
+            <button class="join-item btn" id="page-prev">«</button>
+            <button class="join-item btn btn-disabled" id="page-current">Page X</button>
+            <button class="join-item btn" id="page-next">»</button>
+        </div>
         <template id="recent-build-entry-template">
             <div class="build-entry collapse collapse-arrow join-item border-base-300 border">
                 <input type="radio" name="recent-builds-accordian" checked="checked" />
