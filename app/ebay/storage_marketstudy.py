@@ -117,8 +117,8 @@ async def run_storage_marketstudy() -> StoragePricingModel:
     conn = EbayConnection()
 
     model = StoragePricingModel()
-    model.hdd_parameters = await disk_marketstudy(conn, ["4TB Hard Drive", "1TB Hard Drive", "512GB Hard Drive"], 25, filter_hard_dries)
-    model.sata_ssd_parameters = await disk_marketstudy(conn, ["4TB SATA SSD", "2TB SATA SSD", "1TB SATA SSD", "512GB SATA SSD"], 25, filter_sata_ssd)
-    model.nvme_ssd_parameters = await disk_marketstudy(conn, ["4TB NVMe SSD", "2TB NVMe SSD", "1TB NVMe SSD", "512GB NVMe SSD"], 25, filter_nvme_ssd)
+    model.hdd_parameters = await disk_marketstudy(conn, ["4TB Hard Drive", "1TB Hard Drive", "512GB Hard Drive"], 100, filter_hard_dries)
+    model.sata_ssd_parameters = await disk_marketstudy(conn, ["4TB SATA SSD", "2TB SATA SSD", "1TB SATA SSD", "512GB SATA SSD"], 100, filter_sata_ssd)
+    model.nvme_ssd_parameters = await disk_marketstudy(conn, ["4TB NVMe SSD", "2TB NVMe SSD", "1TB NVMe SSD", "512GB NVMe SSD"], 100, filter_nvme_ssd)
 
     return model

@@ -12,7 +12,7 @@ from app.ebay.util import item_has_category, cull_outliers_1d
 from app.passmark.passmark_scraper import PassmarkScraper
 from app.price.model.processor import ProcessorPricingModel, processor_model_func
 
-PROCESSOR_SAMPLE_SIZE = 25
+PROCESSOR_SAMPLE_SIZE = 100
 SAMPLE_SIZE_PER_PROCESSOR = 50
 
 
@@ -50,10 +50,14 @@ async def run_processor_marketstudy() -> ProcessorPricingModel:
     query_objects = []
     random.shuffle(cpu_query_candidates)
     for cpu_result in cpu_query_candidates:
-        cpu_result = await pm.retrieve_cpu(cpu_result)
-        if cpu_result.cpu_class and cpu_result.socket:
-            if cpu_result.cpu_class.lower() in ["desktop", "server"]:
-                query_objects.append({"name": cpu_result.name, "score": cpu_result.score})
+        try:
+            cpu_result = await pm.retrieve_cpu(cpu_result)
+
+            if cpu_result.cpu_class and cpu_result.socket:
+                if cpu_result.cpu_class.lower() in ["desktop", "server"]:
+                    query_objects.append({"name": cpu_result.name, "score": cpu_result.score})
+        except Exception:
+            pass
 
         if len(query_objects) >= PROCESSOR_SAMPLE_SIZE:
             break

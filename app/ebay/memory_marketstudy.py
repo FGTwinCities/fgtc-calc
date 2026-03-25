@@ -101,7 +101,7 @@ async def run_memory_marketstudy() -> MemoryPricingModel:
 	speeds = []
 	prices = []
 
-	combine = stream.merge(*[fetch_memory_marketdata_query(conn, query, 50) for query in queries])
+	combine = stream.merge(*[fetch_memory_marketdata_query(conn, query, 100) for query in queries])
 	async with combine.stream() as streamer:
 		async for data in streamer:
 			capacities.append(data.get("capacity"))

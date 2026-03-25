@@ -86,5 +86,5 @@ class EbayConnection:
 	async def fetch_item_or_none(self, item: dict | str) -> dict | None:
 		try:
 			return await self.fetch_item(item)
-		except ApiException:
+		except Exception:
 			return None

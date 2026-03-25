@@ -10,7 +10,7 @@ from app.ebay.util import item_has_category, cull_outliers_1d
 from app.passmark.passmark_scraper import PassmarkScraper
 from app.price.model.graphics import GraphicsProcessorPricingModel, graphics_model_func
 
-GPU_SAMPLE_SIZE = 25
+GPU_SAMPLE_SIZE = 100
 SAMPLE_SIZE_PER_GPU = 50
 
 
