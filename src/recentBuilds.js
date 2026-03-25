@@ -221,6 +221,23 @@ async function onClickPageNext(event) {
     await fetchRecentBuildsPage();
 }
 
+function fillComponentList(list, data, formatFunc) {
+    let listItem = list.find("li").clone();
+    list.empty();
+
+    if (data.length > 0) {
+        for (let item of data) {
+            let element = listItem.clone();
+            element.find("#data").html(formatFunc(item));
+            list.append(element);
+        }
+    } else {
+        let element = listItem.clone();
+        element.find("#data").html(`<p class="text-base-content/50">None</p>`)
+        list.append(element);
+    }
+}
+
 async function fetchRecentBuildsPage() {
     $("#recent-builds-list").children().remove();
 
@@ -268,23 +285,33 @@ async function fetchRecentBuildsPage() {
         let created_at = Date.parse(build.created_at);
         entry.find("#entry-timestamp").text(`Created ${timeSince(created_at)} ago`);
 
-        entry.find("#entry-price").text(`$${build.price}`);
-
-        for (let cpu of build.processors) {
-            entry.find("#entry-processors").append(`<p>${cpu.model}</p>`);
+        if (build.price === null) {
+            entry.find("#entry-price").html(`<p class="text-base-content/50">None</p>`)
+        } else {
+            entry.find("#entry-price").text(`$${build.price}`);
         }
 
-        for (let mem of build.memory) {
-            entry.find("#entry-memory").append(`<p>${mem.size / 1000} GB (DDR${mem.type} @ ${mem.clock})</p>`);
+        if (build.notes === null) {
+            entry.find("#entry-notes").html(`<p class="text-base-content/50">None</p>`)
+        } else {
+            entry.find("#entry-notes").text(build.notes);
         }
 
-        for (let disk of build.storage) {
-            entry.find("#entry-storage").append(`<p>${disk.size / 1000} GB ${disk.form} ${disk.interface} ${disk.type}</p>`);
-        }
+        fillComponentList(entry.find("#entry-processors"), build.processors, function(cpu) {
+            return cpu.model;
+        });
 
-        for (let gpu of build.graphics) {
-            entry.find("#entry-graphics").append(`<p>${gpu.model}</p>`);
-        }
+        fillComponentList(entry.find("#entry-memory"), build.memory, function(mem) {
+            return `${mem.size / 1000} GB (DDR${mem.type} @ ${mem.clock})`;
+        });
+
+        fillComponentList(entry.find("#entry-storage"), build.storage, function(disk) {
+            return `${disk.size / 1000} GB ${disk.form} ${disk.interface} ${disk.type}`;
+        });
+
+        fillComponentList(entry.find("#entry-graphics"), build.graphics, function(gpu) {
+            return gpu.model;
+        });
 
         entry.find("a").prop("href", function(i, val) {
             val = val.replace(/%ID%/g, build.id);

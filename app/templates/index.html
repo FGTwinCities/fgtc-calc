@@ -74,25 +74,44 @@
                     <p class="self-center text-right grow" id="entry-timestamp"></p>
                 </div>
                 <div class="collapse-content">
-                    <div class="pb-4">
-                        <span class="text-l font-semibold">Price: </span><span id="entry-price"></span>
-                    </div>
-                    <div class="flex flex-auto gap-4">
-                        <div class="join bg-base-300 p-4 rounded-box">
-                            <div class="join-item pr-8 self-center font-semibold text-lg">CPU</div>
-                            <div class="join-item" id="entry-processors"></div>
+                    <div class="flex flex-auto flex-wrap gap-4">
+                        <div class="join bg-base-300 rounded-box">
+                            <div class="join-item self-center font-semibold text-xl m-4 ml-6 mr-2">Price</div>
+                            <div class="divider divider-horizontal"></div>
+                            <p class="text-xl self-center mr-6" id="entry-price"></p>
                         </div>
-                        <div class="join bg-base-300 p-4 rounded-box">
-                            <div class="join-item pr-8 self-center font-semibold text-lg">Memory</div>
-                            <div class="join-item" id="entry-memory"></div>
+                        <div class="join bg-base-300 rounded-box">
+                            <div class="join-item self-center font-semibold text-xl m-4 ml-6 mr-2">CPU</div>
+                            <div class="divider divider-horizontal"></div>
+                            <ul class="join-item list self-center" id="entry-processors">
+                                <li class="list-row"><p class="text-lg" id="data">Item</p></li>
+                            </ul>
                         </div>
-                        <div class="join bg-base-300 p-4 rounded-box">
-                            <div class="join-item pr-8 self-center font-semibold text-lg">Storage</div>
-                            <div class="join-item" id="entry-storage"></div>
+                        <div class="join bg-base-300 rounded-box">
+                            <div class="join-item self-center font-semibold text-xl m-4 ml-6 mr-2">Memory</div>
+                            <div class="divider divider-horizontal"></div>
+                            <ul class="join-item list self-center" id="entry-memory">
+                                <li class="list-row"><p class="text-lg" id="data">Item</p></li>
+                            </ul>
                         </div>
-                        <div class="join bg-base-300 p-4 rounded-box">
-                            <div class="join-item pr-8 self-center font-semibold text-lg">Graphics</div>
-                            <div class="join-item" id="entry-graphics"></div>
+                        <div class="join bg-base-300 rounded-box">
+                            <div class="join-item self-center font-semibold text-xl m-4 ml-6 mr-2">Storage</div>
+                            <div class="divider divider-horizontal"></div>
+                            <ul class="join-item list self-center" id="entry-storage">
+                                <li class="list-row"><p class="text-lg" id="data">Item</p></li>
+                            </ul>
+                        </div>
+                        <div class="join bg-base-300 rounded-box">
+                            <div class="join-item self-center font-semibold text-xl m-4 ml-6 mr-2">Graphics</div>
+                            <div class="divider divider-horizontal"></div>
+                            <ul class="join-item list self-center" id="entry-graphics">
+                                <li class="list-row"><p class="text-lg" id="data">Item</p></li>
+                            </ul>
+                        </div>
+                        <div class="join bg-base-300 rounded-box">
+                            <div class="join-item self-center font-semibold text-xl m-4 ml-6 mr-2">Notes</div>
+                            <div class="divider divider-horizontal"></div>
+                            <p class="text-md self-center m-4 ml-2 mr-6 min-w-xl" id="entry-notes"></p>
                         </div>
                     </div>
                     <div class="join mt-6">
