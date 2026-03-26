@@ -52,11 +52,28 @@
 <div class="ml-12 mr-12">
     <div class="join join-vertical bg-base-200 w-full">
         <div class="join-item border-base-300 border p-4 flex flex-row">
-            <h1 class="text-2xl">Recent Builds</h1>
-            <form class="text-right grow" id="recents-filter">
-                <span class="text-l mr-2">Show:</span>
-                <input class="btn" type="checkbox" name="recents-modern" aria-label="Modern" checked/>
-                <input class="btn" type="checkbox" name="recents-mac" aria-label="Mac" checked/>
+            <h1 class="text-4xl font-semibold">Recent Builds</h1>
+            <form class="text-right grow" id="recents-filter" onsubmit="return false;">
+                <label>
+                    <span>Show:</span>
+                    <input class="btn" type="checkbox" name="recents-modern" aria-label="Modern"/>
+                    <input class="btn" type="checkbox" name="recents-mac" aria-label="Mac"/>
+                </label>
+                <label class="input ml-4">
+                    <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <g
+                        stroke-linejoin="round"
+                        stroke-linecap="round"
+                        stroke-width="2.5"
+                        fill="none"
+                        stroke="currentColor"
+                        >
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.3-4.3"></path>
+                        </g>
+                    </svg>
+                    <input type="search" name="recents-search" class="grow" placeholder="Search" />
+                </label>
             </form>
         </div>
         <div id="recent-builds-list" page="0" total-pages="0"></div>

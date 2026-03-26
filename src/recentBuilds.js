@@ -248,6 +248,11 @@ async function fetchRecentBuildsPage() {
     if ($("input[name=recents-modern]").prop("checked")) { url += "&type=modern"; }
     if ($("input[name=recents-mac]").prop("checked")) { url += "&type=mac"; }
 
+    let searchQuery = $("input[name=recents-search]").val();
+    if (searchQuery !== null && searchQuery !== "") {
+        url += "&search=" + encodeURI(searchQuery);
+    }
+
     let buildPagination = await $.ajax(url);
 
     entryList.attr('page', buildPagination['current_page']);
