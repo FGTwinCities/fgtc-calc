@@ -86,6 +86,7 @@ class BuildController(Controller):
                          page: int = 0, page_size: int = 25,
                          type: list[str] | None = None,
                          search: str | None = None,
+                         strict_search: bool = False,
                          before: datetime.datetime | None = None,
                          after: datetime.datetime | None = None,
                          ) -> ClassicPagination[BuildRetrieve]:
@@ -95,12 +96,24 @@ class BuildController(Controller):
             filters.append(CollectionFilter("class_type", type))
 
         if search is not None:
-            filters.append(
-                Build.notes.icontains(search)
-                | Build.manufacturer.icontains(search)
-                | Build.model.icontains(search)
-                | Build.operating_system.icontains(search)
-            )
+            search_filters = None
+            tokens = search.split()
+            for token in tokens:
+                token_filter = (BuildBase.notes.icontains(token)
+                    | Build.manufacturer.icontains(token)
+                    | Build.model.icontains(token)
+                    | Build.operating_system.icontains(token)
+                )
+                if strict_search:
+                    filters.append(token_filter)
+                else:
+                    if search_filters is None:
+                        search_filters = token_filter
+                    else:
+                        search_filters = search_filters | token_filter
+
+            if not strict_search:
+                filters.append(search_filters)
 
         if before or after:
             filters.append(OnBeforeAfter("created_at", before, after))

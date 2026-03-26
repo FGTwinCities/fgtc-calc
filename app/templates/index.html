@@ -51,9 +51,9 @@
 </div>
 <div class="ml-12 mr-12">
     <div class="join join-vertical bg-base-200 w-full">
-        <div class="join-item border-base-300 border p-4 flex flex-row">
+        <form class="join-item border-base-300 border p-4 flex flex-row" id="recents-filter" onsubmit="return false;">
             <h1 class="text-4xl font-semibold">Recent Builds</h1>
-            <form class="text-right grow" id="recents-filter" onsubmit="return false;">
+            <div class="text-right grow">
                 <label>
                     <span>Show:</span>
                     <input class="btn" type="checkbox" name="recents-modern" aria-label="Modern"/>
@@ -73,9 +73,11 @@
                         </g>
                     </svg>
                     <input type="search" name="recents-search" class="grow" placeholder="Search" />
+                    <input type="checkbox" name="recents-search-strict" class="checkbox checkbox-primary" />
+                    <span>Strict</span>
                 </label>
-            </form>
-        </div>
+            </div>
+        </form>
         <div id="recent-builds-list" page="0" total-pages="0"></div>
         <div class="join self-center m-2">
             <button class="join-item btn" id="page-prev">«</button>

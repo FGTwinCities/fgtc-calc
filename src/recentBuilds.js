@@ -247,6 +247,7 @@ async function fetchRecentBuildsPage() {
     var url = `/build?page=${page}`;
     if ($("input[name=recents-modern]").prop("checked")) { url += "&type=modern"; }
     if ($("input[name=recents-mac]").prop("checked")) { url += "&type=mac"; }
+    if ($("input[name=recents-search-strict]").prop("checked")) { url += "&strict_search=true"; }
 
     let searchQuery = $("input[name=recents-search]").val();
     if (searchQuery !== null && searchQuery !== "") {
