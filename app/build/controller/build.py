@@ -17,6 +17,7 @@ from litestar.response import Template, Redirect
 from sqlalchemy import ColumnElement
 
 from app.build.schema import BuildRetrieve
+from app.db.enum import MacType
 from app.db.model import BuildProcessorAssociation, BuildGraphicsAssociation, MacBuild, BuildBase
 from app.db.model.battery import Battery
 from app.db.model.build import Build
@@ -29,6 +30,7 @@ from app.db.service.graphics import provide_graphics_service
 from app.db.service.processor import provide_processor_service
 from app.lib.attrs import attrcopy, attrcopy_allowlist
 from app.lib.math import mb2gb
+from app.lib.util import try_int
 
 
 async def get_macos_version_info(version: Version) -> dict | None:
@@ -45,6 +47,18 @@ async def get_macos_version_info(version: Version) -> dict | None:
                     return release
 
             return None
+
+def try_parse_mac_type(token: str) -> list[MacType]:
+    parsed_types = []
+    for type in MacType:
+        if type == MacType.OTHER:
+            continue
+
+        for type_token in type.__str__().lower().split():
+            if token in type_token:
+                parsed_types.append(type)
+
+    return parsed_types
 
 
 class BuildClassicPaginator(AbstractAsyncClassicPaginator[BuildRetrieve]):
@@ -103,7 +117,12 @@ class BuildController(Controller):
                     | Build.manufacturer.icontains(token)
                     | Build.model.icontains(token)
                     | Build.operating_system.icontains(token)
+                    | MacBuild.year.__eq__(try_int(token))
                 )
+
+                for mac_type in try_parse_mac_type(token):
+                    token_filter = token_filter | MacBuild.mac_type.__eq__(mac_type)
+
                 if strict_search:
                     filters.append(token_filter)
                 else:
