@@ -15,6 +15,7 @@ from litestar.di import Provide
 from litestar.pagination import AbstractAsyncClassicPaginator, T, ClassicPagination
 from litestar.response import Template, Redirect
 from sqlalchemy import ColumnElement
+from sqlalchemy.testing.suite import DistinctOnTest
 
 from app.build.schema import BuildRetrieve
 from app.db.enum import MacType
@@ -29,8 +30,10 @@ from app.db.service.build import provide_build_service, BuildService
 from app.db.service.graphics import provide_graphics_service
 from app.db.service.processor import provide_processor_service
 from app.lib.attrs import attrcopy, attrcopy_allowlist
-from app.lib.math import mb2gb
+from app.lib.math import mb2gb, clamp
 from app.lib.util import try_int
+
+MAX_SEARCH_ITEMS = 100
 
 
 async def get_macos_version_info(version: Version) -> dict | None:
@@ -203,3 +206,18 @@ class BuildController(Controller):
     @get("/create")
     async def legacy_redirect_create_page(self) -> Redirect:
         return Redirect("/build/modern/create")
+
+    @get("/operating_systems")
+    async def search_operating_systems(self, q: str, build_service: BuildService, limit: int = 50) -> Sequence[str]:
+        builds = await build_service.list(
+            BuildBase.class_type.icontains("modern"),
+            Build.operating_system.icontains(q),
+            OrderBy(Build.created_at, "desc"),
+        )
+
+        results = []
+        for b in builds:
+            if b.operating_system not in results:
+                results.append(b.operating_system)
+
+        return results

@@ -87,3 +87,17 @@ function onGraphicsResults(results) {
         $("#graphics-results").append(new Option(item, item));
     }
 }
+
+let OS_SEARCH = new AsyncSearchResultsFetcher("/build/operating_systems", onOsResults);
+
+export function onOsSearchKeyup(event) {
+    OS_SEARCH.updateQuery(event.target.value);
+}
+
+function onOsResults(results) {
+    $("#operating-system-results").empty();
+
+    for (let i = 0; i < results.length; i++) {
+        $("#operating-system-results").append(new Option(results[i], results[i]));
+    }
+}

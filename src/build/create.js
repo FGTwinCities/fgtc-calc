@@ -1,6 +1,6 @@
 import {$} from "jquery";
 
-import {onProcessorSearchKeyup, onGraphicsSearchKeyup} from "./search.js";
+import {onProcessorSearchKeyup, onGraphicsSearchKeyup, onOsSearchKeyup} from "./search.js";
 import {addLoadingTask, removeLoadingTask} from "../main.js";
 
 function normalizeDataSizeMegabytes(quantity, unit) {
@@ -429,6 +429,7 @@ window.addEventListener("load", async function() {
     // Bind events for page
     $("input[name=type]").change(updateVisibleFields);
     $("input[name=mac_type]").change(updateMacSelectedBuildType);
+    $("input[name=operating-system]").keyup(onOsSearchKeyup);
     $("#add-processor-button").click(() => addTemplateListItem('processor-template', 'processor-list'));
     $("#add-memory-button").click(() => addTemplateListItem('memory-template', 'memory-list'));
     $("#add-storage-button").click(() => addTemplateListItem('storage-template', 'storage-list'));
