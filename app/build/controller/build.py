@@ -117,8 +117,10 @@ class BuildController(Controller):
                     | Build.manufacturer.icontains(token)
                     | Build.model.icontains(token)
                     | Build.operating_system.icontains(token)
-                    | MacBuild.year.__eq__(try_int(token))
                 )
+
+                if try_int(token):
+                    token_filter = token_filter | MacBuild.year.__eq__(try_int(token))
 
                 for mac_type in try_parse_mac_type(token):
                     token_filter = token_filter | MacBuild.mac_type.__eq__(mac_type)
