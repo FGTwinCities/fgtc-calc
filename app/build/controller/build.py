@@ -1,20 +1,23 @@
 import datetime
+from email.iterators import typed_subpart_iterator
 from math import ceil
 from typing import Sequence
 from uuid import UUID
 from zoneinfo import ZoneInfo
 
 import dateutil
-from advanced_alchemy.filters import LimitOffset, OrderBy
+from advanced_alchemy.filters import LimitOffset, OrderBy, CollectionFilter, StatementFilter, SearchFilter, \
+    OnBeforeAfter
 from aiohttp import ClientSession
 from litestar import get, delete
 from litestar.controller import Controller
 from litestar.di import Provide
 from litestar.pagination import AbstractAsyncClassicPaginator, T, ClassicPagination
 from litestar.response import Template, Redirect
+from sqlalchemy import ColumnElement
 
 from app.build.schema import BuildRetrieve
-from app.db.model import BuildProcessorAssociation, BuildGraphicsAssociation, MacBuild
+from app.db.model import BuildProcessorAssociation, BuildGraphicsAssociation, MacBuild, BuildBase
 from app.db.model.battery import Battery
 from app.db.model.build import Build
 from app.db.model.display import Display
@@ -46,17 +49,20 @@ async def get_macos_version_info(version: Version) -> dict | None:
 
 class BuildClassicPaginator(AbstractAsyncClassicPaginator[BuildRetrieve]):
     build_service: BuildService
+    filters: list[StatementFilter | ColumnElement[bool]]
 
-    def __init__(self, build_service: BuildService) -> None:
+    def __init__(self, build_service: BuildService, filters: list[StatementFilter | ColumnElement[bool]] = []) -> None:
         self.build_service = build_service
+        self.filters = filters
 
     async def get_total(self, page_size: int) -> int:
-        return ceil(await self.build_service.count() / page_size)
+        return ceil(await self.build_service.count(*self.filters) / page_size)
 
     async def get_items(self, page_size: int, current_page: int) -> list[BuildRetrieve]:
         builds = await self.build_service.list(
             LimitOffset(offset=current_page * page_size, limit=page_size),
             OrderBy(Build.created_at, "desc"),
+            *self.filters,
         )
 
         return [self.build_service.retrieve_schema(b) for b in builds]
@@ -75,8 +81,31 @@ class BuildController(Controller):
     }
 
     @get("/")
-    async def get_builds(self, build_service: BuildService, page: int = 0, page_size: int = 25) -> ClassicPagination[BuildRetrieve]:
-        paginator = BuildClassicPaginator(build_service)
+    async def get_builds(self,
+                         build_service: BuildService,
+                         page: int = 0, page_size: int = 25,
+                         type: list[str] | None = None,
+                         search: str | None = None,
+                         before: datetime.datetime | None = None,
+                         after: datetime.datetime | None = None,
+                         ) -> ClassicPagination[BuildRetrieve]:
+        filters = []
+
+        if type is not None:
+            filters.append(CollectionFilter("class_type", type))
+
+        if search is not None:
+            filters.append(
+                Build.notes.icontains(search)
+                | Build.manufacturer.icontains(search)
+                | Build.model.icontains(search)
+                | Build.operating_system.icontains(search)
+            )
+
+        if before or after:
+            filters.append(OnBeforeAfter("created_at", before, after))
+
+        paginator = BuildClassicPaginator(build_service, filters)
         return await paginator(page_size=page_size, current_page=page)
 
     @get("/{build_id: uuid}")

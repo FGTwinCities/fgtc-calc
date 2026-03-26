@@ -241,23 +241,14 @@ function fillComponentList(list, data, formatFunc) {
 async function fetchRecentBuildsPage() {
     $("#recent-builds-list").children().remove();
 
-    let modern = $("input[name=recents-modern]").prop("checked");
-    let mac = $("input[name=recents-mac]").prop("checked");
-
-    var url = "/build";
-    if (!modern && mac) {
-        url = "/build/mac"
-    } else if (modern && !mac) {
-        url = "/build/modern"
-    } else if (!modern && !mac) {
-        return;
-    }
-
     let entryList = $("#recent-builds-list");
 
     let page = entryList.attr('page');
+    var url = `/build?page=${page}`;
+    if ($("input[name=recents-modern]").prop("checked")) { url += "&type=modern"; }
+    if ($("input[name=recents-mac]").prop("checked")) { url += "&type=mac"; }
 
-    let buildPagination = await $.ajax(url + `?page=${page}`);
+    let buildPagination = await $.ajax(url);
 
     entryList.attr('page', buildPagination['current_page']);
     entryList.attr('total-pages', buildPagination['total_pages']);
