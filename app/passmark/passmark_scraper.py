@@ -92,7 +92,7 @@ def _parse_pe_core_details(tag: Tag) -> PassmarkCoreDetails:
 
     return details
 
-_rate_limiter = RateLimitMiddleware(3, 0.1)
+_rate_limiter = RateLimitMiddleware(2, 0.1)
 
 
 class PassmarkScraper:
